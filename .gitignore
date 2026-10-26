@@ -1,0 +1,21 @@
+# Local credentials and runtime data
+.env
+**/.env
+**/.env.*
+!**/.env.example
+**/.venv/
+**/node_modules/
+**/dist/
+**/storage/
+
+# Generated Python files
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Local source documents and private learning notes
+/发票账单数据/
+/study/
+
+# Editor and OS files
+.DS_Store

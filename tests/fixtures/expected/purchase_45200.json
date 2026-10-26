@@ -1,0 +1,74 @@
+{
+  "scenario_id": "purchase_45200",
+  "scenario_name": "三张采购单据金额与主体一致，期间已付款",
+  "source_directory": "发票账单数据/zhangqing_raw_docs_20261025/01_采购入库付款",
+  "business_policy_fixture": {
+    "tenant_id": "fixture-tenant-zhangqing",
+    "account_set_id": "fixture-account-set-general-vat",
+    "accounting_period": "2024-12",
+    "accounting_date": "2024-12-01",
+    "vat_registration": "GENERAL",
+    "input_vat_deductible": true,
+    "business_use": "inventory_for_resale",
+    "goods_received": true,
+    "bank_settled_in_period": true,
+    "account_mapping": {
+      "inventory": {"code": "1405", "name": "库存商品"},
+      "input_vat": {"code": "222101", "name": "应交税费—应交增值税（进项税额）"},
+      "bank": {"code": "1002", "name": "银行存款"}
+    },
+    "notice": "仅为验收 fixture，不是任何真实企业的默认会计政策。"
+  },
+  "documents": [
+    {
+      "file": "01_数电发票_45200.jpg",
+      "document_type": "VAT_INVOICE",
+      "fields": {
+        "invoice_number": "24360125413017362003",
+        "issue_date": "2024-12-01",
+        "buyer": "南昌市杰盛科技有限公司",
+        "seller": "南昌市视维科技公司",
+        "net_amount": "40000.00",
+        "tax_rate": "13%",
+        "tax_amount": "5200.00",
+        "gross_amount": "45200.00"
+      }
+    },
+    {
+      "file": "02_入库单_45200.jpg",
+      "document_type": "GOODS_RECEIPT",
+      "fields": {
+        "receipt_number": "NO56784001",
+        "receipt_date": "2024-12-01",
+        "item": "教学专用VR眼镜",
+        "quantity": "100",
+        "gross_amount": "45200.00",
+        "received": true
+      }
+    },
+    {
+      "file": "03_银行回单_45200.jpg",
+      "document_type": "BANK_RECEIPT",
+      "fields": {
+        "payer": "南昌市杰盛科技有限公司",
+        "payee": "南昌市视维科技公司",
+        "gross_amount": "45200.00",
+        "settlement_date": "2024-12-01",
+        "settled": true
+      }
+    }
+  ],
+  "expected_business": {
+    "status": "MATCHED",
+    "currency": "CNY",
+    "gross_amount": "45200.00",
+    "blocking_findings": []
+  },
+  "expected_voucher_lines": [
+    {"account_code": "1405", "debit": "40000.00", "credit": "0.00"},
+    {"account_code": "222101", "debit": "5200.00", "credit": "0.00"},
+    {"account_code": "1002", "debit": "0.00", "credit": "45200.00"}
+  ],
+  "expected_voucher_totals": {"debit": "45200.00", "credit": "45200.00"},
+  "expected_final_without_erp_authorization": "EXPORTED_PENDING_MANUAL_POST"
+}

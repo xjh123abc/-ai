@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zhangqing-ai-domain"
+version = "0.1.0"
+description = "Domain modules for Zhangqing AI"
+requires-python = ">=3.12"
+
+[tool.setuptools]
+package-dir = {"" = "packages"}
+
+[tool.setuptools.packages.find]
+where = ["packages"]
+namespaces = true

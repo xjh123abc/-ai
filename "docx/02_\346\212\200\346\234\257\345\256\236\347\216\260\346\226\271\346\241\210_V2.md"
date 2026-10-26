@@ -1,0 +1,262 @@
+# 账清 AI｜技术实现方案 V2.0
+
+更新时间：2026-10-26 · 目的：在既有代码基础上，使「单据 → 业务 → 凭证 → ERP → 财务管理」可实际运行。
+
+此文档是**目标技术契约**，不是宣称相关功能已开发；Codex 必须先检查当前 WSL 仓库。
+
+## 0. 总体架构与保留策略
+
+```text
+Vue 财务工作台
+    │ 上传单据 / 核对 / 审核凭证 / 查询入账
+FastAPI API + RBAC + Workflow Orchestrator
+    │
+    ├─ Evidence / Ingestion：原件存储、图片/OFD/PDF/Excel 读取、OCR、字段证据
+    ├─ Domain / Reconciliation：业务分组、强/弱关联、确定性核对与异常
+    ├─ AI：业务/凭证候选、证据引用、问答（结构化输出；不可直接修改 ERP）
+    ├─ Voucher Service：科目映射、规则校验、版本、审批、凭证状态机
+    ├─ Posting Service：ERP 授权、幂等、提交、写后回读、状态恢复
+    ├─ Connectors：柠檬云官方接口与文件导出/导入适配
+    └─ PostgreSQL / Object Storage / Audit：标准数据、状态、原件和审计
+    │
+    └─ 已有 ERP 账套：正式凭证与账簿唯一权威源
+```
+
+沿用 Vue 3 + TypeScript + Vite、FastAPI + Pydantic、PostgreSQL、Python Decimal 和现有的租户/来源/核对/证据/工单/审计能力。先按模块化单体实现，不凭想象引入微服务、消息总线或复杂多 Agent。
+
+旧版 `packages/ai` 只读解释策略修改为：**AI 可以建议结构化字段、业务匹配和会计分录，但所有事实金额由可追溯的原件和规则计算决定，提交权限仍只在后端 Posting Service。**
+
+如新增 `packages/documents`、`packages/vouchers`、`packages/posting`，先写简短 ADR 说明依赖/数据归属；不得另建正式总账。
+
+## 1. 单据处理与数据契约
+
+### 1.1 文件类型
+
+首选可落地入口：JPG/PNG/PDF 图片及文本、电子发票结构化文件、Excel/CSV。OFD 若项目缺少可验证解析器，应记录 `UNSUPPORTED_FORMAT` 并提示转换/人工上传，不得虚构兼容。类型覆盖：
+
+- 发票（多张增值税电子/纸质照片，红字/普通/专用类型区分）；
+- 入库单/收货单；
+- 银行电子回单/交易流水；
+- 支付证明单/付款通知（**付款申请或证明不等于银行实际支付完成**）；
+- 购销合同（可能多页）；
+- 验收报告（可能多页）。
+
+批次可上传多张，不能默认同一批文件一定是同一笔业务。
+
+### 1.2 新增/扩展最小逻辑表
+
+| 表/实体 | 必要字段 |
+|---|---|
+| `document_assets` | id,tenant_id,account_set_id,sha256,mime_type,object_key,origin,uploaded_by,uploaded_at,processing_status |
+| `document_pages` | document_id,page_no,width,height,text_content,extraction_version |
+| `document_extractions` | document_id,doc_type,field_key,value_raw,value_normalized,confidence,evidence_page,evidence_bbox,evidence_text,model_version,verified_by |
+| `business_events` | id,tenant_id,account_set_id,event_type,party_ref,amount,currency,event_date,status,version,policy_version |
+| `business_event_documents` | event_id,document_id,role,relation_type,reason,confidence,confirmed_by |
+| `voucher_drafts` | id,event_id,account_set_id,period,date,status,version,creator,source_hash,policy_version,approval_id |
+| `voucher_draft_lines` | draft_id,seq,account_code,debit,credit,description,auxiliary_json,evidence_refs |
+| `voucher_validations` | draft_id,draft_version,rule_id,rule_version,status,details |
+| `voucher_approvals` | draft_id,draft_version,approver,decision,reason,occurred_at |
+| `posting_attempts` | draft_id,draft_version,connector,environment,idempotency_key,request_hash,attempt_status,external_voucher_id,response_digest,verified_at |
+| `audit_events` | tenant_id,actor,event_type,entity_ref,before_hash,after_hash,source_refs,occurred_at |
+
+保留旧版 `source_snapshots`、`match_groups`、`exception_cases`、`account_sets`、`chart_accounts` 等实体；上述表与项目已有表合并而非重复创建。金额为 NUMERIC，API JSON 金额为字符串。
+
+### 1.3 提取输出示例（候选，不是账务真值）
+
+```json
+{
+  "document_id": "doc_038",
+  "document_type": "VAT_INVOICE",
+  "fields": {
+    "invoice_number": {"value": "待从图像读取", "source_page": 1, "bbox": null, "status": "UNVERIFIED"},
+    "gross_amount": {"value": "45200.00", "source_page": 1, "bbox": [100,150,400,190], "status": "EXTRACTED"},
+    "net_amount": {"value": "40000.00", "source_page": 1, "bbox": null, "status": "EXTRACTED"},
+    "tax_amount": {"value": "5200.00", "source_page": 1, "bbox": null, "status": "EXTRACTED"}
+  },
+  "extraction_engine": "adapter_version",
+  "needs_review": false
+}
+```
+
+此例是数据契约展示；文件号、bbox 等须真实提取，不能把示例坐标写进生产数据。字段修改保留 `original_value / corrected_value / actor / timestamp`，账务候选必须绑定特定抽取版本。
+
+### 1.4 OCR 与模型边界
+
+- 本地 PDF/文本解析优先；扫描件、图片使用 OCR/具备视觉能力的识别组件；发票行/税额必要时由规则复核。
+- DeepSeek 可以作为**结构化文本推理/会计候选模型**；若当前部署型号不支持图片，就先用 OCR/视觉提供方抽取，再将脱敏结构字段交给 DeepSeek。**不可仅凭 `/health` 中的 `model=deepseek-flash` 声称有图像识别能力。**
+- 封装 `ExtractionProvider`、`AccountingSuggestionProvider`，确保能替换模型而不改业务 API；所有 JSON 用 Pydantic 验证，带证据引用和失败原因。
+- 未经授权不要将完整发票、合同、银行账号等敏感资料发送外部模型；服务端最小字段、脱敏和审计。
+
+## 2. 业务关联与金额规则
+
+1. 先依据发票号、统一社会信用代码、合同/订单号、银行参考号、ERP 业务外键建立**强关系**；金额/日期窗口/近似名称只能建立候选。
+2. 允许 1 订单→N 入库→M 发票→K 支付；也允许跨订单合并支付及部分清偿；一个单据可参与多个有明确分配金额的业务组。
+3. 规则必须把「发票已开」「付款申请获批」「银行已清算」「货物已验收」「会计凭证已入账」视为不同事实。
+4. 核对状态 `MATCHED / PARTIAL / NEEDS_REVIEW / INSUFFICIENT_EVIDENCE`，记录条件、差异、原始证据、规则版本，不把差异一律标为损失。
+5. 若 OCR 文本模糊、金额冲突、票号重复或无法确定主体，禁止自动审批/正式写入；请求人工修正。
+
+## 3. 凭证生成与核算安全
+
+### 3.1 规则与会计政策
+
+财务负责人配置/确认：会计准则、纳税人类型、科目表与末级可用科目、辅助核算、税额抵扣前提、库存/固定资产/费用用途判定、往来科目、会计期间、币种和不同业务入账时点。
+
+会计处理分为：**AI 提出分录候选** → **后端根据规则与证据重算金额** → **财务确认会计判断** → **锁定版本审批**。分录须符合：
+
+- 借贷金额 `sum(debit) == sum(credit)`；
+- 每笔金额有来源、合理的税额/含税公式、合法科目；
+- 科目是当前账套可用的末级科目、必填辅助核算齐全；
+- 期间未锁定、未重复记账、红字/退货正确处理；
+- 关联银行付款时必须区分银行清算与应付应计；
+- 同一发票不被错误重复入账；允许有凭证拆分的明确分配规则。
+
+**示例仅在指定前提下成立**：
+
+```text
+采购 100 副用于转售的 VR 眼镜，一般纳税人，合法可抵扣进项税，
+已验收入库且同期间付款：
+借：库存商品                         40,000.00
+借：应交税费—应交增值税（进项税额）   5,200.00
+  贷：银行存款                       45,200.00
+```
+
+业务前提不同即可能分录不同；AI 不得见到发票就武断决定库存商品还是固定资产。
+
+### 3.2 状态机
+
+```text
+DRAFT
+  -> VALIDATED
+  -> PENDING_APPROVAL
+  -> APPROVED
+  -> SUBMITTING
+  -> POSTED_PENDING_VERIFY
+  -> VERIFIED
+
+分支：
+  -> NEEDS_REVIEW    证据/科目/税额缺失或冲突
+  -> REJECTED        有权限者拒绝
+  -> FAILED          已确认提交失败、没有入账
+  -> UNKNOWN         网络超时/结果不能确认，必须查重/回读
+  -> EXPORTED_PENDING_MANUAL_POST  只导出凭证文件，没有写入
+```
+
+变更已批准的凭证草稿生成新 `draft_version` 并要求重新审批。审核和写入不能单凭前端按钮本地改状态；后端检查 RBAC/职责分离/版本号/幂等键并写审计。
+
+## 4. 柠檬云及其他 ERP 接入
+
+官方公开接口文档截至审查时列出记账接口 `POST /api/Voucher/Voucher/AddVoucher`、科目/账套查询、凭证查询等；这只属于 **DOCUMENTED**。特定第三方应用/企业账套是否得到 **AUTHORIZED**，以及是否已在测试账套跑通 **VERIFIED**，仍待实际验证。
+
+接口资料（需重新核对官方版本）：
+
+- `https://open2.ningmengyun.com/Home/Introduction`
+- `https://open2.ningmengyun.com/Content/h5/AccApiDecription.html`
+
+### 4.1 读写适配器
+
+```python
+class AccountingConnector(Protocol):
+    def get_account_sets(self, authorization): ...
+    def get_chart_of_accounts(self, account_set_id): ...
+    def get_vouchers(self, account_set_id, period): ...
+    def can_create_voucher(self, account_set_id) -> bool: ...
+    def create_voucher(self, approved_payload, idempotency_context): ...
+    def find_voucher(self, account_set_id, external_reference): ...
+```
+
+接口与实际字段必须由官方文档/授权响应确定；示例内部 `ApprovedVoucherPayload` 不可当作第三方 JSON 原样发出。
+
+写入网关要求：
+
+1. 用户已主动授权第三方应用和具体账套的写入，生产与沙盒凭据隔离；后台记录 `authorization_scope`。
+2. 提交前再次检查已审批的不可变版本、有效期间、重复风险、科目存在、金额平衡。
+3. `posting_attempts` 持久化本地幂等键；限制并发重复点击，写入后保存 ERP 响应摘要（不含 Token）。
+4. 通过获取 ERP 凭证接口，按账套、期间、凭证号/ID、行项目、金额**写后回读**。只有核对一致才 `VERIFIED`。
+5. 网络超时无法证明未写入时进入 `UNKNOWN`，先查询 ERP 结果/人工核实；不得自动重发造成重复入账。
+6. 如官方接口无权调用，系统可生成明确格式的导出文件及人工入账指引，状态为 `EXPORTED_PENDING_MANUAL_POST`，绝不能伪称已正式记账。
+
+这里不提供自动删除、自动修改已入账正式凭证的入口；冲红与调整须设计单独可审批流程。
+
+## 5. 对内 API（参考契约，先检查现有路由）
+
+| 方法 + 路由 | 用途 |
+|---|---|
+| `POST /api/v1/documents` | 上传多文件，返回 document_id、batch_id、每文件状态 |
+| `GET /api/v1/documents/{id}` | 文件预览、字段和来源证据，权限校验 |
+| `PATCH /api/v1/documents/{id}/extraction` | 人工纠正提取结果，带 expected_version |
+| `POST /api/v1/document-batches/{id}/process` | 异步触发识别与业务关联 |
+| `GET /api/v1/business-events` | 当前租户/账套的业务分组与状态 |
+| `GET /api/v1/business-events/{id}` | 所有关联单据、候选关系、核对和异常 |
+| `POST /api/v1/business-events/{id}/reconcile` | 重跑确定性规则，产生可重放结果 |
+| `POST /api/v1/business-events/{id}/voucher-drafts` | 生成凭证候选；不可直接写 ERP |
+| `GET /api/v1/voucher-drafts/{id}` | 草稿行、证据、规则校验与版本 |
+| `POST /api/v1/voucher-drafts/{id}/validate` | 后端重算和规则检查 |
+| `POST /api/v1/voucher-drafts/{id}/submit-review` | 提交审批 |
+| `POST /api/v1/voucher-drafts/{id}/approve` | 有权限者审批，锁定草稿版本 |
+| `POST /api/v1/voucher-drafts/{id}/post` | 服务端受控 ERP 写入；必须经授权审批 |
+| `GET /api/v1/voucher-drafts/{id}/posting-status` | 写回/回读状态与 ERP 凭证号 |
+| `POST /api/v1/voucher-drafts/{id}/export` | 导出 ERP 可用凭证文件并留审计 |
+| `GET /api/v1/insights/summary` | 已授权数据范围内的财务指标与依据 |
+
+遵循旧 API 的版本号/错误结构与鉴权中间件；若已有等价端点，扩展而不是复制一套平行 API。
+
+示例状态码：202 任务排队不等于完成，403 没权限，409 版本冲突，422 规则不通过，503 外部 ERP 暂不可用；未授权要提供明显业务错误代码。
+
+## 6. 前端/后端操作顺序
+
+```python
+def process_batch(tenant_id, account_set_id, uploaded_files):
+    assets = evidence.save_immutable_originals(uploaded_files)
+    extracted = ingestion.extract_with_evidence(assets)
+    groups = reconciliation.propose_business_links(extracted)
+    return groups  # 用户校正候选关系
+
+def generate_voucher(event_id, approved_policy, actor):
+    event = domain.load_confirmed_event(event_id)
+    findings = reconciliation.verify(event)
+    if findings.blocking or not event.evidence_sufficient:
+        return cases.raise_need_review(event, findings)
+    suggestion = ai.propose_journal(event, approved_policy) # 仅建议
+    draft = vouchers.create_versioned_draft(event, suggestion, actor)
+    return vouchers.validate_with_decimal(draft, approved_policy)
+
+def post_approved_voucher(draft_id, actor):
+    draft = vouchers.get_approved_locked_version(draft_id)
+    auth.require_write_permission(actor, draft.account_set_id)
+    vouchers.revalidate(draft)
+    attempt = posting.begin_idempotent_attempt(draft)
+    response = connectors.for_account_set(draft.account_set_id).create_voucher(attempt.payload)
+    return posting.verify_or_mark_unknown(attempt, response)
+```
+
+伪代码不等于建议盲调生产写入。必须对“第三方请求已经到达但回执丢失”保留 UNKNOWN 和人工确认分支。
+
+## 7. 测试与数据集
+
+用上一轮整理的 **15 张原始单据图片 ZIP** 作为图像输入样本（只包含图片，没有标准答案），并在独立 `tests/fixtures/expected/` 中人工制定预期值，不要向原始图包里添加说明文件。
+
+必测：
+
+1. 三张 45,200 元相关文件分别完成分类、金额抽取、业务关联；生成符合指定政策的借贷平衡候选；
+2. 4,448 元餐饮住宿发票、银行回单、支付证明能正确关联；不同税项和费用用途须配置/审核；
+3. 合同 904,000 元与两页验收报告应关联成一笔交付验收事件，多页材料不得丢页；
+4. 6780 元电脑发票/回单匹配；多张独立来源发票不能错误合并；
+5. 重复上传相同文件、同一发票重复记账、缺银行回单、少入库、票款差额、无法识别金额均正确处理；
+6. 草稿金额/科目/期间错误不得批准与写回；低权限者无法调用 post；
+7. Mock Connector 写回 + 回读一致才 VERIFIED；模拟断网超时 → UNKNOWN，不得再次盲写；
+8. 无真实 ERP 写入权限 → 可导出但状态不是 VERIFIED；
+9. 企业 A 不得读取/引用/写入企业 B 的单据、凭证或账套；
+10. Playwright 端到端：上传 → 识别 → 业务核对 → 凭证预览 → 审核 → 测试写回/导出 → 正确状态回显。
+
+评测指标按 **字段抽取**、**业务关联**、**凭证建议**、**规则拦截**、**ERP 状态一致性** 分开统计，不要仅用一个大模型响应评分掩盖错误。
+
+## 8. 实施次序和迁移
+
+- **S0**：定位现有代码/文档，跑现有测试，更新 ADR、PRD、AGENTS，建差异/测试清单。
+- **S1**：单据中心与图像/文件解析，保留原始证据和修正回路，完成 45,200 元样例抽取。
+- **S2**：业务关联/核对 → 生成草稿 → 校验/审批；新增凭证中心最小页面。
+- **S3**：ERP 测试适配（在官方授权已验证时）+ 回写、回读、幂等；未授权时导出模式可完整演示。
+- **S4**：财务总览与有限度的实际数据问答、异常/对账联动，端到端回归，测试结果和阻塞项交付。
+
+所有阶段先检查现有模块是否已实现；按最小修改原则复用。切勿移动/覆盖用户 WSL 中未提交代码。
+
