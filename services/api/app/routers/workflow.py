@@ -9,19 +9,20 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field, field_validator
-from sqlalchemy import func, or_, select
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db.models import (AccountSet, AccountingPolicy, AppUser, AuditEvent, BusinessEvent, BusinessEventAssignment, BusinessEventDocument,
                            AccountingPeriod, DocumentAsset, DocumentExtraction, ExceptionCase, Tenant,
-                           TenantMembership, VoucherApproval, VoucherDraft, VoucherDraftLine, ChartAccount)
+                           TenantMembership, VoucherApproval, VoucherDraft, VoucherDraftLine, ChartAccount, PostingAttempt)
 from app.db.session import db_session
 from app.ocr import OcrImageTooLargeError, extract_image, extract_pdf
 from ai.suggestions import (AccountingSuggestionProvider, DeepSeekAccountingSuggestionProvider,
-    SuggestedAccount, SuggestionProviderError, VoucherSuggestionContext)
+    SOURCE_FACT_FIELDS, SuggestedAccount, SuggestionProviderError, VoucherSuggestionContext)
 from app.security import Principal, current_principal, require
+from domain.settlement import normalize_bank_settlement_state
 from app.structured_files import extract_csv, extract_xlsx
 from ingestion.candidates import field_candidates, normalize_date_value
 from connectors.csv_export import GenericCsvVoucherExporter, VoucherExportData, VoucherExportLine
@@ -62,6 +63,44 @@ def latest_accounting_policy(db: Session, account_set_id: str, business_type: st
 
 def accounting_policy_ref(business_type: str, version: int) -> str:
     return f"accounting-policy:{business_type}:v{version}"
+
+
+def validate_voucher_amounts_and_accounts(lines, configuration: dict | None,
+                                          net: Decimal, tax: Decimal, gross: Decimal) -> None:
+    allowed_codes = set(configuration["allowed_account_codes"]) if configuration else None
+    if allowed_codes is not None and any(line.account_code not in allowed_codes for line in lines):
+        raise HTTPException(422, "分录科目不在当前会计政策允许范围内")
+    if any((line.debit == 0) == (line.credit == 0) or line.debit < 0 or line.credit < 0
+           for line in lines):
+        raise HTTPException(422, "每条分录必须只填写借方或贷方正金额")
+    debit = sum((line.debit for line in lines), Decimal("0.00"))
+    credit = sum((line.credit for line in lines), Decimal("0.00"))
+    if debit != credit:
+        raise HTTPException(422, "借贷不平")
+    if net + tax != gross or debit != gross:
+        raise HTTPException(422, "凭证金额与已确认发票金额不一致")
+    if not configuration:
+        return
+    treatment = configuration["tax_treatment"]
+    tax_codes = set(configuration["input_tax_account_codes"])
+    if treatment == "DEDUCTIBLE":
+        tax_debit = sum((line.debit for line in lines if line.account_code in tax_codes), Decimal("0.00"))
+        tax_credit = sum((line.credit for line in lines if line.account_code in tax_codes), Decimal("0.00"))
+        if tax_debit != tax or tax_credit or debit - tax_debit != net:
+            raise HTTPException(422, "进项税分录与已确认税额及税务政策不一致")
+    elif any(line.account_code in tax_codes for line in lines):
+        raise HTTPException(422, "不可抵扣政策不能使用进项税科目")
+
+
+def validate_voucher_evidence(lines, linked_documents, tax_codes: set[str]) -> None:
+    linked_ids = {link.document_id for link in linked_documents}
+    invoice_ids = {link.document_id for link in linked_documents if link.role == "INVOICE"}
+    for line in lines:
+        refs = set(line.evidence_refs)
+        if not refs or not refs.issubset(linked_ids):
+            raise HTTPException(422, "分录引用了未关联的来源单据或缺少证据引用")
+        if line.account_code in tax_codes and line.debit and not refs.intersection(invoice_ids):
+            raise HTTPException(422, "进项税分录必须引用关联发票")
 
 
 def rental_direct_expense_confirmation_is_current(event: BusinessEvent, policy: AccountingPolicy) -> bool:
@@ -108,13 +147,25 @@ def public_extraction_fields(fields: dict) -> tuple[dict, dict | None]:
 DOCUMENT_TYPE_FIELDS = {
     "VAT_INVOICE": {"invoice_number", "issue_date", "buyer", "seller", "net_amount", "tax_rate", "tax_amount", "gross_amount"},
     "GOODS_RECEIPT": {"receipt_number", "receipt_date", "item", "quantity", "gross_amount", "received"},
-    "BANK_RECEIPT": {"payer", "payee", "settlement_date", "gross_amount", "settled"},
+    "BANK_RECEIPT": {"payer", "payee", "settlement_date", "gross_amount", "settled",
+                     "payer_account_number", "payee_account_number", "bank_account_number", "bank_name",
+                     "electronic_receipt_number", "transaction_id"},
     "PAYMENT_PROOF": {"proof_number", "payment_date", "payer", "payee", "purpose", "gross_amount", "approved"},
     "CONTRACT": {"contract_number", "contract_date", "buyer", "seller", "item", "ordered_quantity", "gross_amount"},
     "ACCEPTANCE_REPORT": {"acceptance_date", "acceptance_result"},
     "TAXI_RECEIPT": {"invoice_number", "issue_date", "gross_amount"},
     "TOLL_RECEIPT": {"receipt_number", "issue_date", "gross_amount"},
 }
+AUXILIARY_FIELD_KEYS = {"payer_account_number", "payee_account_number", "bank_account_number",
+                        "bank_name", "electronic_receipt_number", "transaction_id"}
+
+def fill_ocr_auxiliary_fields(fields: dict, full_text: str, lines: list[dict]) -> dict:
+    result = dict(fields)
+    candidates = field_candidates(full_text, lines)
+    for key in AUXILIARY_FIELD_KEYS:
+        if not result.get(key, {}).get("normalized_value") and candidates[key].get("normalized_value"):
+            result[key] = candidates[key]
+    return result
 
 @router.post("/documents")
 async def upload_document(file: UploadFile = File(...), db: Session = Depends(db_session), who: str = Depends(actor), principal: Principal = Depends(current_principal)):
@@ -179,11 +230,18 @@ async def upload_document(file: UploadFile = File(...), db: Session = Depends(db
 
 @router.get("/documents")
 def list_documents(page: int = Query(default=1, ge=1), page_size: int = Query(default=20, ge=1, le=100),
+                   work_queue: bool = False,
                    db: Session = Depends(db_session), principal: Principal = Depends(current_principal)):
     require_document_read(principal)
     tenant, account = active_scope(db, principal)
     query=apply_document_read_scope(select(DocumentAsset).where(
         DocumentAsset.tenant_id == tenant.id, DocumentAsset.account_set_id == account.id),principal)
+    if work_queue:
+        archived_document_ids = (select(BusinessEventDocument.document_id)
+            .join(BusinessEvent, BusinessEvent.id == BusinessEventDocument.event_id)
+            .join(VoucherDraft, VoucherDraft.event_id == BusinessEvent.id)
+            .where(BusinessEvent.account_set_id == account.id, VoucherDraft.status != "REJECTED"))
+        query = query.where(DocumentAsset.id.not_in(archived_document_ids))
     total = db.scalar(select(func.count()).select_from(query.subquery())) or 0
     rows = db.scalars(query.order_by(DocumentAsset.uploaded_at.desc())
         .offset((page - 1) * page_size).limit(page_size)).all()
@@ -199,12 +257,15 @@ def list_documents(page: int = Query(default=1, ge=1), page_size: int = Query(de
         BusinessEvent, BusinessEvent.id == BusinessEventDocument.event_id).where(
             BusinessEventDocument.document_id.in_(row_ids), BusinessEvent.tenant_id == tenant.id,
             BusinessEvent.account_set_id == account.id), principal)
-    event_links = db.execute(event_link_query).all() if row_ids else []
+    event_links = db.execute(event_link_query.order_by(
+        BusinessEvent.created_at.desc(), BusinessEventDocument.id.desc())).all() if row_ids else []
     events_by_document: dict[str, list[dict]] = {}
     for link, event in event_links:
-        events_by_document.setdefault(link.document_id, []).append({
+        if link.document_id in events_by_document:
+            continue
+        events_by_document[link.document_id] = [{
             "id": event.id, "status": event.status, "role": link.role,
-        })
+        }]
     required_fields = {
         "VAT_INVOICE": ("invoice_number", "issue_date", "buyer", "seller", "net_amount", "tax_amount", "gross_amount"),
         "GOODS_RECEIPT": ("receipt_number", "receipt_date", "item", "quantity", "gross_amount", "received"),
@@ -220,7 +281,14 @@ def list_documents(page: int = Query(default=1, ge=1), page_size: int = Query(de
         return value.get("normalized_value") if isinstance(value, dict) else value
     def document_summary(document: DocumentAsset):
         extraction = extraction_by_document.get(document.id)
-        fields = extraction.fields if extraction else {}
+        fields = dict(extraction.fields) if extraction else {}
+        if extraction and extraction.status == "NEEDS_REVIEW" and extraction.full_text:
+            fresh_amount = field_candidates(extraction.full_text, extraction.lines).get("gross_amount")
+            saved_amount = fields.get("gross_amount")
+            if (fresh_amount and fresh_amount.get("normalized_value")
+                    and isinstance(saved_amount, dict) and not saved_amount.get("bbox")
+                    and fresh_amount.get("bbox")):
+                fields["gross_amount"] = fresh_amount
         document_type = extraction.document_type if extraction else "UNCLASSIFIED"
         required = required_fields.get(document_type, ())
         missing_fields = [key for key in required if candidate_value(fields, key) in (None, "")]
@@ -238,10 +306,9 @@ def list_documents(page: int = Query(default=1, ge=1), page_size: int = Query(de
         DocumentAsset.tenant_id == tenant.id, DocumentAsset.account_set_id == account.id,
         DocumentAsset.id.not_in(linked_ids)), principal)
     unlinked_total = db.scalar(select(func.count()).select_from(unlinked_query.subquery())) or 0
+    visible_document_ids = query.with_only_columns(DocumentAsset.id).order_by(None)
     status_counts = dict(db.execute(select(DocumentAsset.processing_status, func.count())
-        .where(DocumentAsset.tenant_id == tenant.id, DocumentAsset.account_set_id == account.id,
-            DocumentAsset.id.in_(apply_document_read_scope(select(DocumentAsset.id).where(
-                DocumentAsset.tenant_id == tenant.id, DocumentAsset.account_set_id == account.id), principal)))
+        .where(DocumentAsset.id.in_(visible_document_ids))
         .group_by(DocumentAsset.processing_status)).all())
     return {"items": [document_summary(document) for document in rows],
             "page": page, "page_size": page_size, "total": total,
@@ -309,6 +376,20 @@ def document_detail(document_id: str, version: int | None = Query(default=None, 
     else:
         e = extractions[0] if extractions else None
     current_fields, current_type_candidate = public_extraction_fields(e.fields) if e else ({}, None)
+    if e and version is None:
+        current_fields = fill_ocr_auxiliary_fields(current_fields, e.full_text, e.lines)
+        if e.status == "NEEDS_REVIEW" and e.full_text:
+            recovered = field_candidates(e.full_text, e.lines)
+            for key, candidate in recovered.items():
+                if key == "document_type_candidate":
+                    if not current_type_candidate or not current_type_candidate.get("normalized_value"):
+                        current_type_candidate = candidate
+                    continue
+                current = current_fields.get(key)
+                if (candidate.get("normalized_value") not in (None, "")
+                        and (not isinstance(current, dict) or current.get("normalized_value") in (None, "")
+                             or (key == "gross_amount" and not current.get("bbox") and candidate.get("bbox")))):
+                    current_fields[key] = candidate
     return {"id": d.id, "filename": d.original_filename, "status": d.processing_status,
             "extraction": None if not e else {"version": e.version, "document_type": e.document_type,
                 "fields": current_fields, "document_type_candidate": current_type_candidate,
@@ -385,15 +466,21 @@ def confirm_fields(document_id: str, body: ConfirmFields, db: Session = Depends(
     if not prev or prev.version != body.expected_version: raise HTTPException(409, "字段版本冲突，请刷新后重试")
     allowed_fields = DOCUMENT_TYPE_FIELDS.get(body.document_type)
     if allowed_fields is not None:
+        allowed_fields = allowed_fields | AUXILIARY_FIELD_KEYS
+    if allowed_fields is not None:
         unexpected_fields = set(body.fields) - allowed_fields
         if unexpected_fields:
             raise HTTPException(422, "字段与所选单据类型不匹配，请检查字段类型")
-    fields = dict(prev.fields)
+    fields = fill_ocr_auxiliary_fields(prev.fields, prev.full_text, prev.lines)
     fields.pop("document_type_candidate", None)
     if allowed_fields is not None:
         fields = {key: value for key, value in fields.items() if key in allowed_fields}
     for key, value in body.fields.items():
         normalized_value = value
+        if key == "settled":
+            normalized_value = normalize_bank_settlement_state(value)
+            if normalized_value is None:
+                raise HTTPException(422, "银行清算状态只能是已清算、未清算或无法确认")
         if key in {"issue_date", "receipt_date", "settlement_date", "payment_date", "acceptance_date"}:
             normalized_value, _ = normalize_date_value(str(value))
             normalized_value = normalized_value or value
@@ -491,7 +578,7 @@ def create_event(body: EventCreate, db: Session = Depends(db_session), who: str 
         raise HTTPException(422, "请先配置并确认租赁直接费用政策，再逐笔确认合同适用该政策")
     policy_version = accounting_policy_ref(body.event_type, configured_policy.version) if configured_policy else {
         "EXPENSE": "unconfigured-expense-v1", "ASSET_PURCHASE": "unconfigured-asset-v1",
-        "RENTAL": "unconfigured-rental-v1"}.get(body.event_type, "fixture-purchase-v1")
+        "RENTAL": "unconfigured-rental-v1"}.get(body.event_type, "account-set-chart-v1")
     event = BusinessEvent(tenant_id=tenant.id, account_set_id=account.id, event_type=body.event_type, status="NEEDS_REVIEW",
         currency="CNY", policy_version=policy_version, findings=[], created_by=who, request_hash=request_hash,
         rental_direct_expense_confirmed=body.event_type == "RENTAL" and body.rental_direct_expense_confirmed,
@@ -617,6 +704,8 @@ def reconcile(event_id: str, db: Session = Depends(db_session), who: str = Depen
     configured_policy = latest_accounting_policy(db, account.id, event.event_type) if (is_expense or is_asset_purchase or is_rental) else None
     if configured_policy:
         event.policy_version = accounting_policy_ref(event.event_type, configured_policy.version)
+    elif event.event_type == "PURCHASE":
+        event.policy_version = "account-set-chart-v1"
     required = ({"INVOICE", "BANK_RECEIPT", "PAYMENT_PROOF"} if is_expense else
                 {"INVOICE", "BANK_RECEIPT"} if is_asset_purchase or is_rental else
                 {"INVOICE", "GOODS_RECEIPT", "BANK_RECEIPT"})
@@ -697,16 +786,20 @@ def reconcile(event_id: str, db: Session = Depends(db_session), who: str = Depen
             elif received_quantity > ordered_quantity:
                 findings.append({"code":"GOODS_RECEIPT_QUANTITY_EXCEEDS_ORDER","ordered_quantity":str(ordered_quantity),
                                  "received_quantity":str(received_quantity),"severity":"BLOCKING"})
-    if bank_receipts and any(value(fields,"settled") not in (True,"true","True") for fields in bank_receipts):
-        findings.append({"code":"BANK_SETTLEMENT_NOT_CONFIRMED","severity":"BLOCKING"})
+    for fields in bank_receipts:
+        settlement_state = normalize_bank_settlement_state(value(fields, "settled"))
+        if settlement_state == "NOT_SETTLED":
+            findings.append({"code":"BANK_SETTLEMENT_NOT_CONFIRMED","severity":"BLOCKING"})
+        elif settlement_state != "SETTLED":
+            findings.append({"code":"BANK_SETTLEMENT_STATUS_UNKNOWN","severity":"REVIEW"})
     if (is_expense or is_asset_purchase or is_rental) and configured_policy is None:
         policy_finding = "EXPENSE_ACCOUNT_POLICY_REVIEW_REQUIRED" if is_expense else \
             "ASSET_CAPITALIZATION_POLICY_REVIEW_REQUIRED" if is_asset_purchase else "RENTAL_ACCOUNT_POLICY_REVIEW_REQUIRED"
         findings.append({"code":policy_finding,"severity":"REVIEW"})
     elif configured_policy is not None:
-        for code in (configured_policy.configuration.get("debit_account_code"),
-                     configured_policy.configuration.get("bank_account_code"),
-                     configured_policy.configuration.get("input_tax_account_code")):
+        if not configured_policy.configuration.get("allowed_account_codes"):
+            findings.append({"code": "ACCOUNTING_POLICY_RECONFIRM_REQUIRED", "severity": "REVIEW"})
+        for code in configured_policy.configuration.get("allowed_account_codes", []):
             if not code:
                 continue
             account_row = db.scalar(select(ChartAccount).where(
@@ -724,7 +817,7 @@ def reconcile(event_id: str, db: Session = Depends(db_session), who: str = Depen
         except (ValueError,TypeError): findings.append({"code":"DATE_EVIDENCE_MISSING_OR_INVALID","role":role,"severity":"BLOCKING"})
     all_dates=[day for values in parsed_dates.values() for day in values]
     if len(all_dates) != len(date_sets) or (all_dates and len({d.strftime("%Y-%m") for d in all_dates})!=1):
-        findings.append({"code":"FIXTURE_PERIOD_MISMATCH","severity":"BLOCKING"})
+        findings.append({"code":"DOCUMENT_PERIOD_MISMATCH","severity":"BLOCKING"})
     invoice_buyers=[value(fields,"buyer") for fields in invoices]
     invoice_sellers=[value(fields,"seller") for fields in invoices]
     bank_payers=[value(fields,"payer") for fields in bank_receipts]
@@ -757,7 +850,7 @@ def reconcile(event_id: str, db: Session = Depends(db_session), who: str = Depen
                "policy_version":event.policy_version,
                "extraction_versions":{link.document_id:link.extraction_version for link,_ in docs}});db.commit()
     if configured_policy:
-        note = f"本次核对使用财务负责人确认的账套政策 {event.policy_version}；规则结果和凭证仍需人工审批，未写入 ERP。"
+        note = f"本次核对使用财务负责人确认的账套政策 {event.policy_version}；核对结果和凭证仍需人工审批，未写入 ERP。"
     elif is_expense:
         note = "费用科目政策尚未配置并确认；支付证明不代替银行清算证据。"
     elif is_asset_purchase:
@@ -765,7 +858,7 @@ def reconcile(event_id: str, db: Session = Depends(db_session), who: str = Depen
     elif is_rental:
         note = "租赁会计政策尚未配置并确认；合同和租赁处理方式需要财务确认。"
     else:
-        note = "此规则只覆盖明确关联的采购 fixture，不代表通用会计规则。"
+        note = "单据证据已核对；凭证科目由 DeepSeek 从当前账套有效科目中提出，仍需人工审核。"
     return {"id":event.id,"status":event.status,"amount":str(event.amount) if event.amount is not None else None,
             "rule_version":event.policy_version,"findings":event.findings,
             "note":note}
@@ -781,6 +874,8 @@ def create_voucher(event_id: str, db: Session = Depends(db_session), who: str = 
     if event.event_type in {"EXPENSE", "ASSET_PURCHASE", "RENTAL"}:
         if configured_policy is None:
             raise HTTPException(422, "该业务类型尚未配置并确认账套会计政策，当前不能生成凭证草稿")
+        if not configured_policy.configuration.get("allowed_account_codes"):
+            raise HTTPException(422, "旧版会计政策缺少允许科目范围，请财务负责人重新确认")
         current_policy_ref = accounting_policy_ref(event.event_type, configured_policy.version)
         if event.policy_version != current_policy_ref:
             raise HTTPException(409, "会计政策已更新，请重新运行核对后再生成凭证")
@@ -837,9 +932,11 @@ def create_voucher(event_id: str, db: Session = Depends(db_session), who: str = 
                 duplicate_invoice_number=identity[0]
                 break
             seen_invoice_identities.add(identity)
+        first_source_link_id = min(link.id for link in event.documents)
         linked_invoices=db.execute(select(BusinessEventDocument,BusinessEvent).join(BusinessEvent,BusinessEvent.id==BusinessEventDocument.event_id)
             .where(BusinessEvent.tenant_id==tenant.id,BusinessEvent.account_set_id==account.id,
-                   BusinessEventDocument.role=="INVOICE",BusinessEvent.id!=event.id)).all()
+                   BusinessEventDocument.role=="INVOICE",BusinessEvent.id!=event.id,
+                   BusinessEventDocument.id < first_source_link_id)).all()
         for link,other_event in linked_invoices:
             other_extraction=db.scalar(select(DocumentExtraction).where(DocumentExtraction.document_id==link.document_id,
                                                                           DocumentExtraction.version==link.extraction_version))
@@ -875,16 +972,14 @@ def create_voucher(event_id: str, db: Session = Depends(db_session), who: str = 
                 "tax_treatment": str(configured.get("tax_treatment", "")),
                 "accounting_treatment": str(configured.get("accounting_treatment", "")),
             }
-            for key in ("debit_account_code", "bank_account_code", "input_tax_account_code"):
-                if configured.get(key):
-                    policy_summary[key] = str(configured[key])
+            policy_summary["input_tax_account_codes"] = list(configured["input_tax_account_codes"])
+            policy_summary["allowed_account_codes"] = list(configured["allowed_account_codes"])
             business_use = configured.get("business_use")
             if isinstance(business_use, str) and re.fullmatch(r"[A-Za-z0-9_.:-]{1,120}", business_use):
                 policy_summary["business_use"] = business_use
         else:
-            policy_ref = "fixture-purchase-v1"
-            policy_summary = {"policy_ref": policy_ref, "tax_treatment": "DEDUCTIBLE",
-                              "accounting_treatment": "RESALE_INVENTORY", "business_use": "resale_inventory"}
+            policy_ref = "account-set-chart-v1"
+            policy_summary = {"policy_ref": policy_ref}
         available_accounts = tuple(SuggestedAccount(row.code, row.name) for row in db.scalars(
             select(ChartAccount).where(ChartAccount.account_set_id == account.id,
                 ChartAccount.is_active.is_(True), ChartAccount.is_leaf.is_(True)).order_by(ChartAccount.code)).all())
@@ -905,11 +1000,18 @@ def create_voucher(event_id: str, db: Session = Depends(db_session), who: str = 
                     continue
             elif isinstance(raw_value, str):
                 confirmed_facts[field] = raw_value.strip().upper() if field == "payment_state" else raw_value.strip()
+        source_documents = tuple({
+            "evidence_ref": link.document_id,
+            "role": link.role,
+            "fields": {key: value["normalized_value"] for key, value in extraction.fields.items()
+                       if key in SOURCE_FACT_FIELDS and isinstance(value, dict)
+                       and value.get("normalized_value") is not None},
+        } for link, extraction in zip(event.documents, source_extractions))
         reconciliation_codes = tuple(sorted({"BUSINESS_RECONCILIATION_MATCHED", *(
             str(item.get("code")) for item in (event.findings or [])
             if item.get("passed") is True and isinstance(item.get("code"), str))}))
         context = VoucherSuggestionContext(event.event_type, confirmed_facts, reconciliation_codes,
-            available_accounts, policy_summary)
+            available_accounts, policy_summary, source_documents)
         suggestion = suggestion_provider.suggest(net=net, tax=tax, gross=amount,
             evidence_refs=evidence_refs, policy={"policy_ref": policy_ref, **policy_summary}, context=context)
     except SuggestionProviderError as exc:
@@ -940,35 +1042,15 @@ def create_voucher(event_id: str, db: Session = Depends(db_session), who: str = 
                 raise HTTPException(422, f"科目 {line.account_code} 尚未配置辅助核算维度，不能生成凭证")
             auxiliary_requirements[line.account_code] = list(account_row.required_auxiliary_fields)
         suggestion_accounts[line.account_code] = account_row
-    debit=sum((line.debit for line in suggestion.lines),Decimal("0.00")); credit=sum((line.credit for line in suggestion.lines),Decimal("0.00"))
-    expected_debit = net + tax if (configured_policy is None or configured_policy.configuration.get("tax_treatment") == "DEDUCTIBLE") else amount
-    if debit != expected_debit or credit != amount:
-        raise HTTPException(422, "AI 凭证金额与已确认发票金额或会计政策不一致")
-    if debit!=credit: raise HTTPException(422,"借贷不平")
-    expected_account_totals = {}
-    if configured_policy is None:
-        expected_account_totals = {"1405": (net, Decimal("0.00")),
-            "222101": (tax, Decimal("0.00")), "1002": (Decimal("0.00"), amount)}
-    else:
-        debit_code = str(configured_policy.configuration["debit_account_code"])
-        bank_code = str(configured_policy.configuration["bank_account_code"])
-        debit_amount = net if configured_policy.configuration.get("tax_treatment") == "DEDUCTIBLE" else amount
-        expected_account_totals[debit_code] = (debit_amount, Decimal("0.00"))
-        if configured_policy.configuration.get("tax_treatment") == "DEDUCTIBLE" and tax:
-            tax_code = str(configured_policy.configuration["input_tax_account_code"])
-            expected_account_totals[tax_code] = (tax, Decimal("0.00"))
-        expected_account_totals[bank_code] = (Decimal("0.00"), amount)
-    actual_account_totals = {}
-    for line in suggestion.lines:
-        old = actual_account_totals.get(line.account_code, (Decimal("0.00"), Decimal("0.00")))
-        actual_account_totals[line.account_code] = (old[0] + line.debit, old[1] + line.credit)
-    expected_account_totals = {code: totals for code, totals in expected_account_totals.items()
-        if totals != (Decimal("0.00"), Decimal("0.00"))}
-    if actual_account_totals != expected_account_totals:
-        raise HTTPException(422, "AI 凭证科目及金额与当前账套会计政策不一致")
-    allowed_refs = {link.document_id for link in event.documents}
-    if any(not line.evidence_refs or not set(line.evidence_refs).issubset(allowed_refs) for line in suggestion.lines):
-        raise HTTPException(422, "AI 凭证引用了未关联的来源单据或缺少证据引用")
+    validate_voucher_amounts_and_accounts(suggestion.lines,
+        configured_policy.configuration if configured_policy else None, net, tax, amount)
+    debit = sum((line.debit for line in suggestion.lines), Decimal("0.00"))
+    credit = sum((line.credit for line in suggestion.lines), Decimal("0.00"))
+    tax_codes = (set(configured_policy.configuration["input_tax_account_codes"])
+                 if configured_policy and policy_summary["tax_treatment"] == "DEDUCTIBLE" else set())
+    validate_voucher_evidence(suggestion.lines, event.documents, tax_codes)
+    if any(not line.rationale.strip() for line in suggestion.lines):
+        raise HTTPException(422, "AI 凭证每条分录必须提供理由")
     source_docs=[x.document_id for x in event.documents]
     import json
     source_versions=sorted((link.document_id,link.extraction_version) for link in event.documents)
@@ -988,16 +1070,15 @@ def create_voucher(event_id: str, db: Session = Depends(db_session), who: str = 
     ]
     if auxiliary_missing:
         validations.append({"code":"AUXILIARY_COMPLETE","passed":False,
-            "required_fields":auxiliary_requirements,"reason":"规则候选没有提供必填辅助核算，需要人工补充"})
+            "required_fields":auxiliary_requirements,"reason":"凭证候选没有提供必填辅助核算，需要人工补充"})
     else:
         validations.append({"code":"AUXILIARY_COMPLETE","passed":True})
     trace = suggestion.trace
     voucher_policy = {"kind":"AI_CANDIDATE", "provider":suggestion.provider,
         "model":trace.model_version if trace else settings.deepseek_model,
         "policy_ref":suggestion.policy_ref, "business_type":event.event_type,
-        "fixture_only":event.event_type == "PURCHASE",
         "confirmed_by":configured_policy.confirmed_by if configured_policy is not None else None,
-        "input_vat_deductible":policy_summary.get("tax_treatment") == "DEDUCTIBLE",
+        "input_vat_deductible":policy_summary.get("tax_treatment") == "DEDUCTIBLE" if configured_policy else None,
         "policy_summary":policy_summary, "policy_explanation":suggestion.policy_explanation,
         "warnings":list(suggestion.warnings), "input_snapshot_hash":trace.input_digest if trace else None,
         "output_hash":trace.output_digest if trace else None,
@@ -1125,6 +1206,8 @@ def correct_voucher(draft_id: str, body: VoucherCorrectionBody, db: Session = De
     if event.event_type in {"EXPENSE", "ASSET_PURCHASE", "RENTAL"}:
         if current_policy is None or event.policy_version != accounting_policy_ref(event.event_type, current_policy.version):
             raise HTTPException(409, "会计政策已变化，请重新核对后再修正凭证")
+        if not current_policy.configuration.get("allowed_account_codes"):
+            raise HTTPException(422, "旧版会计政策缺少允许科目范围，请财务负责人重新确认")
     latest_version = db.scalar(select(VoucherDraft.version).where(VoucherDraft.event_id == event.id)
         .order_by(VoucherDraft.version.desc()).limit(1))
     if latest_version != previous.version:
@@ -1133,7 +1216,6 @@ def correct_voucher(draft_id: str, body: VoucherCorrectionBody, db: Session = De
     current_hash = hashlib.sha256(json.dumps(source_versions, separators=(",", ":")).encode()).hexdigest()
     if current_hash != previous.source_hash:
         raise HTTPException(409, "来源单据版本已变化，请重新核对并生成凭证")
-    source_document_ids = {document_id for document_id, _ in source_versions}
     invoice_links = [link for link in event.documents if link.role == "INVOICE"]
     invoice_extractions = [db.scalar(select(DocumentExtraction).where(
         DocumentExtraction.document_id == link.document_id,
@@ -1161,28 +1243,10 @@ def correct_voucher(draft_id: str, body: VoucherCorrectionBody, db: Session = De
         raise HTTPException(422, f"会计期间 {previous.accounting_period} 未开放")
     debit = sum((line.debit for line in body.lines), Decimal("0.00"))
     credit = sum((line.credit for line in body.lines), Decimal("0.00"))
-    if debit <= 0 or debit != credit:
-        raise HTTPException(422, "修正后的凭证借贷必须大于零且相等")
-    if current_policy is None:
-        expected_account_totals = {"1405": (net_total, Decimal("0.00")),
-                                   "222101": (tax_total, Decimal("0.00")),
-                                   "1002": (Decimal("0.00"), gross_total)}
-    else:
-        config = current_policy.configuration
-        debit_amount = net_total if config.get("tax_treatment") == "DEDUCTIBLE" else gross_total
-        expected_account_totals = {str(config["debit_account_code"]): (debit_amount, Decimal("0.00")),
-                                   str(config["bank_account_code"]): (Decimal("0.00"), gross_total)}
-        if config.get("tax_treatment") == "DEDUCTIBLE" and tax_total:
-            expected_account_totals[str(config["input_tax_account_code"])] = (tax_total, Decimal("0.00"))
-    actual_account_totals = {}
+    validate_voucher_amounts_and_accounts(body.lines,
+        current_policy.configuration if current_policy else None, net_total, tax_total, gross_total)
     resolved_lines = []
     for line in body.lines:
-        if (line.debit == 0) == (line.credit == 0):
-            raise HTTPException(422, "每条分录必须只填写借方或贷方金额")
-        if not line.evidence_refs or not set(line.evidence_refs).issubset(source_document_ids):
-            raise HTTPException(422, "每条分录必须引用本业务已关联的单据")
-        previous_totals = actual_account_totals.get(line.account_code, (Decimal("0.00"), Decimal("0.00")))
-        actual_account_totals[line.account_code] = (previous_totals[0] + line.debit, previous_totals[1] + line.credit)
         account_row = db.scalar(select(ChartAccount).where(ChartAccount.account_set_id == account.id,
             ChartAccount.code == line.account_code, ChartAccount.is_active.is_(True), ChartAccount.is_leaf.is_(True)).with_for_update())
         if account_row is None:
@@ -1203,8 +1267,8 @@ def correct_voucher(draft_id: str, body: VoucherCorrectionBody, db: Session = De
         if not account_row.requires_auxiliary and line.auxiliary:
             raise HTTPException(422, f"科目 {line.account_code} 未配置辅助核算维度，不能提交额外辅助核算")
         resolved_lines.append((line, account_row))
-    if actual_account_totals != expected_account_totals:
-        raise HTTPException(422, "分录科目及金额必须符合已确认会计政策及来源金额")
+    tax_codes = set(current_policy.configuration["input_tax_account_codes"]) if current_policy else set()
+    validate_voucher_evidence(body.lines, event.documents, tax_codes)
     corrected = VoucherDraft(event_id=event.id, tenant_id=tenant.id, account_set_id=account.id,
         accounting_period=previous.accounting_period, accounting_date=previous.accounting_date,
         status="VALIDATED", version=latest_version + 1, source_hash=current_hash,
@@ -1286,11 +1350,33 @@ def export_voucher(draft_id:str,db:Session=Depends(db_session),who:str=Depends(a
 
 @router.get("/business-events")
 def list_events(page: int = Query(default=1, ge=1), page_size: int = Query(default=20, ge=1, le=100),
+                search: str = Query(default="", max_length=100), event_type: str = "", status: str = "",
+                archive_only: bool | None = None,
                 db:Session=Depends(db_session),principal:Principal=Depends(current_principal)):
     require_document_read(principal)
     tenant,account=active_scope(db,principal)
     event_query=apply_event_read_scope(select(BusinessEvent).where(BusinessEvent.tenant_id==tenant.id,
         BusinessEvent.account_set_id==account.id),principal)
+    has_voucher = select(VoucherDraft.id).where(
+        VoucherDraft.event_id == BusinessEvent.id, VoucherDraft.status != "REJECTED").exists()
+    if archive_only is not None:
+        event_query = event_query.where(has_voucher if archive_only else ~has_voucher)
+    if event_type:
+        event_query = event_query.where(BusinessEvent.event_type == event_type)
+    if status:
+        event_query = event_query.where(BusinessEvent.status == status)
+    if search.strip():
+        pattern = f"%{search.strip()}%"
+        filename_matches = (select(BusinessEventDocument.event_id)
+            .join(DocumentAsset, DocumentAsset.id == BusinessEventDocument.document_id)
+            .where(DocumentAsset.original_filename.ilike(pattern)))
+        seller_matches = (select(BusinessEventDocument.event_id)
+            .join(DocumentExtraction, (DocumentExtraction.document_id == BusinessEventDocument.document_id)
+                & (DocumentExtraction.version == BusinessEventDocument.extraction_version))
+            .where(DocumentExtraction.fields["seller"]["normalized_value"].as_string().ilike(pattern)))
+        event_query = event_query.where(or_(BusinessEvent.id.ilike(pattern),
+            BusinessEvent.party_ref.ilike(pattern), BusinessEvent.id.in_(filename_matches),
+            BusinessEvent.id.in_(seller_matches)))
     total=db.scalar(select(func.count()).select_from(event_query.subquery())) or 0
     event_query=event_query.order_by(BusinessEvent.created_at.desc()).offset((page-1)*page_size).limit(page_size)
     events=db.scalars(event_query).all()
@@ -1325,6 +1411,45 @@ def list_events(page: int = Query(default=1, ge=1), page_size: int = Query(defau
         "document_ids":[link.document_id for link in e.documents],
         "voucher_status":voucher_status,"posting_status":posting_status})
     return {"items": summaries, "page": page, "page_size": page_size, "total": total}
+
+
+class BulkDeleteEventsBody(BaseModel):
+    ids: list[str] = Field(min_length=1, max_length=100)
+
+
+@router.post("/business-events/bulk-delete")
+def bulk_delete_events(body: BulkDeleteEventsBody, db: Session = Depends(db_session),
+                       principal: Principal = Depends(current_principal)):
+    require(principal, "voucher_create")
+    tenant, account = active_scope(db, principal)
+    ids = list(dict.fromkeys(body.ids))
+    events = db.scalars(select(BusinessEvent).where(
+        BusinessEvent.id.in_(ids), BusinessEvent.tenant_id == tenant.id,
+        BusinessEvent.account_set_id == account.id,
+    ).with_for_update()).all()
+    if len(events) != len(ids):
+        raise HTTPException(404, "部分业务不存在或不属于当前账套")
+    drafts = db.scalars(select(VoucherDraft).where(
+        VoucherDraft.event_id.in_(ids), VoucherDraft.account_set_id == account.id,
+    )).all()
+    if any(draft.status in {"VERIFIED", "SUBMITTING", "POSTED_PENDING_VERIFY", "UNKNOWN"} for draft in drafts):
+        raise HTTPException(409, "所选业务已有入账或结果待核实凭证，不能删除")
+    draft_ids = [draft.id for draft in drafts]
+    if draft_ids:
+        db.execute(delete(PostingAttempt).where(PostingAttempt.voucher_draft_id.in_(draft_ids)))
+        db.execute(delete(VoucherApproval).where(VoucherApproval.draft_id.in_(draft_ids)))
+    for draft in drafts:
+        db.delete(draft)
+    db.flush()
+    db.execute(delete(ExceptionCase).where(ExceptionCase.event_id.in_(ids)))
+    db.execute(delete(BusinessEventAssignment).where(BusinessEventAssignment.event_id.in_(ids)))
+    source_ids = list(dict.fromkeys(link.document_id for event in events for link in event.documents))
+    for event in events:
+        db.delete(event)
+    audit(db, tenant.id, principal.actor, "BUSINESS_EVENTS_DELETED", account.id, source_ids,
+          before={"event_ids": ids, "draft_ids": draft_ids}, after={"deleted_count": len(ids)})
+    db.commit()
+    return {"deleted_count": len(ids)}
 
 
 @router.get("/insights/summary")
@@ -1464,12 +1589,37 @@ def get_voucher(draft_id:str,db:Session=Depends(db_session),principal:Principal=
     if not d:raise HTTPException(404,"凭证不存在")
     return voucher_json(d)
 
+@router.delete("/voucher-drafts/{draft_id}")
+def delete_voucher(draft_id: str, db: Session = Depends(db_session), who: str = Depends(actor),
+                   principal: Principal = Depends(current_principal)):
+    require(principal, "voucher_create")
+    tenant, account = active_scope(db, principal)
+    selected = db.scalar(select(VoucherDraft).where(VoucherDraft.id == draft_id,
+        VoucherDraft.tenant_id == tenant.id, VoucherDraft.account_set_id == account.id))
+    if selected is None:
+        raise HTTPException(404, "凭证不存在")
+    versions = db.scalars(select(VoucherDraft).where(VoucherDraft.event_id == selected.event_id,
+        VoucherDraft.tenant_id == tenant.id, VoucherDraft.account_set_id == account.id)).all()
+    version_ids = [item.id for item in versions]
+    db.execute(delete(PostingAttempt).where(PostingAttempt.voucher_draft_id.in_(version_ids)))
+    db.execute(delete(VoucherApproval).where(VoucherApproval.draft_id.in_(version_ids)))
+    for item in versions:
+        db.delete(item)
+    audit(db, tenant.id, who, "VOUCHER_VERSIONS_DELETED", selected.event_id,
+        [link.document_id for link in db.get(BusinessEvent, selected.event_id).documents],
+        before={"draft_ids": version_ids}, after={"deleted_count": len(version_ids)})
+    db.commit()
+    return {"event_id": selected.event_id, "deleted_count": len(version_ids)}
+
 @router.get("/voucher-drafts")
 def list_vouchers(page: int = Query(default=1, ge=1), page_size: int = Query(default=20, ge=1, le=100),
+                  event_id: str = "",
                   db:Session=Depends(db_session),principal:Principal=Depends(current_principal)):
     require(principal,"read")
     tenant,account=active_scope(db,principal)
     query=select(VoucherDraft).where(VoucherDraft.tenant_id==tenant.id,VoucherDraft.account_set_id==account.id)
+    if event_id:
+        query = query.where(VoucherDraft.event_id == event_id)
     total=db.scalar(select(func.count()).select_from(query.subquery())) or 0
     rows=db.scalars(query.order_by(VoucherDraft.created_at.desc()).offset((page-1)*page_size).limit(page_size)).all()
     latest_versions=(select(VoucherDraft.event_id,func.max(VoucherDraft.version).label("version"))

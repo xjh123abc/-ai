@@ -18,38 +18,45 @@ from app.db.models import (
     ChartAccount,
     DocumentAsset,
     DocumentExtraction,
+    PostingAttempt,
     Tenant,
     TenantMembership,
+    VoucherApproval,
+    VoucherDraftLine,
 )
 from app.db.session import db_session
 from app.main import app
 from app.core.config import settings
 from app.routers import workflow
 from app.security import hash_password
-from ai.suggestions import (ConfiguredAccountingSuggestionProvider, FixtureRuleSuggestionProvider,
-    SuggestedLine, SuggestionProviderError, SuggestionTrace, VoucherSuggestion)
+from ai.suggestions import SuggestedLine, SuggestionProviderError, SuggestionTrace, VoucherSuggestion
 
 
 class InjectedWorkflowSuggestionProvider:
     """Explicit test-only provider; never used by the application default path."""
     def suggest(self, *, net, tax, gross, evidence_refs, policy, context=None):
         if context.business_type == "PURCHASE":
-            result = FixtureRuleSuggestionProvider().suggest(net=net, tax=tax, gross=gross,
-                evidence_refs=evidence_refs, policy={"fixture_only": True, "business_use": "resale_inventory"})
+            lines = (
+                SuggestedLine("1405", "库存商品", net, Decimal("0.00"), "测试模型返回的库存分录", evidence_refs),
+                SuggestedLine("222101", "进项税额", tax, Decimal("0.00"), "测试模型返回的进项税分录", evidence_refs),
+                SuggestedLine("1002", "银行存款", Decimal("0.00"), gross, "测试模型返回的付款分录", evidence_refs),
+            )
         else:
-            result = ConfiguredAccountingSuggestionProvider().suggest(net=net, tax=tax, gross=gross,
-                evidence_refs=evidence_refs, policy={**context.policy_summary,
-                    "debit_account_code": context.policy_summary["debit_account_code"],
-                    "bank_account_code": context.policy_summary["bank_account_code"],
-                    "input_tax_account_code": context.policy_summary.get("input_tax_account_code", ""),
-                    "policy_ref": context.policy_summary["policy_ref"]})
-        return VoucherSuggestion(provider="TEST_ONLY_INJECTED", policy_ref=result.policy_ref,
+            tax_code = context.policy_summary["input_tax_account_codes"][0]
+            debit_code = next(code for code in context.policy_summary["allowed_account_codes"]
+                              if code not in {"1002", tax_code})
+            debit_amount = net if context.policy_summary["tax_treatment"] == "DEDUCTIBLE" else gross
+            lines = [SuggestedLine(debit_code, "", debit_amount, Decimal("0.00"), "业务费用", evidence_refs)]
+            if context.policy_summary["tax_treatment"] == "DEDUCTIBLE" and tax:
+                lines.append(SuggestedLine(tax_code, "", tax, Decimal("0.00"), "进项税", evidence_refs))
+            lines.append(SuggestedLine("1002", "", Decimal("0.00"), gross, "付款", evidence_refs))
+        return VoucherSuggestion(provider="TEST_ONLY_INJECTED", policy_ref=context.policy_summary["policy_ref"],
             warnings=("仅测试注入 provider",), policy_explanation="仅用于自动化测试",
             trace=SuggestionTrace(provider="TEST_ONLY_INJECTED", model_version="test-model",
                 prompt_version="test-prompt-v1", input_digest="a" * 64,
                 output_digest="b" * 64, call_status="SUCCEEDED", validation_status="PASSED"),
             lines=tuple(SuggestedLine(line.account_code, line.account_name, line.debit, line.credit,
-                line.description, line.evidence_refs, "自动化测试注入建议") for line in result.lines))
+                line.description, line.evidence_refs, "自动化测试注入建议") for line in lines))
 
 
 @pytest.fixture(params=[1, 2])
@@ -201,6 +208,105 @@ def _matched_purchase_event(client, document_ids, invoice_count):
     return event_id
 
 
+def test_document_list_shows_only_latest_visible_business_event(workflow_client):
+    client, document_ids, invoice_count, _ = workflow_client
+    roles = ["INVOICE"] * invoice_count + ["GOODS_RECEIPT", "BANK_RECEIPT"]
+    first = client.post("/api/v1/business-events", json={
+        "document_ids": document_ids, "roles": roles, "reason": "首次关联业务单据",
+    })
+    second = client.post("/api/v1/business-events", json={
+        "document_ids": document_ids, "roles": roles, "reason": "最新关联业务单据",
+    })
+    assert first.status_code == second.status_code == 200
+    summaries = client.get("/api/v1/documents?page=1&page_size=100").json()["items"]
+    invoice = next(item for item in summaries if item["id"] == document_ids[0])
+    assert [event["id"] for event in invoice["business_events"]] == [second.json()["id"]]
+
+
+def test_unconfirmed_legacy_document_review_recovers_ocr_candidates(workflow_client):
+    client, _, _, _ = workflow_client
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        tenant = db.scalar(select(Tenant))
+        account = db.scalar(select(AccountSet))
+        document = DocumentAsset(
+            tenant_id=tenant.id, account_set_id=account.id, sha256=uuid4().hex.ljust(64, "0"),
+            original_filename="legacy-payment-proof.jpg", mime_type="image/jpeg", byte_size=1,
+            storage_key="/tmp/legacy-payment-proof.jpg", uploaded_by="workflow-test",
+            processing_status="NEEDS_REVIEW",
+        )
+        db.add(document)
+        db.flush()
+        lines = [
+            {"text": "支付证明单", "bbox": [100, 10, 200, 30], "page": 1},
+            {"text": "事由或品名", "bbox": [50, 100, 150, 120], "page": 1},
+            {"text": "报销业务招待费", "bbox": [10, 130, 100, 150], "page": 1},
+            {"text": "共计金额", "bbox": [20, 220, 80, 240], "page": 1},
+            {"text": "￥4448.00", "bbox": [200, 220, 260, 240], "page": 1},
+        ]
+        db.add(DocumentExtraction(
+            document_id=document.id, version=1, document_type="UNCLASSIFIED",
+            full_text="支付证明单\n报销业务招待费\n￥4448.00", lines=lines,
+            fields={"gross_amount": {"normalized_value": None, "confidence": 0}},
+            provider="RapidOCR", model_version="legacy", status="NEEDS_REVIEW",
+            created_by="workflow-test",
+        ))
+        db.commit()
+        document_id = document.id
+    finally:
+        dependency.close()
+    detail = client.get(f"/api/v1/documents/{document_id}")
+    assert detail.status_code == 200
+    extraction = detail.json()["extraction"]
+    assert extraction["document_type"] == "UNCLASSIFIED"
+    assert extraction["document_type_candidate"]["normalized_value"] == "PAYMENT_PROOF"
+    assert extraction["fields"]["gross_amount"]["normalized_value"] == "4448.00"
+    assert extraction["fields"]["purpose"]["normalized_value"] == "报销业务招待费"
+    assert extraction["fields"]["gross_amount"]["status"] == "NEEDS_REVIEW"
+    historical = client.get(f"/api/v1/documents/{document_id}?version=1").json()["extraction"]
+    assert historical["fields"]["gross_amount"]["normalized_value"] is None
+
+
+def test_old_bank_receipt_amount_from_timestamp_is_replaced_by_ocr_amount(workflow_client):
+    client, _, _, _ = workflow_client
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        tenant = db.scalar(select(Tenant))
+        account = db.scalar(select(AccountSet))
+        document = DocumentAsset(tenant_id=tenant.id, account_set_id=account.id,
+            sha256=uuid4().hex.ljust(64, "0"), original_filename="bank-4448.jpg",
+            mime_type="image/jpeg", byte_size=1, storage_key="/tmp/bank-4448.jpg",
+            uploaded_by="workflow-test", processing_status="NEEDS_REVIEW")
+        db.add(document)
+        db.flush()
+        lines = [
+            {"text": "网上银行电子回单", "page": 1, "bbox": [180, 10, 500, 40]},
+            {"text": "金额", "page": 1, "bbox": [64, 176, 122, 200]},
+            {"text": "￥4448.00", "page": 1, "bbox": [597, 177, 670, 198]},
+            {"text": "时间戳", "page": 1, "bbox": [399, 264, 457, 291]},
+            {"text": "2024-12-07-18.16.29.198714", "page": 1, "bbox": [491, 269, 690, 286]},
+        ]
+        db.add(DocumentExtraction(document_id=document.id, version=1,
+            document_type="UNCLASSIFIED", full_text="\n".join(line["text"] for line in lines),
+            lines=lines, fields={"gross_amount": {"normalized_value": "18.16", "raw_value": "18.16",
+                "confidence": 0.45, "status": "NEEDS_REVIEW", "bbox": None}},
+            provider="RapidOCR", model_version="legacy", status="NEEDS_REVIEW",
+            created_by="workflow-test"))
+        db.commit()
+        document_id = document.id
+    finally:
+        dependency.close()
+    detail = client.get(f"/api/v1/documents/{document_id}").json()["extraction"]
+    assert detail["fields"]["gross_amount"]["normalized_value"] == "4448.00"
+    assert detail["fields"]["gross_amount"]["evidence_text"] == "￥4448.00"
+    listed = client.get("/api/v1/documents?page=1&page_size=100").json()["items"]
+    assert next(item for item in listed if item["id"] == document_id)["key_amount"] == "4448.00"
+    historical = client.get(f"/api/v1/documents/{document_id}?version=1").json()["extraction"]
+    assert historical["fields"]["gross_amount"]["normalized_value"] == "18.16"
+
+
 def test_business_event_reconciles_and_drafts_multiple_invoices(workflow_client):
     client, document_ids, invoice_count, _ = workflow_client
     document_page = client.get("/api/v1/documents?page=2&page_size=1").json()
@@ -230,7 +336,7 @@ def test_business_event_reconciles_and_drafts_multiple_invoices(workflow_client)
     assert reconciled.status_code == 200
     assert reconciled.json()["status"] == "MATCHED", reconciled.json()["findings"]
     assert reconciled.json()["amount"] == "45200.00"
-    assert reconciled.json()["rule_version"] == "fixture-purchase-v1"
+    assert reconciled.json()["rule_version"] == "account-set-chart-v1"
     linked_invoice = next(item for item in client.get("/api/v1/documents?page=1&page_size=100").json()["items"]
                           if item["id"] == document_ids[0])
     assert {item["id"] for item in linked_invoice["business_events"]} == {event_id}
@@ -501,7 +607,122 @@ def test_inactive_account_blocks_voucher_creation_without_partial_draft(workflow
     assert client.get("/api/v1/voucher-drafts").json()["total"] == 0
 
 
-def test_required_auxiliary_rule_candidate_stays_needs_review_until_corrected(workflow_client):
+def test_bulk_delete_business_records_keeps_source_documents(workflow_client):
+    client, document_ids, invoice_count, _ = workflow_client
+    first_id = _matched_purchase_event(client, document_ids, invoice_count)
+    second_id = str(uuid4())
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        first = db.get(BusinessEvent, first_id)
+        db.add(BusinessEvent(id=second_id, tenant_id=first.tenant_id,
+                             account_set_id=first.account_set_id, event_type="PURCHASE",
+                             created_by=first.created_by))
+        db.commit()
+    finally:
+        dependency.close()
+    draft = client.post(f"/api/v1/business-events/{first_id}/voucher-drafts")
+    assert draft.status_code == 200
+    deleted = client.post("/api/v1/business-events/bulk-delete", json={"ids": [first_id, second_id]})
+    assert deleted.status_code == 200
+    assert deleted.json() == {"deleted_count": 2}
+    assert client.get("/api/v1/business-events").json()["total"] == 0
+    assert client.get("/api/v1/voucher-drafts").json()["total"] == 0
+    assert all(client.get(f"/api/v1/documents/{id}").status_code == 200 for id in document_ids)
+
+
+def test_delete_unused_chart_account(workflow_client):
+    client, *_ = workflow_client
+    assert client.put("/api/v1/auth/chart-accounts", json={"accounts": [
+        {"code": "660201", "name": "管理费用—业务招待费"},
+    ]}).status_code == 200
+    response = client.delete("/api/v1/auth/chart-accounts/660201")
+    assert response.status_code == 200
+    assert response.json() == {"deleted": "660201"}
+    assert all(row["code"] != "660201" for row in client.get("/api/v1/auth/chart-accounts").json()["accounts"])
+
+
+def test_vouchered_business_moves_documents_to_searchable_archive(workflow_client):
+    client, document_ids, invoice_count, _ = workflow_client
+    event_id = _matched_purchase_event(client, document_ids, invoice_count)
+    assert client.get("/api/v1/business-events", params={"archive_only": True}).json()["total"] == 0
+    assert client.get("/api/v1/documents", params={"work_queue": True}).json()["total"] == len(document_ids)
+
+    voucher = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts")
+    assert voucher.status_code == 200
+    archives = client.get("/api/v1/business-events", params={
+        "archive_only": True, "search": "document-1.jpg", "event_type": "PURCHASE",
+        "status": "MATCHED", "page": 1, "page_size": 1,
+    }).json()
+    assert archives["total"] == 1
+    assert archives["items"][0]["id"] == event_id
+    assert client.get("/api/v1/business-events", params={
+        "archive_only": True, "search": "Seller Ltd",
+    }).json()["total"] == 1
+    assert client.get("/api/v1/business-events", params={"archive_only": False}).json()["total"] == 0
+    assert client.get("/api/v1/documents", params={"work_queue": True}).json()["total"] == 0
+    assert client.get(f"/api/v1/documents/{document_ids[0]}").status_code == 200
+    archived_vouchers = client.get("/api/v1/voucher-drafts", params={"event_id": event_id}).json()
+    assert archived_vouchers["total"] == 1
+    assert archived_vouchers["items"][0]["id"] == voucher.json()["id"]
+
+
+@pytest.mark.parametrize("workflow_client", [1], indirect=True)
+def test_4448_expense_uses_management_entertainment_account(workflow_client):
+    client, document_ids, _, _ = workflow_client
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        invoice = db.scalar(select(DocumentExtraction).where(DocumentExtraction.document_id == document_ids[0]))
+        invoice.fields = {**invoice.fields,
+            "net_amount": {"normalized_value": "4196.23"},
+            "tax_amount": {"normalized_value": "251.77"},
+            "gross_amount": {"normalized_value": "4448.00"}}
+        proof = db.scalar(select(DocumentExtraction).where(DocumentExtraction.document_id == document_ids[1]))
+        proof.document_type = "PAYMENT_PROOF"
+        proof.fields = {"payment_date": {"normalized_value": "2024-12-07"},
+                        "payer": {"normalized_value": "Buyer Ltd"},
+                        "payee": {"normalized_value": "Seller Ltd"},
+                        "purpose": {"normalized_value": "业务招待费"},
+                        "approved": {"normalized_value": True},
+                        "gross_amount": {"normalized_value": "4448.00"}}
+        bank = db.scalar(select(DocumentExtraction).where(DocumentExtraction.document_id == document_ids[2]))
+        bank.fields = {**bank.fields, "gross_amount": {"normalized_value": "4448.00"}}
+        db.commit()
+    finally:
+        dependency.close()
+    created = client.post("/api/v1/business-events", json={
+        "event_type": "EXPENSE", "document_ids": document_ids,
+        "roles": ["INVOICE", "PAYMENT_PROOF", "BANK_RECEIPT"],
+        "reason": "4,448元业务招待费报销验收",
+    })
+    assert created.status_code == 200
+    event_id = created.json()["id"]
+    before = client.post(f"/api/v1/business-events/{event_id}/reconcile")
+    assert before.json()["status"] == "NEEDS_REVIEW"
+    assert "EXPENSE_ACCOUNT_POLICY_REVIEW_REQUIRED" in [f["code"] for f in before.json()["findings"]]
+    assert client.put("/api/v1/auth/chart-accounts", json={"accounts": [
+        {"code": "6602", "name": "管理费用", "is_leaf": False},
+        {"code": "660201", "name": "管理费用—业务招待费"},
+    ]}).status_code == 200
+    policy = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
+        "allowed_account_codes": ["660201", "1002", "222101"],
+        "tax_treatment": "DEDUCTIBLE", "input_tax_account_codes": ["222101"],
+        "accounting_treatment": "EXPENSE", "confirmed": True,
+    })
+    assert policy.status_code == 200
+    after = client.post(f"/api/v1/business-events/{event_id}/reconcile")
+    assert after.json()["status"] == "MATCHED"
+    voucher = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts")
+    assert voucher.status_code == 200
+    assert voucher.json()["status"] == "VALIDATED"
+    assert [(line["account_code"], line["debit"], line["credit"]) for line in voucher.json()["lines"]] == [
+        ("660201", "4196.23", "0.00"), ("222101", "251.77", "0.00"),
+        ("1002", "0.00", "4448.00"),
+    ]
+
+
+def test_required_auxiliary_model_candidate_stays_needs_review_until_corrected(workflow_client):
     client, document_ids, invoice_count, _ = workflow_client
     event_id = _matched_purchase_event(client, document_ids, invoice_count)
     invalid_configuration = client.put("/api/v1/auth/chart-accounts", json={"accounts": [{
@@ -557,13 +778,13 @@ def test_required_auxiliary_rule_candidate_stays_needs_review_until_corrected(wo
         ("6601", "45200.00", "0.00"), ("1002", "0.00", "45200.00"),
     ]),
 ])
-def test_confirmed_expense_policy_is_versioned_and_drives_a_balanced_rule_candidate(
+def test_confirmed_expense_policy_is_versioned_and_checks_a_balanced_model_candidate(
     workflow_client, tax_treatment, tax_account_code, expected_lines,
 ):
     client, document_ids, invoice_count, business_email = workflow_client
     unconfirmed = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
-        "debit_account_code": "6601", "bank_account_code": "1002", "tax_treatment": tax_treatment,
-        "input_tax_account_code": tax_account_code, "accounting_treatment": "EXPENSE", "confirmed": False,
+        "allowed_account_codes": ["6601", "1002"] + ([tax_account_code] if tax_account_code else []), "tax_treatment": tax_treatment,
+        "input_tax_account_codes": [tax_account_code or "222101"], "accounting_treatment": "EXPENSE", "confirmed": False,
     })
     assert unconfirmed.status_code == 422
     accounts = client.put("/api/v1/auth/chart-accounts", json={"accounts": [{
@@ -571,14 +792,14 @@ def test_confirmed_expense_policy_is_versioned_and_drives_a_balanced_rule_candid
     }]})
     assert accounts.status_code == 200
     policy_response = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
-        "debit_account_code": "6601", "bank_account_code": "1002", "tax_treatment": tax_treatment,
-        "input_tax_account_code": tax_account_code, "accounting_treatment": "EXPENSE", "confirmed": True,
+        "allowed_account_codes": ["6601", "1002"] + ([tax_account_code] if tax_account_code else []), "tax_treatment": tax_treatment,
+        "input_tax_account_codes": [tax_account_code or "222101"], "accounting_treatment": "EXPENSE", "confirmed": True,
     })
     assert policy_response.status_code == 200
     assert policy_response.json()["version"] == 1
     replay = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
-        "debit_account_code": "6601", "bank_account_code": "1002", "tax_treatment": tax_treatment,
-        "input_tax_account_code": tax_account_code, "accounting_treatment": "EXPENSE", "confirmed": True,
+        "allowed_account_codes": ["6601", "1002"] + ([tax_account_code] if tax_account_code else []), "tax_treatment": tax_treatment,
+        "input_tax_account_codes": [tax_account_code or "222101"], "accounting_treatment": "EXPENSE", "confirmed": True,
     })
     assert replay.status_code == 200
     assert replay.json()["version"] == 1
@@ -589,8 +810,8 @@ def test_confirmed_expense_policy_is_versioned_and_drives_a_balanced_rule_candid
     })
     business_client.headers["Authorization"] = f"Bearer {login.json()['access_token']}"
     denied = business_client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
-        "debit_account_code": "6601", "bank_account_code": "1002", "tax_treatment": tax_treatment,
-        "input_tax_account_code": tax_account_code, "accounting_treatment": "EXPENSE", "confirmed": True,
+        "allowed_account_codes": ["6601", "1002"] + ([tax_account_code] if tax_account_code else []), "tax_treatment": tax_treatment,
+        "input_tax_account_codes": [tax_account_code or "222101"], "accounting_treatment": "EXPENSE", "confirmed": True,
     })
     assert denied.status_code == 403
 
@@ -628,8 +849,8 @@ def test_confirmed_expense_policy_is_versioned_and_drives_a_balanced_rule_candid
     }]})
     assert added_account.status_code == 200
     revised_policy = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
-        "debit_account_code": "6602", "bank_account_code": "1002", "tax_treatment": tax_treatment,
-        "input_tax_account_code": tax_account_code, "accounting_treatment": "EXPENSE", "confirmed": True,
+        "allowed_account_codes": ["6602", "6601", "1002"] + ([tax_account_code] if tax_account_code else []), "tax_treatment": tax_treatment,
+        "input_tax_account_codes": [tax_account_code or "222101"], "accounting_treatment": "EXPENSE", "confirmed": True,
     })
     assert revised_policy.status_code == 200
     assert revised_policy.json()["version"] == 2
@@ -639,27 +860,108 @@ def test_confirmed_expense_policy_is_versioned_and_drives_a_balanced_rule_candid
     assert rerun.status_code == 200
     assert rerun.json()["rule_version"] == "accounting-policy:EXPENSE:v2"
 
-    candidate = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts")
-    assert candidate.status_code == 200
+    seen_contexts = []
+    chosen_code = "1405"
+
+    class ChoiceProvider(InjectedWorkflowSuggestionProvider):
+        def suggest(self, *, net, tax, gross, evidence_refs, policy, context=None):
+            seen_contexts.append(context)
+            suggestion = super().suggest(net=net, tax=tax, gross=gross,
+                                         evidence_refs=evidence_refs, policy=policy, context=context)
+            first = suggestion.lines[0]
+            chosen = SuggestedLine(chosen_code, first.account_name, first.debit, first.credit,
+                                   first.description, first.evidence_refs, first.rationale)
+            return VoucherSuggestion(provider=suggestion.provider, policy_ref=suggestion.policy_ref,
+                                     warnings=suggestion.warnings, policy_explanation=suggestion.policy_explanation,
+                                     trace=suggestion.trace, lines=(chosen, *suggestion.lines[1:]))
+
+    try:
+        app.dependency_overrides[workflow.get_accounting_suggestion_provider] = ChoiceProvider
+        disallowed = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts")
+        assert disallowed.status_code == 422
+        assert "允许范围" in disallowed.json()["detail"]
+        chosen_code = "6601"
+        candidate = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts")
+    finally:
+        app.dependency_overrides[workflow.get_accounting_suggestion_provider] = InjectedWorkflowSuggestionProvider
+    assert candidate.status_code == 200, candidate.text
     payload = candidate.json()
     assert payload["status"] == "VALIDATED"
-    assert payload["policy"]["fixture_only"] is False
+    assert "fixture_only" not in payload["policy"]
     assert payload["policy"]["policy_ref"] == "accounting-policy:EXPENSE:v2"
     assert payload["debit_total"] == payload["credit_total"] == "45200.00"
-    expected_lines[0] = ("6602", expected_lines[0][1], expected_lines[0][2])
+    expected_lines[0] = ("6601", expected_lines[0][1], expected_lines[0][2])
     assert [(line["account_code"], line["debit"], line["credit"]) for line in payload["lines"]] == expected_lines
+    assert any(document["fields"].get("purpose") == "办公费用"
+               and document["evidence_ref"] == document_ids[invoice_count]
+               for document in seen_contexts[-1].source_documents)
+    assert any(document["role"] == "INVOICE" and "tax_amount" in document["fields"]
+               for document in seen_contexts[-1].source_documents)
+    assert any(document["role"] == "BANK_RECEIPT" and document["fields"].get("settled") is True
+               for document in seen_contexts[-1].source_documents)
     replay_after_draft = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
-        "debit_account_code": "6602", "bank_account_code": "1002", "tax_treatment": tax_treatment,
-        "input_tax_account_code": tax_account_code, "accounting_treatment": "EXPENSE", "confirmed": True,
+        "allowed_account_codes": ["6602", "6601", "1002"] + ([tax_account_code] if tax_account_code else []), "tax_treatment": tax_treatment,
+        "input_tax_account_codes": [tax_account_code or "222101"], "accounting_treatment": "EXPENSE", "confirmed": True,
     })
     assert replay_after_draft.status_code == 200
     assert replay_after_draft.json()["version"] == 2
     assert replay_after_draft.json()["unchanged"] is True
-    blocked_policy_change = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
-        "debit_account_code": "6601", "bank_account_code": "1002", "tax_treatment": tax_treatment,
-        "input_tax_account_code": tax_account_code, "accounting_treatment": "EXPENSE", "confirmed": True,
+    corrected_lines = [{"account_code": "6602" if index == 0 else line["account_code"],
+                        "debit": line["debit"], "credit": line["credit"],
+                        "description": line["description"], "evidence_refs": line["evidence_refs"]}
+                       for index, line in enumerate(payload["lines"])]
+    corrected = client.post(f"/api/v1/voucher-drafts/{payload['id']}/versions", json={
+        "expected_version": payload["version"], "reason": "按付款用途改用销售费用", "lines": corrected_lines,
     })
-    assert blocked_policy_change.status_code == 409
+    assert corrected.status_code == 200, corrected.text
+    assert corrected.json()["lines"][0]["account_code"] == "6602"
+    replacement = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
+        "allowed_account_codes": ["6601", "1002"] + ([tax_account_code] if tax_account_code else []), "tax_treatment": tax_treatment,
+        "input_tax_account_codes": [tax_account_code or "222101"], "accounting_treatment": "EXPENSE", "confirmed": True,
+    })
+    assert replacement.status_code == 200, replacement.text
+    assert replacement.json()["version"] == 3
+    assert replacement.json()["deleted_draft_count"] == 2
+    assert client.get(f"/api/v1/voucher-drafts/{payload['id']}").status_code == 404
+    assert client.get(f"/api/v1/voucher-drafts/{corrected.json()['id']}").status_code == 404
+    assert client.post(f"/api/v1/business-events/{event_id}/reconcile").json()["status"] == "MATCHED"
+    fresh = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts")
+    assert fresh.status_code == 200, fresh.text
+    assert client.post(f"/api/v1/voucher-drafts/{fresh.json()['id']}/submit-review").status_code == 200
+    protected = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
+        "allowed_account_codes": ["6602", "6601", "1002"] + ([tax_account_code] if tax_account_code else []),
+        "tax_treatment": tax_treatment, "input_tax_account_codes": [tax_account_code or "222101"],
+        "accounting_treatment": "EXPENSE", "confirmed": True,
+    })
+    assert protected.status_code == 409
+    assert client.get(f"/api/v1/voucher-drafts/{fresh.json()['id']}").status_code == 200
+
+
+def test_expense_policy_accepts_an_allowed_account_range_without_fixed_entries(workflow_client):
+    client, *_ = workflow_client
+    assert client.put("/api/v1/auth/chart-accounts", json={"accounts": [
+        {"code": "6601", "name": "管理费用", "is_active": True, "is_leaf": True},
+    ]}).status_code == 200
+    response = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
+        "allowed_account_codes": ["1002", "6601", "222101"],
+        "tax_treatment": "DEDUCTIBLE", "input_tax_account_codes": ["222101"],
+        "accounting_treatment": "EXPENSE", "confirmed": True,
+    })
+    assert response.status_code == 200, response.text
+    assert response.json()["configuration"]["allowed_account_codes"] == ["1002", "6601", "222101"]
+
+    invalid = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
+        "allowed_account_codes": ["1002", "9999"], "tax_treatment": "NON_DEDUCTIBLE",
+        "input_tax_account_codes": ["222101"],
+        "accounting_treatment": "EXPENSE", "confirmed": True,
+    })
+    assert invalid.status_code == 422
+    non_deductible_tax = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
+        "allowed_account_codes": ["6601", "1002", "222101"], "tax_treatment": "NON_DEDUCTIBLE",
+        "input_tax_account_codes": ["222101"], "accounting_treatment": "EXPENSE", "confirmed": True,
+    })
+    assert non_deductible_tax.status_code == 422
+    assert "不能允许进项税科目" in non_deductible_tax.text
 
 
 @pytest.mark.parametrize(("business_type", "treatment", "debit_code", "account_name"), [
@@ -674,8 +976,8 @@ def test_confirmed_asset_and_rental_policies_generate_balanced_candidates(
         "code": debit_code, "name": account_name, "is_active": True, "is_leaf": True,
     }]}).status_code == 200
     saved = client.put(f"/api/v1/auth/accounting-policies/{business_type}", json={
-        "debit_account_code": debit_code, "bank_account_code": "1002", "tax_treatment": "DEDUCTIBLE",
-        "input_tax_account_code": "222101", "accounting_treatment": treatment, "confirmed": True,
+        "allowed_account_codes": [debit_code, "1002", "222101"], "tax_treatment": "DEDUCTIBLE",
+        "input_tax_account_codes": ["222101"], "accounting_treatment": treatment, "confirmed": True,
     })
     assert saved.status_code == 200
     ids = list(document_ids[:invoice_count])
@@ -809,7 +1111,7 @@ def test_unbalanced_provider_output_cannot_create_voucher(workflow_client, monke
     client, document_ids, invoice_count, _ = workflow_client
     event_id = _matched_purchase_event(client, document_ids, invoice_count)
 
-    def unbalanced_suggestion(self, *, net, tax, gross, evidence_refs, policy):
+    def unbalanced_suggestion(self, *, net, tax, gross, evidence_refs, policy, context=None):
         return suggestions.VoucherSuggestion(
             provider="test-provider",
             policy_ref="test-unbalanced",
@@ -821,19 +1123,19 @@ def test_unbalanced_provider_output_cannot_create_voucher(workflow_client, monke
             ),
         )
 
-    monkeypatch.setattr(suggestions.FixtureRuleSuggestionProvider, "suggest", unbalanced_suggestion)
+    monkeypatch.setattr(InjectedWorkflowSuggestionProvider, "suggest", unbalanced_suggestion)
 
     response = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts")
 
     assert response.status_code == 422
-    assert response.json()["detail"] == "AI 凭证金额与已确认发票金额或会计政策不一致"
+    assert response.json()["detail"] == "借贷不平"
     assert client.get("/api/v1/voucher-drafts").json()["total"] == 0
 
 
 @pytest.mark.parametrize("violation, expected_detail", [
     ("unknown_account", "科目不可用"),
     ("unrelated_evidence", "未关联的来源单据或缺少证据引用"),
-    ("amount_mismatch", "AI 凭证金额与已确认发票金额或会计政策不一致"),
+    ("amount_mismatch", "凭证金额与已确认发票金额不一致"),
 ])
 def test_untrusted_ai_candidate_is_blocked_before_draft_persistence(workflow_client, violation, expected_detail):
     client, document_ids, invoice_count, _ = workflow_client
@@ -852,8 +1154,16 @@ def test_untrusted_ai_candidate_is_blocked_before_draft_persistence(workflow_cli
                 lines[0] = SuggestedLine("1405", "库存商品", Decimal("40000.00"), Decimal("0.00"), "库存", ("unrelated-document",))
             elif violation == "amount_mismatch":
                 lines[0] = SuggestedLine("1405", "库存商品", Decimal("40001.00"), Decimal("0.00"), "库存", evidence_refs)
+                lines[2] = SuggestedLine("1002", "银行存款", Decimal("0.00"), Decimal("45201.00"), "付款", evidence_refs)
+            elif violation == "tax_misallocated":
+                lines[0] = SuggestedLine("1405", "库存商品", Decimal("40001.00"), Decimal("0.00"), "库存", evidence_refs)
+                lines[1] = SuggestedLine("222101", "进项税额", Decimal("5199.00"), Decimal("0.00"), "税额", evidence_refs)
+            elif violation == "tax_wrong_evidence":
+                lines[1] = SuggestedLine("222101", "进项税额", Decimal("5200.00"), Decimal("0.00"), "税额", (document_ids[-1],))
+            elif violation == "payment_wrong_evidence":
+                lines[2] = SuggestedLine("1002", "银行存款", Decimal("0.00"), Decimal("45200.00"), "付款", (document_ids[0],))
             return VoucherSuggestion(
-                provider="UNTRUSTED_TEST_PROVIDER", lines=tuple(lines), policy_ref="fixture-purchase-v1",
+                provider="UNTRUSTED_TEST_PROVIDER", lines=tuple(lines), policy_ref="account-set-chart-v1",
                 warnings=(), policy_explanation="测试候选",
             )
 
@@ -880,6 +1190,50 @@ def test_duplicate_voucher_submission_is_rejected_and_audited(workflow_client):
     assert client.get("/api/v1/voucher-drafts").json()["total"] == 1
     audit = client.get(f"/api/v1/voucher-drafts/{first.json()['id']}/audit").json()
     assert any(entry["event_type"] == "VOUCHER_DUPLICATE_CREATION_BLOCKED" for entry in audit)
+
+
+def test_delete_voucher_removes_all_versions_and_related_records_then_allows_regeneration(workflow_client):
+    client, document_ids, invoice_count, _ = workflow_client
+    event_id = _matched_purchase_event(client, document_ids, invoice_count)
+    first = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts").json()
+    draft_id = first["id"]
+    corrected = client.post(f"/api/v1/voucher-drafts/{draft_id}/versions", json={
+        "expected_version": first["version"], "reason": "测试删除全部版本",
+        "lines": [{key: line[key] for key in ("account_code", "debit", "credit", "description", "evidence_refs")}
+                  for line in first["lines"]],
+    })
+    assert corrected.status_code == 200, corrected.text
+    corrected_id = corrected.json()["id"]
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        tenant = db.scalar(select(Tenant))
+        account = db.scalar(select(AccountSet))
+        db.add(VoucherApproval(draft_id=draft_id, draft_version=1, approver="workflow-test",
+            decision="APPROVE", reason="测试关联审批"))
+        db.add(PostingAttempt(tenant_id=tenant.id, account_set_id=account.id,
+            voucher_draft_id=draft_id, voucher_version=1, idempotency_key=f"delete-{uuid4().hex}",
+            request_digest="a" * 64, request_payload={}, status="FAILED", created_by="workflow-test"))
+        db.commit()
+    finally:
+        dependency.close()
+    removed = client.delete(f"/api/v1/voucher-drafts/{corrected_id}")
+    assert removed.status_code == 200, removed.text
+    assert removed.json()["deleted_count"] == 2
+    assert client.get(f"/api/v1/voucher-drafts/{draft_id}").status_code == 404
+    assert client.get(f"/api/v1/voucher-drafts/{corrected_id}").status_code == 404
+    assert client.get("/api/v1/voucher-drafts").json()["total"] == 0
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        assert db.scalars(select(VoucherDraftLine).where(VoucherDraftLine.draft_id == draft_id)).all() == []
+        assert db.scalars(select(VoucherApproval).where(VoucherApproval.draft_id == draft_id)).all() == []
+        assert db.scalars(select(PostingAttempt).where(PostingAttempt.voucher_draft_id == draft_id)).all() == []
+    finally:
+        dependency.close()
+    recreated = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts")
+    assert recreated.status_code == 200, recreated.text
+    assert recreated.json()["id"] != draft_id
 
 
 def test_self_approval_and_low_privilege_approval_are_rejected(workflow_client):
@@ -1340,6 +1694,46 @@ def test_multiple_bank_receipts_are_explicitly_linked_and_summed(
         assert expected_finding in [finding["code"] for finding in reconciled.json()["findings"]]
 
 
+@pytest.mark.parametrize(("settlement_state", "expected_status", "expected_finding"), [
+    ("SETTLED", "MATCHED", None),
+    ("NOT_SETTLED", "NEEDS_REVIEW", "BANK_SETTLEMENT_NOT_CONFIRMED"),
+    ("UNKNOWN", "NEEDS_REVIEW", "BANK_SETTLEMENT_STATUS_UNKNOWN"),
+])
+def test_bank_settlement_state_controls_reconciliation(
+    workflow_client, settlement_state, expected_status, expected_finding,
+):
+    client, document_ids, invoice_count, _ = workflow_client
+    bank_document_id = document_ids[-1]
+    saved = client.patch(f"/api/v1/documents/{bank_document_id}/extraction", json={
+        "expected_version": 1,
+        "document_type": "BANK_RECEIPT",
+        "fields": {
+            "payer": "Buyer Ltd",
+            "payee": "Seller Ltd",
+            "settlement_date": "2024-12-01",
+            "gross_amount": "45200.00",
+            "settled": settlement_state,
+        },
+        "reason": "API 验收三态清算状态",
+    })
+
+    assert saved.status_code == 200
+    assert saved.json()["fields"]["settled"]["normalized_value"] == settlement_state
+
+    event = client.post("/api/v1/business-events", json={
+        "document_ids": document_ids,
+        "roles": ["INVOICE"] * invoice_count + ["GOODS_RECEIPT", "BANK_RECEIPT"],
+        "reason": "验证清算状态影响业务核对",
+    })
+    reconciled = client.post(f"/api/v1/business-events/{event.json()['id']}/reconcile")
+
+    assert reconciled.status_code == 200
+    assert reconciled.json()["status"] == expected_status
+    finding_codes = [finding["code"] for finding in reconciled.json()["findings"]]
+    if expected_finding:
+        assert expected_finding in finding_codes
+
+
 def test_upload_field_candidate_keeps_ocr_page_and_bounding_box(
     workflow_client, tmp_path, monkeypatch
 ):
@@ -1368,6 +1762,56 @@ def test_upload_field_candidate_keeps_ocr_page_and_bounding_box(
     assert field["page"] == 2
     assert field["bbox"] == [10, 20, 210, 48]
     assert field["evidence_text"] == "价税合计 45,200.00"
+
+
+def test_bank_receipt_api_extracts_auxiliary_candidates_and_evidence(
+    workflow_client, tmp_path, monkeypatch,
+):
+    client, _, _, _ = workflow_client
+    monkeypatch.setattr(settings, "storage_dir", tmp_path)
+    source_lines = [
+        {"text": "付款人账号", "page": 1, "bbox": [10, 10, 110, 30]},
+        {"text": "6222001234567890", "page": 1, "bbox": [140, 10, 300, 30]},
+        {"text": "收款人账号", "page": 1, "bbox": [10, 40, 110, 60]},
+        {"text": "6217009876543210", "page": 1, "bbox": [140, 40, 300, 60]},
+        {"text": "开户银行", "page": 1, "bbox": [10, 70, 110, 90]},
+        {"text": "招商银行南昌分行", "page": 1, "bbox": [140, 70, 300, 90]},
+        {"text": "电子回单号", "page": 1, "bbox": [10, 100, 110, 120]},
+        {"text": "DZHD20241201001", "page": 1, "bbox": [140, 100, 300, 120]},
+        {"text": "交易流水号", "page": 1, "bbox": [10, 130, 110, 150]},
+        {"text": "JYLS20241201002", "page": 1, "bbox": [140, 130, 300, 150]},
+    ]
+    monkeypatch.setattr(workflow, "extract_image", lambda _: {
+        "full_text": "网上银行电子回单\n" + "\n".join(line["text"] for line in source_lines),
+        "lines": source_lines,
+        "provider": "fixture-ocr",
+        "model_version": "fixture-ocr-v1",
+    })
+
+    response = client.post("/api/v1/documents", files={
+        "file": ("bank-receipt.jpg", b"\xff\xd8\xfffixture", "image/jpeg"),
+    })
+
+    assert response.status_code == 200
+    fields = response.json()["extraction"]["fields"]
+    assert fields["payer_account_number"]["normalized_value"] == "6222001234567890"
+    assert fields["payee_account_number"]["normalized_value"] == "6217009876543210"
+    assert fields["bank_name"]["normalized_value"] == "招商银行南昌分行"
+    assert fields["electronic_receipt_number"]["normalized_value"] == "DZHD20241201001"
+    assert fields["transaction_id"]["normalized_value"] == "JYLS20241201002"
+    assert fields["transaction_id"]["evidence_text"] == "交易流水号 JYLS20241201002"
+    assert fields["transaction_id"]["status"] == "NEEDS_REVIEW"
+
+    confirmed = client.patch(f"/api/v1/documents/{response.json()['id']}/extraction", json={
+        "expected_version": 1,
+        "document_type": "BANK_RECEIPT",
+        "fields": {"payer": "Buyer Ltd", "payee": "Seller Ltd", "settled": "UNKNOWN"},
+        "reason": "仅确认关键字段，辅助识别结果应保留",
+    })
+    assert confirmed.status_code == 200
+    for key in ("payer_account_number", "payee_account_number", "bank_name",
+                "electronic_receipt_number", "transaction_id"):
+        assert confirmed.json()["fields"][key]["normalized_value"] == fields[key]["normalized_value"]
 
 
 def test_reconciliation_replays_newly_confirmed_extraction_version(workflow_client):

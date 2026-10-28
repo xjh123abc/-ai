@@ -200,7 +200,7 @@ class BusinessEvent(Base):
     event_date: Mapped[date | None] = mapped_column(Date)
     status: Mapped[str] = mapped_column(String(40), nullable=False, default="NEEDS_REVIEW")
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
-    policy_version: Mapped[str] = mapped_column(String(100), nullable=False, default="demo-purchase-v1")
+    policy_version: Mapped[str] = mapped_column(String(100), nullable=False, default="account-set-chart-v1")
     findings: Mapped[list] = mapped_column(JSON_DOCUMENT, nullable=False, default=list)
     created_by: Mapped[str] = mapped_column(String(200), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())

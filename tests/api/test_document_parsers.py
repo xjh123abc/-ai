@@ -322,7 +322,7 @@ def test_bank_receipt_requires_explicit_success_text_for_settled_candidate():
 
     fields = field_candidates("网上银行电子回单", lines)
 
-    assert fields["settled"]["normalized_value"] == "true"
+    assert fields["settled"]["normalized_value"] == "SETTLED"
     assert fields["settled"]["evidence_text"] == "交易成功"
     assert fields["settled"]["status"] == "NEEDS_REVIEW"
 
@@ -332,7 +332,7 @@ def test_bank_receipt_without_explicit_status_leaves_settled_empty():
 
     fields = field_candidates("网上银行电子回单 交易流水号 202412011234")
 
-    assert fields["settled"]["normalized_value"] is None
+    assert fields["settled"]["normalized_value"] == "UNKNOWN"
 
 
 def test_bank_receipt_does_not_mark_success_when_receiving_side_failed():
@@ -341,7 +341,7 @@ def test_bank_receipt_does_not_mark_success_when_receiving_side_failed():
     lines = [{"text": "支付成功但到账失败", "bbox": [100, 100, 240, 120], "page": 1}]
     fields = field_candidates("网上银行电子回单 支付成功但到账失败", lines)
 
-    assert fields["settled"]["normalized_value"] is None
+    assert fields["settled"]["normalized_value"] == "UNKNOWN"
 
 
 def test_bookkeeping_posted_text_is_not_bank_settlement_evidence():
@@ -350,7 +350,7 @@ def test_bookkeeping_posted_text_is_not_bank_settlement_evidence():
     lines = [{"text": "已入账", "bbox": [100, 100, 160, 120], "page": 1}]
     fields = field_candidates("网上银行电子回单 已入账", lines)
 
-    assert fields["settled"]["normalized_value"] is None
+    assert fields["settled"]["normalized_value"] == "UNKNOWN"
 
 
 def test_goods_receipt_extracts_number_date_and_item_from_labeled_rows():

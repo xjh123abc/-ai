@@ -54,7 +54,7 @@
         "payee": "南昌市视维科技公司",
         "gross_amount": "45200.00",
         "settlement_date": "2024-12-01",
-        "settled": true
+        "settled": "SETTLED"
       }
     }
   ],

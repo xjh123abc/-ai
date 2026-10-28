@@ -1,4 +1,6 @@
 from datetime import date
+
+from domain.settlement import normalize_bank_settlement_state
 from itertools import permutations
 import re
 
@@ -382,8 +384,54 @@ def field_candidates(full_text: str, lines: list[dict] | None = None) -> dict:
             if succeeded != failed:
                 outcomes.append(("true" if succeeded else "false", line))
         distinct_outcomes = {value for value, _ in outcomes}
-        return (outcomes[0] if len(outcomes) == 1 and len(distinct_outcomes) == 1
-                else (None, None))
+        if len(outcomes) == 1 and len(distinct_outcomes) == 1:
+            value, line = outcomes[0]
+            return normalize_bank_settlement_state(value), line
+        return "UNKNOWN", None
+
+    def bank_auxiliary_candidate(labels: tuple[str, ...], value_pattern: str):
+        candidates = []
+        label_pattern = "|".join(re.escape(label) for label in labels)
+        value_regex = re.compile(rf"^(?:{value_pattern})$", re.IGNORECASE)
+        for index, line in enumerate(lines):
+            text = str(line.get("text") or "")
+            match = re.search(rf"(?:{label_pattern})\s*[:：]?\s*({value_pattern})", text, re.IGNORECASE)
+            if match:
+                value = match.group(1).strip().rstrip("，,。；;")
+                if value:
+                    candidates.append((value, line))
+                continue
+
+            if not any(label in compact(text) for label in labels):
+                continue
+            label_position = line_position(line)
+            same_row_values = []
+            if label_position is not None:
+                for value_line in lines:
+                    value_position = line_position(value_line)
+                    value_text = str(value_line.get("text") or "").strip()
+                    if (value_line.get("page") != line.get("page") or value_position is None
+                            or value_position[0] <= label_position[0]
+                            or abs(value_position[1] - label_position[1]) > 25
+                            or not value_regex.fullmatch(value_text)):
+                        continue
+                    same_row_values.append((abs(value_position[0] - label_position[0]), value_text, value_line))
+            if same_row_values:
+                same_row_values.sort(key=lambda item: item[0])
+                if len(same_row_values) == 1 or same_row_values[1][0] - same_row_values[0][0] >= 35:
+                    _, value, value_line = same_row_values[0]
+                    candidates.append((value, {**value_line, "text": f"{text.strip()} {value}"}))
+                    continue
+
+            if index + 1 < len(lines):
+                next_line = lines[index + 1]
+                next_text = str(next_line.get("text") or "").strip()
+                if value_regex.fullmatch(next_text):
+                    candidates.append((next_text, {**next_line, "text": f"{text.strip()} {next_text}"}))
+        distinct_values = {value for value, _ in candidates}
+        if len(distinct_values) != 1:
+            return None, None
+        return candidates[0]
 
     def goods_receipt_candidates():
         numbers = []
@@ -778,6 +826,51 @@ def field_candidates(full_text: str, lines: list[dict] | None = None) -> dict:
     result["payment_date"] = make_candidate(payment_date, payment_date_evidence, payment_date_line)
     result["settlement_date"] = make_candidate(settlement_date, settlement_date, settlement_date_line)
     result["settled"] = make_candidate(settled, settled_line.get("text") if settled_line else None, settled_line)
+    if settled == "UNKNOWN":
+        result["settled"]["confidence"] = 0
+    for key, labels in (
+        ("payer_account_number", ("付款人账号", "付款方账号", "付款人账户", "付款方账户")),
+        ("payee_account_number", ("收款人账号", "收款方账号", "收款人账户", "收款方账户")),
+        ("bank_account_number", ("银行账号", "银行账户")),
+    ):
+        value, evidence_line = bank_auxiliary_candidate(labels, r"[0-9Xx*·\- ]{6,32}")
+        result[key] = make_candidate(value, value, evidence_line)
+    bank_name, bank_name_line = bank_auxiliary_candidate(
+        ("付款人开户银行", "付款方开户银行", "收款人开户银行", "收款方开户银行", "开户银行"),
+        r"[\u4e00-\u9fffA-Za-z0-9（）()· -]{2,40}",
+    )
+    result["bank_name"] = make_candidate(bank_name, bank_name, bank_name_line)
+    electronic_number, receipt_line = bank_auxiliary_candidate(
+        ("电子回单号", "电子回单号码", "电子回单编号", "回单编号"), r"[A-Za-z0-9-]{6,40}",
+    )
+    result["electronic_receipt_number"] = make_candidate(electronic_number, electronic_number, receipt_line)
+    transaction_id, transaction_line = bank_auxiliary_candidate(
+        ("交易流水号", "流水号", "交易序号"), r"[A-Za-z0-9-]{6,40}",
+    )
+    result["transaction_id"] = make_candidate(transaction_id, transaction_id, transaction_line)
+    if type_value == "BANK_RECEIPT":
+        def paired_values(label: str, pattern: str):
+            values = []
+            for index, line in enumerate(lines[:-1]):
+                if compact(str(line.get("text") or "")) != label:
+                    continue
+                value_line = lines[index + 1]
+                value = str(value_line.get("text") or "").strip()
+                position = line_position(line)
+                if position and re.fullmatch(pattern, value):
+                    values.append((position[0], value, value_line))
+            return sorted(values, key=lambda item: item[0]) if len(values) == 2 else []
+
+        accounts = paired_values("账号", r"[0-9Xx*·\- ]{6,32}")
+        if accounts:
+            result["payer_account_number"] = make_candidate(accounts[0][1], accounts[0][1], accounts[0][2])
+            result["payee_account_number"] = make_candidate(accounts[1][1], accounts[1][1], accounts[1][2])
+            both_accounts = f"付款方：{accounts[0][1]}；收款方：{accounts[1][1]}"
+            result["bank_account_number"] = make_candidate(both_accounts, both_accounts)
+        banks = paired_values("开户银行", r"[\u4e00-\u9fffA-Za-z0-9（）()· -]{2,40}")
+        if banks:
+            both_banks = f"付款方：{banks[0][1]}；收款方：{banks[1][1]}"
+            result["bank_name"] = make_candidate(both_banks, both_banks)
     receipt_number_value, receipt_number_line = receipt_number
     receipt_date_value, receipt_date_line = receipt_date
     receipt_item_value, receipt_item_line = receipt_item

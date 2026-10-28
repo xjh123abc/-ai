@@ -74,10 +74,13 @@ async function syntheticTwoPagePdf(page: Page): Promise<Buffer> {
 }
 
 async function signIn(page: Page, email: string) {
+  const response = await page.request.post('/api/v1/auth/login', {
+    data: { email, password },
+  })
+  expect(response.ok()).toBeTruthy()
+  const { access_token } = await response.json()
+  await page.addInitScript((value: string) => sessionStorage.setItem('zq-access-token', value), access_token)
   await page.goto('/')
-  await page.getByLabel('邮箱').fill(email)
-  await page.getByLabel('密码').fill(password)
-  await page.getByRole('button', { name: '登录工作台' }).click()
   await expect(page.getByRole('navigation', { name: '主导航' })).toBeVisible()
 }
 
@@ -100,9 +103,11 @@ async function uploadAndConfirm(
   const editor = page.locator('.field-editor').last()
   await expect(editor).toBeVisible()
   await expect(editor.locator('.ocr-meta')).toContainText('RapidOCR')
-  await editor.locator('select').selectOption(documentType)
+  await editor.getByLabel('单据类型').selectOption(documentType)
   for (const [field, value] of Object.entries(fields)) {
-    await editor.getByLabel(field, { exact: true }).fill(value)
+    const control = editor.getByLabel(field, { exact: true })
+    if (field === 'settled') await control.selectOption(value)
+    else await control.fill(value)
   }
   const saveResponse = page.waitForResponse((response) =>
     response.url().includes('/api/v1/documents/') && response.url().endsWith('/extraction')
@@ -141,12 +146,17 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
   const invoiceEditor = page.locator('.field-editor').last()
   await invoiceEditor.locator('.field-editor-footer input').fill('复核后确认字段版本留痕')
   await invoiceEditor.getByRole('button', { name: '保存确认版本' }).click()
+  const historyResponse = page.waitForResponse((response) =>
+    /\/api\/v1\/documents\/[0-9a-f-]{36}$/.test(new URL(response.url()).pathname)
+      && response.request().method() === 'GET',
+  )
   await invoiceRow.getByRole('button', { name: '查看并确认字段' }).click()
+  const invoiceHistory = await (await historyResponse).json()
   await expect(page.locator('.current-extraction-version')).toContainText('复核后确认字段版本留痕')
   await expectMobileLayout(page)
-  await expect(page.locator('.extraction-history')).toContainText('查看历史字段版本（3 个版本）')
-  await expect(page.locator('.extraction-history')).toContainText('V1')
-  await expect(page.locator('.extraction-history')).toContainText('24360125413017362003')
+  expect(invoiceHistory.extraction_history).toHaveLength(3)
+  expect(invoiceHistory.extraction_history[0].fields.invoice_number.normalized_value).toBe('24360125413017362003')
+  expect(invoiceHistory.extraction_history[2].fields.invoice_number.normalized_value).toBeNull()
   await invoiceRow.getByRole('button', { name: '收起字段' }).click()
   await uploadAndConfirm(page, receiptFilename, receiptImage, 'GOODS_RECEIPT', {
     receipt_number: 'NO56784001',
@@ -161,7 +171,7 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
     payee: '南昌市视维科技公司',
     settlement_date: '2024-12-01',
     gross_amount: '45200.00',
-    settled: 'true',
+    settled: 'SETTLED',
   })
 
   const rolesByFile: Record<string, string> = {
@@ -169,11 +179,11 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
     [receiptFilename]: 'GOODS_RECEIPT',
     [bankFilename]: 'BANK_RECEIPT',
   }
-  for (const [filename, role] of Object.entries(rolesByFile)) {
+  for (const filename of Object.keys(rolesByFile)) {
     const row = page.locator('article.document-row').filter({ hasText: filename })
     await row.locator('input[type="checkbox"]').check()
-    await row.getByLabel('单据业务角色').selectOption(role)
   }
+  await expect(page.getByLabel('单据业务角色')).toHaveCount(0)
   const reconcileResponse = page.waitForResponse((response) =>
     response.url().includes('/api/v1/business-events/') && response.url().endsWith('/reconcile') && response.request().method() === 'POST',
   )
@@ -183,7 +193,7 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
   await page.getByRole('button', { name: '确认关联并核对' }).click()
   const createdEvent = await (await eventCreateResponse).json()
   const reconciliation = await (await reconcileResponse).json()
-  expect(reconciliation.rule_version).toBe('fixture-purchase-v1')
+  expect(reconciliation.rule_version).toBe('account-set-chart-v1')
   await test.info().attach('purchase-reconciliation-rule.json', {
     body: JSON.stringify({ ruleVersion: reconciliation.rule_version, status: reconciliation.status, findings: reconciliation.findings }, null, 2),
     contentType: 'application/json',
@@ -213,7 +223,7 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
   expect(generatedVoucherResponse.status(), JSON.stringify(generatedVoucher)).toBe(200)
   await expect(page.getByRole('heading', { name: '凭证草稿与审批' })).toBeVisible()
   await expect(page.locator('.voucher-detail')).toContainText('45,200.00')
-  await expect(page.locator('.voucher-detail')).toContainText('AI 生成')
+  await expect(page.locator('.voucher-detail')).toContainText(useRealDeepSeek ? 'AI 生成' : '凭证建议')
   if (useRealDeepSeek) {
     expect(generatedVoucher.policy.provider).toMatch(/^DEEPSEEK:/)
     expect(generatedVoucher.policy.trace).toEqual({ call_status: 'SUCCEEDED', validation_status: 'PASSED' })
@@ -235,9 +245,12 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
     await expect(page.locator('.voucher-detail')).toContainText('PLAYWRIGHT_TEST_STUB')
   }
   await expect(page.locator('.ai-rationale').first()).toBeVisible()
-  await page.getByRole('button', { name: invoiceFilename }).first().click()
-  await expect(page.locator('.voucher-evidence-panel')).toContainText('人工确认版本')
-  await expect(page.locator('.voucher-evidence-panel')).toContainText('45200.00')
+  await expect(page.locator('.voucher-sources').getByRole('button')).toHaveCount(3)
+  await expect(page.locator('.entry-table').getByRole('button', { name: invoiceFilename })).toHaveCount(0)
+  await page.locator('.voucher-sources').getByRole('button', { name: invoiceFilename }).click()
+  await expect(page.locator('.voucher-evidence-panel')).toContainText(`原始单据：${invoiceFilename}`)
+  await expect(page.locator('.voucher-evidence-panel .source-field')).toHaveCount(0)
+  await expect(page.locator('.voucher-evidence-preview')).toBeVisible()
   await page.locator('.voucher-evidence-panel').getByRole('button', { name: '关闭' }).click()
   await expectMobileLayout(page)
   await expect(page.locator('.entry-table')).toContainText('1405')
@@ -305,12 +318,18 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
   await expect(page.locator('.source-note')).toContainText('正式入账金额')
   await expect(page.locator('.content-card').filter({ hasText: '最近业务证据' })).toContainText('全部时间')
   await expect(page.locator('.content-card').filter({ hasText: '最近业务证据' })).toContainText('最近 5 笔')
-  await page.getByRole('button', { name: '查看全部业务' }).click()
-  await expect(page.locator('.business-list')).toContainText(createdEvent.id.slice(0, 8))
+  await page.getByRole('button', { name: '查看业务档案' }).click()
+  await expect(page.locator('.archive-list')).toContainText(createdEvent.id.slice(0, 8))
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '财务分析' }).click()
   await page.locator('.business-list-item').filter({ hasText: createdEvent.id.slice(0, 8) }).click()
   await expect(page.locator('.detail-card')).toContainText(createdEvent.id.slice(0, 8))
   await expectMobileLayout(page)
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '凭证中心' }).click()
+  await page.locator('.voucher-list-item').first().click()
+  page.once('dialog', (dialog) => dialog.accept())
+  await page.getByRole('button', { name: '删除凭证' }).click()
+  await expect(page.locator('.alert')).toContainText('已删除')
+  await expect(page.locator('.voucher-list-item')).toHaveCount(0)
 })
 
 test('本地金标发票字段可打开带 bbox 的原件位置', async ({ page }) => {
@@ -384,7 +403,8 @@ test('银行回单候选显示付款方、收款方、金额及其原件证据',
   await expect(editor.getByLabel('payee')).toHaveValue('南昌市视维科技公司')
   await expect(editor.getByLabel('gross_amount')).toHaveValue('45200.00')
   await expect(editor.getByLabel('settlement_date')).toHaveValue('2024-12-01')
-  await expect(editor.getByLabel('settled')).toHaveValue('')
+  await expect(editor.getByLabel('settled')).toHaveValue('UNKNOWN')
+  await expect(editor.getByLabel('settled').locator('option')).toHaveText(['已清算', '未清算', '无法确认'])
   await expect(editor.locator('.field-grid label').filter({ hasText: '结算日期' })).toBeVisible()
   await editor.getByLabel('payer').click()
   await expect(editor.locator('.source-preview-panel')).toContainText('原件第 1 页')
@@ -393,8 +413,81 @@ test('银行回单候选显示付款方、收款方、金额及其原件证据',
     response.url().includes('/api/v1/documents/') && response.url().endsWith('/extraction')
       && response.request().method() === 'PATCH',
   )
+  await editor.getByLabel('settled').selectOption('NOT_SETTLED')
   await editor.getByRole('button', { name: '保存确认版本' }).click()
   expect((await saveResponse).status()).toBe(200)
+  await row.getByRole('button', { name: '查看并确认字段' }).click()
+  await expect(page.locator('.field-editor').last().getByLabel('settled')).toHaveValue('NOT_SETTLED')
+})
+
+test('银行回单审核页分层展示辅助字段并默认脱敏账号', async ({ page }) => {
+  await signIn(page, 'accountant@playwright.example.test')
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '单据中心' }).click()
+  const filename = 'layered-bank-receipt.png'
+  await page.locator('input[type="file"]').setInputFiles({
+    name: filename,
+    mimeType: 'image/png',
+    buffer: await syntheticDocument(page, 'BANK RECEIPT'),
+  })
+  const row = page.locator('article.document-row').filter({ hasText: filename })
+  await expect(row).toBeVisible({ timeout: 60_000 })
+  await page.route(/\/api\/v1\/documents\/[0-9a-f-]+$/, async (route) => {
+    const response = await route.fetch()
+    const body = await response.json()
+    body.extraction.document_type = 'BANK_RECEIPT'
+    body.extraction.fields = {
+      ...body.extraction.fields,
+      payer_account_number: { normalized_value: '6222001234567890', confidence: 0.45, status: 'NEEDS_REVIEW', evidence_text: '付款人账号 6222001234567890' },
+      bank_name: { normalized_value: '招商银行南昌分行', confidence: 0.45, status: 'NEEDS_REVIEW', evidence_text: '开户银行 招商银行南昌分行' },
+      electronic_receipt_number: { normalized_value: 'DZHD20241201001', confidence: 0.45, status: 'NEEDS_REVIEW', evidence_text: '电子回单号 DZHD20241201001' },
+      transaction_id: { normalized_value: 'JYLS20241201002', confidence: 0.45, status: 'NEEDS_REVIEW', evidence_text: '交易流水号 JYLS20241201002' },
+    }
+    body.extraction.full_text = '网上银行电子回单\n付款人账号 6222001234567890\n开户银行 招商银行南昌分行\n电子回单号 DZHD20241201001\n交易流水号 JYLS20241201002'
+    await route.fulfill({ response, json: body })
+  })
+  await row.getByRole('button', { name: '查看并确认字段' }).click()
+  const editor = page.locator('.field-editor').last()
+  await expect(editor.locator('.field-tier')).toContainText('第一层 · 记账关键字段')
+  const auxiliary = editor.locator('.auxiliary-fields')
+  await expect(auxiliary.locator('summary')).toContainText('第二层 · 业务辅助字段')
+  await expect(auxiliary).not.toHaveAttribute('open', '')
+  await auxiliary.locator('summary').click()
+  await expect(auxiliary).toContainText('****7890')
+  await expect(auxiliary).not.toContainText('6222001234567890')
+  const rawText = editor.locator('.ocr-text')
+  await expect(rawText.locator('summary')).toContainText('第三层 · 查看 OCR 识别原文')
+  await expect(rawText).not.toHaveAttribute('open', '')
+  await rawText.locator('summary').click()
+  await expect(rawText.locator('pre')).toContainText('付款人账号 6222001234567890')
+})
+
+test('银行回单三种清算状态都能从审核页保存', async ({ page }) => {
+  await signIn(page, 'accountant@playwright.example.test')
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '单据中心' }).click()
+  const filename = 'settlement-state-bank-receipt.png'
+  await page.locator('input[type="file"]').setInputFiles({
+    name: filename,
+    mimeType: 'image/png',
+    buffer: await syntheticDocument(page, 'BANK RECEIPT'),
+  })
+  const row = page.locator('article.document-row').filter({ hasText: filename })
+  await expect(row).toBeVisible({ timeout: 60_000 })
+  await row.getByRole('button', { name: '查看并确认字段' }).click()
+  const editor = page.locator('.field-editor').last()
+  await editor.locator('.field-editor-heading select').selectOption('BANK_RECEIPT')
+  for (const [index, state] of ['SETTLED', 'NOT_SETTLED', 'UNKNOWN'].entries()) {
+    await editor.getByLabel('settled').selectOption(state)
+    const saveResponse = page.waitForResponse((response) =>
+      response.url().includes('/api/v1/documents/') && response.url().endsWith('/extraction')
+        && response.request().method() === 'PATCH',
+    )
+    await editor.getByRole('button', { name: '保存确认版本' }).click()
+    expect((await saveResponse).status()).toBe(200)
+    if (index < 2) {
+      await row.getByRole('button', { name: '查看并确认字段' }).click()
+      await expect(editor.getByLabel('settled')).toHaveValue(state)
+    }
+  }
 })
 
 test('支付证明候选保留报销事由、证明日期和证明金额语义并可人工确认', async ({ page }) => {
@@ -407,7 +500,7 @@ test('支付证明候选保留报销事由、证明日期和证明金额语义�
   await row.getByRole('button', { name: '查看并确认字段' }).click()
   const editor = page.locator('.field-editor').last()
   await expect(editor.locator('.document-type-suggestion')).toContainText('支付证明')
-  await editor.getByRole('button', { name: '采用建议' }).click()
+  await expect(editor.getByLabel('单据类型')).toHaveValue('PAYMENT_PROOF')
   await expect(editor.getByLabel('purpose')).toHaveValue('报销业务招待费')
   await expect(editor.getByLabel('payment_date')).toHaveValue('2024-12-07')
   await expect(editor.getByLabel('gross_amount')).toHaveValue('4448.00')
@@ -446,10 +539,9 @@ test('4,448元费用报销将发票、银行回单和支付证明分角色关联
   const expenseRoles: Record<string, string> = {
     [invoiceName]: 'INVOICE', [bankName]: 'BANK_RECEIPT', [proofName]: 'PAYMENT_PROOF',
   }
-  for (const [filename, role] of Object.entries(expenseRoles)) {
+  for (const filename of Object.keys(expenseRoles)) {
     const row = page.locator('article.document-row').filter({ hasText: filename })
     await row.locator('input[type="checkbox"]').check()
-    await row.getByLabel('单据业务角色').selectOption(role)
   }
   await page.getByLabel('业务类型').selectOption('EXPENSE')
   const reconciliationResponse = page.waitForResponse((response) =>
@@ -474,30 +566,29 @@ test('4,448元费用报销将发票、银行回单和支付证明分角色关联
   await expect(page.getByRole('button', { name: '生成凭证草稿' })).toBeDisabled()
 })
 
-test('财务确认费用政策后可按版本生成平衡规则候选', async ({ page }) => {
-  const invoice = await syntheticDocument(page, 'INVOICE TOTAL 106.00')
-  const bank = await syntheticDocument(page, 'BANK RECEIPT 106.00')
-  const proof = await syntheticDocument(page, 'PAYMENT PROOF 106.00')
-  await signIn(page, 'accountant@playwright.example.test')
+test('4,448元费用报销补齐管理费用科目和政策后可生成凭证', async ({ page }) => {
+  const invoice = await syntheticDocument(page, 'INVOICE TOTAL 4448.00')
+  const bank = await syntheticDocument(page, 'BANK RECEIPT 4448.00')
+  const proof = await syntheticDocument(page, 'PAYMENT PROOF 4448.00')
+  await signIn(page, 'admin@playwright.example.test')
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '单据中心' }).click()
   await uploadAndConfirm(page, 'policy-expense-invoice.png', invoice, 'VAT_INVOICE', {
-    invoice_number: 'POLICY-EXPENSE-106', issue_date: '2024-12-08', buyer: 'Buyer Ltd', seller: 'Seller Ltd',
-    net_amount: '100.00', tax_rate: '6%', tax_amount: '6.00', gross_amount: '106.00',
+    invoice_number: 'POLICY-EXPENSE-4448', issue_date: '2024-12-08', buyer: 'Buyer Ltd', seller: 'Seller Ltd',
+    net_amount: '4196.23', tax_rate: '6%', tax_amount: '251.77', gross_amount: '4448.00',
   })
   await uploadAndConfirm(page, 'policy-expense-bank.png', bank, 'BANK_RECEIPT', {
-    payer: 'Buyer Ltd', payee: 'Seller Ltd', settlement_date: '2024-12-08', gross_amount: '106.00', settled: 'true',
+    payer: 'Buyer Ltd', payee: 'Seller Ltd', settlement_date: '2024-12-08', gross_amount: '4448.00', settled: 'SETTLED',
   })
   await uploadAndConfirm(page, 'policy-expense-proof.png', proof, 'PAYMENT_PROOF', {
-    payment_date: '2024-12-08', payer: 'Buyer Ltd', payee: 'Seller Ltd', purpose: '办公费用',
-    gross_amount: '106.00', approved: 'true',
+    payment_date: '2024-12-08', payer: 'Buyer Ltd', payee: 'Seller Ltd', purpose: '业务招待费',
+    gross_amount: '4448.00', approved: 'true',
   })
-  for (const [filename, role] of Object.entries({
+  for (const filename of Object.keys({
     'policy-expense-invoice.png': 'INVOICE', 'policy-expense-bank.png': 'BANK_RECEIPT',
     'policy-expense-proof.png': 'PAYMENT_PROOF',
   })) {
     const row = page.locator('article.document-row').filter({ hasText: filename })
     await row.locator('input[type="checkbox"]').check()
-    await row.getByLabel('单据业务角色').selectOption(role)
   }
   await page.getByLabel('业务类型').selectOption('EXPENSE')
   const eventCreated = page.waitForResponse((response) =>
@@ -508,11 +599,23 @@ test('财务确认费用政策后可按版本生成平衡规则候选', async ({
   await expect(page.locator('.finding-list')).toContainText('费用科目政策尚未确认')
 
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '连接与设置' }).click()
+  await expect(page.getByRole('heading', { name: '账套设置', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: '收起账套设置' }).click()
+  await expect(page.getByRole('heading', { name: '账套科目与辅助核算' })).toBeHidden()
+  await page.getByRole('button', { name: '展开账套设置' }).click()
+  await page.getByRole('button', { name: /资产类/ }).click()
+  await expect(page.getByRole('cell', { name: '1002', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: /资产类/ }).click()
+  await expect(page.getByRole('cell', { name: '1002', exact: true })).toBeHidden()
+  await page.getByLabel('新科目编码').fill('660201')
+  await page.getByLabel('新科目名称').fill('管理费用—业务招待费')
+  await page.getByRole('button', { name: '添加科目' }).click()
+  await page.getByRole('button', { name: '保存科目配置' }).click()
+  await expect(page.locator('.alert')).toContainText('已保存 6 个科目配置')
   const expensePolicy = page.locator('.policy-editor').filter({ hasText: '费用报销' })
-  await expensePolicy.getByLabel('借方科目').selectOption('6601')
-  await expensePolicy.getByLabel('付款科目').selectOption('1002')
+  await expensePolicy.getByLabel('允许科目范围（可多选）').selectOption(['660201', '1002', '222101'])
   await expensePolicy.getByLabel('进项税处理').selectOption('DEDUCTIBLE')
-  await expensePolicy.getByLabel('进项税科目').selectOption('222101')
+  await expensePolicy.getByLabel('进项税科目范围（不可抵扣时禁止用于分录）').selectOption('222101')
   await expensePolicy.getByRole('checkbox').check()
   await expensePolicy.getByRole('button', { name: '保存费用报销政策' }).click()
   await expect(page.locator('.alert')).toContainText('费用报销政策已保存为 V1')
@@ -533,10 +636,27 @@ test('财务确认费用政策后可按版本生成平衡规则候选', async ({
   const voucher = await (await voucherResponse).json()
   expect(voucher.status).toBe('VALIDATED')
   expect(voucher.policy.policy_ref).toBe('accounting-policy:EXPENSE:v1')
-  expect(voucher.debit_total).toBe('106.00')
-  expect(voucher.credit_total).toBe('106.00')
+  expect(voucher.debit_total).toBe('4448.00')
+  expect(voucher.credit_total).toBe('4448.00')
+  expect(voucher.lines[0].account_code).toBe('660201')
   await expect(page.locator('.voucher-detail .source-note')).toContainText('accounting-policy:EXPENSE:v1')
-  await expect(page.locator('.voucher-detail .source-note')).toContainText('accountant@playwright.example.test')
+  await expect(page.locator('.voucher-detail .source-note')).toContainText('admin@playwright.example.test')
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '财务工作台' }).click()
+  await expect(page.locator('.recent-card')).not.toContainText(eventId.slice(0, 8))
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '单据中心' }).click()
+  await expect(page.locator('article.document-row').filter({ hasText: 'policy-expense-invoice.png' })).toHaveCount(0)
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '业务档案' }).click()
+  await page.getByLabel('搜索业务档案').fill('policy-expense-invoice.png')
+  await page.getByRole('button', { name: '搜索', exact: true }).click()
+  await expect(page.locator('.archive-list-item')).toHaveCount(1)
+  await page.locator('.archive-list-item').click()
+  await expect(page.locator('.archive-detail')).toContainText('policy-expense-invoice.png')
+  await expect(page.locator('.archive-detail')).toContainText('policy-expense-bank.png')
+  await expect(page.locator('.archive-detail')).toContainText('policy-expense-proof.png')
+  await expect(page.locator('.archive-detail')).toContainText('660201')
+  await expect(page.locator('.archive-detail')).toContainText('柠檬云未连接')
+  await page.locator('.archive-document').first().getByText('查看 OCR 结果').click()
+  await expect(page.locator('.archive-document').first()).toContainText('4448.00')
 })
 
 test('6,780元设备购置核对发票和回单并等待资本化政策', async ({ page }) => {
@@ -552,10 +672,9 @@ test('6,780元设备购置核对发票和回单并等待资本化政策', async 
   await uploadAndConfirm(page, bankName, await readFile(privateAssetBankReceipt), 'BANK_RECEIPT', {
     payer: '南昌市杰盛科技有限公司', payee: '南昌市归鸿商贸有限公司', gross_amount: '6780.00', settlement_date: '2024-12-01',
   })
-  for (const [filename, role] of [[invoiceName, 'INVOICE'], [bankName, 'BANK_RECEIPT']]) {
+  for (const filename of [invoiceName, bankName]) {
     const row = page.locator('article.document-row').filter({ hasText: filename })
     await row.locator('input[type="checkbox"]').check()
-    await row.getByLabel('单据业务角色').selectOption(role)
   }
   await page.getByLabel('业务类型').selectOption('ASSET_PURCHASE')
   const reconciliationResponse = page.waitForResponse((response) =>
@@ -595,10 +714,9 @@ test('21,800元办公室租赁核对发票和回单并等待租赁政策及合�
     payer: '南昌市杰盛科技有限公司', payee: '南昌市中智集团地产有限公司',
     settlement_date: '2024-12-01', gross_amount: '21800.00',
   })
-  for (const [filename, role] of [[invoiceName, 'INVOICE'], [bankName, 'BANK_RECEIPT']]) {
+  for (const filename of [invoiceName, bankName]) {
     const row = page.locator('article.document-row').filter({ hasText: filename })
     await row.locator('input[type="checkbox"]').check()
-    await row.getByLabel('单据业务角色').selectOption(role)
   }
   await page.getByLabel('业务类型').selectOption('RENTAL')
   await expect(page.locator('.rental-confirmation-hint')).toContainText('请先在设置中确认租赁直接费用政策')
@@ -633,18 +751,27 @@ test('管理员可以维护账套科目和必填辅助核算维度', async ({ pa
   await page.getByLabel('新科目编码').fill('6602')
   await page.getByLabel('新科目名称').fill('销售费用')
   await page.getByRole('button', { name: '添加科目' }).click()
-  const row = page.locator('tr').filter({ hasText: '6602' })
+  const row = page.getByRole('row').filter({ has: page.getByRole('cell', { name: '6602', exact: true }) })
   await expect(row).toBeVisible()
   await row.getByLabel('6602 辅助核算维度').fill('部门、员工')
   await page.getByRole('button', { name: '保存科目配置' }).click()
-  await expect(page.locator('.alert')).toContainText('已保存 6 个科目配置')
+  await expect(page.locator('.alert')).toContainText(/已保存 \d+ 个科目配置/)
   await expect(row.getByLabel('6602 辅助核算维度')).toHaveValue('部门、员工')
 
+  await page.getByLabel('新科目编码').fill('9998')
+  await page.getByLabel('新科目名称').fill('待删除测试科目')
+  await page.getByRole('button', { name: '添加科目' }).click()
+  await page.getByRole('button', { name: '保存科目配置' }).click()
+  page.once('dialog', (dialog) => dialog.accept())
+  await page.getByRole('button', { name: '删除科目 9998' }).click()
+  await expect(page.locator('tr').filter({ hasText: '9998' })).toHaveCount(0)
+  await page.getByRole('button', { name: '刷新', exact: true }).click()
+  await expect(page.locator('tr').filter({ hasText: '9998' })).toHaveCount(0)
+
   const assetPolicy = page.locator('.policy-editor').filter({ hasText: '设备购置' })
-  await assetPolicy.getByLabel('借方科目').selectOption('1601')
-  await assetPolicy.getByLabel('付款科目').selectOption('1002')
+  await assetPolicy.getByLabel('允许科目范围（可多选）').selectOption(['1601', '1002', '222101'])
   await assetPolicy.getByLabel('进项税处理').selectOption('DEDUCTIBLE')
-  await assetPolicy.getByLabel('进项税科目').selectOption('222101')
+  await assetPolicy.getByLabel('进项税科目范围（不可抵扣时禁止用于分录）').selectOption('222101')
   await assetPolicy.getByRole('checkbox').check()
   await assetPolicy.getByRole('button', { name: '保存设备购置政策' }).click()
   await expect(page.locator('.alert')).toContainText('设备购置政策已保存为 V1')
@@ -667,7 +794,7 @@ test('发票与入库单金额冲突时显示待复核并阻止制证', async ({
   })
   await uploadAndConfirm(page, 'conflict-bank-receipt.png', bankImage, 'BANK_RECEIPT', {
     payer: '南昌市杰盛科技有限公司', payee: '南昌市视维科技公司', settlement_date: '2024-12-01',
-    gross_amount: '45200.00', settled: 'true',
+    gross_amount: '45200.00', settled: 'SETTLED',
   })
 
   const rolesByFile: Record<string, string> = {
@@ -675,10 +802,9 @@ test('发票与入库单金额冲突时显示待复核并阻止制证', async ({
     'conflict-goods-receipt.png': 'GOODS_RECEIPT',
     'conflict-bank-receipt.png': 'BANK_RECEIPT',
   }
-  for (const [filename, role] of Object.entries(rolesByFile)) {
+  for (const filename of Object.keys(rolesByFile)) {
     const row = page.locator('article.document-row').filter({ hasText: filename })
     await row.locator('input[type="checkbox"]').check()
-    await row.getByLabel('单据业务角色').selectOption(role)
   }
   const createEventResponse = page.waitForResponse((response) =>
     response.url().endsWith('/api/v1/business-events') && response.request().method() === 'POST',
@@ -723,14 +849,13 @@ test('缺少银行回单时进入待复核并说明缺失单据', async ({ page 
     proof_number: 'PAY-2024-12-001', payment_date: '2024-12-01', payer: '南昌市杰盛科技有限公司',
     payee: '南昌市视维科技公司', gross_amount: '45200.00', approved: 'true',
   })
-  for (const [filename, role] of Object.entries({
+  for (const filename of Object.keys({
     'missing-bank-invoice.png': 'INVOICE',
     'missing-bank-goods-receipt.png': 'GOODS_RECEIPT',
     'missing-bank-payment-proof.png': 'PAYMENT_PROOF',
   })) {
     const row = page.locator('article.document-row').filter({ hasText: filename })
     await row.locator('input[type="checkbox"]').check()
-    await row.getByLabel('单据业务角色').selectOption(role)
   }
 
   await page.getByRole('button', { name: '确认关联并核对' }).click()
@@ -797,7 +922,7 @@ test('合同订购数量多于入库数量时进入待复核并禁止生成凭�
     gross_amount: '45200.00', received: 'true',
   })
   await uploadAndConfirm(page, 'shortfall-bank.png', await syntheticDocument(page, 'SHORTFALL BANK RECEIPT 45200.00'), 'BANK_RECEIPT', {
-    payer: 'Buyer Ltd', payee: 'Seller Ltd', settlement_date: '2024-12-01', gross_amount: '45200.00', settled: 'true',
+    payer: 'Buyer Ltd', payee: 'Seller Ltd', settlement_date: '2024-12-01', gross_amount: '45200.00', settled: 'SETTLED',
   })
 
   const rolesByFile: Record<string, string> = {
@@ -806,10 +931,9 @@ test('合同订购数量多于入库数量时进入待复核并禁止生成凭�
     'shortfall-receipt.png': 'GOODS_RECEIPT',
     'shortfall-bank.png': 'BANK_RECEIPT',
   }
-  for (const [filename, role] of Object.entries(rolesByFile)) {
+  for (const filename of Object.keys(rolesByFile)) {
     const row = page.locator('article.document-row').filter({ hasText: filename })
     await row.locator('input[type="checkbox"]').check()
-    await row.getByLabel('单据业务角色').selectOption(role)
   }
   await page.getByRole('button', { name: '确认关联并核对' }).click()
 

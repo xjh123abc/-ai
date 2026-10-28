@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 from tempfile import mkdtemp
+from decimal import Decimal
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -20,8 +21,7 @@ from app.db.base import Base  # noqa: E402
 from app.db.session import SessionLocal, engine  # noqa: E402
 from app.main import app  # noqa: E402
 from app.security import hash_password  # noqa: E402
-from ai.suggestions import (ConfiguredAccountingSuggestionProvider, FixtureRuleSuggestionProvider,
-    SuggestedLine, SuggestionProviderError, SuggestionTrace, VoucherSuggestion)  # noqa: E402
+from ai.suggestions import SuggestedLine, SuggestionProviderError, SuggestionTrace, VoucherSuggestion  # noqa: E402
 from app.routers.workflow import get_accounting_suggestion_provider  # noqa: E402
 
 
@@ -29,19 +29,28 @@ class PlaywrightOnlySuggestionProvider:
     """Deterministic UI fixture; never represents a real model call."""
     def suggest(self, *, net, tax, gross, evidence_refs, policy, context=None):
         if context.business_type == 'PURCHASE':
-            candidate = FixtureRuleSuggestionProvider().suggest(net=net, tax=tax, gross=gross,
-                evidence_refs=evidence_refs, policy={'fixture_only': True, 'business_use': 'resale_inventory'})
+            lines = (
+                SuggestedLine('1405', '库存商品', net, Decimal('0.00'), '测试模型返回的库存分录', evidence_refs),
+                SuggestedLine('222101', '进项税额', tax, Decimal('0.00'), '测试模型返回的税额分录', evidence_refs),
+                SuggestedLine('1002', '银行存款', Decimal('0.00'), gross, '测试模型返回的付款分录', evidence_refs),
+            )
         else:
-            candidate = ConfiguredAccountingSuggestionProvider().suggest(net=net, tax=tax, gross=gross,
-                evidence_refs=evidence_refs, policy={**context.policy_summary, 'policy_ref': context.policy_summary['policy_ref']})
-        return VoucherSuggestion(provider='PLAYWRIGHT_TEST_STUB', policy_ref=candidate.policy_ref,
+            tax_code = context.policy_summary['input_tax_account_codes'][0]
+            debit_code = next(code for code in context.policy_summary['allowed_account_codes']
+                              if code not in {'1002', tax_code})
+            debit_amount = net if context.policy_summary['tax_treatment'] == 'DEDUCTIBLE' else gross
+            lines = [SuggestedLine(debit_code, '', debit_amount, Decimal('0.00'), '业务支出', evidence_refs)]
+            if context.policy_summary['tax_treatment'] == 'DEDUCTIBLE' and tax:
+                lines.append(SuggestedLine(tax_code, '', tax, Decimal('0.00'), '进项税', evidence_refs))
+            lines.append(SuggestedLine('1002', '', Decimal('0.00'), gross, '付款', evidence_refs))
+        return VoucherSuggestion(provider='PLAYWRIGHT_TEST_STUB', policy_ref=context.policy_summary['policy_ref'],
             warnings=('仅 Playwright 测试替身，不是真实 DeepSeek 输出',),
             policy_explanation='Playwright 自动化测试替身',
             trace=SuggestionTrace(provider='PLAYWRIGHT_TEST_STUB', model_version='test-stub',
                 prompt_version='playwright-fixture-v1', input_digest='a' * 64,
                 output_digest='b' * 64, call_status='TEST_STUB', validation_status='PASSED'),
             lines=tuple(SuggestedLine(line.account_code, line.account_name, line.debit, line.credit,
-                line.description, line.evidence_refs, 'Playwright 自动化测试理由') for line in candidate.lines))
+                line.description, line.evidence_refs, 'Playwright 自动化测试理由') for line in lines))
 
 
 class PlaywrightFailingSuggestionProvider:

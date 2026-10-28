@@ -335,10 +335,9 @@ class ChartAccountsBody(BaseModel):
 
 
 class AccountingPolicyInput(BaseModel):
-    debit_account_code: str = Field(min_length=1, max_length=40)
-    bank_account_code: str = Field(min_length=1, max_length=40)
+    allowed_account_codes: list[str] = Field(min_length=1, max_length=2000)
     tax_treatment: str = Field(pattern="^(DEDUCTIBLE|NON_DEDUCTIBLE)$")
-    input_tax_account_code: str | None = Field(default=None, max_length=40)
+    input_tax_account_codes: list[str] = Field(min_length=1, max_length=100)
     accounting_treatment: str = Field(pattern="^(EXPENSE|CAPITALIZE|DIRECT_EXPENSE)$")
     confirmed: bool
 
@@ -346,10 +345,16 @@ class AccountingPolicyInput(BaseModel):
     def validate_policy_confirmation(self):
         if not self.confirmed:
             raise ValueError("保存前必须确认这是财务负责人核定的会计处理政策")
-        if self.tax_treatment == "DEDUCTIBLE" and not self.input_tax_account_code:
-            raise ValueError("可抵扣进项税必须指定进项税科目")
-        if self.tax_treatment == "NON_DEDUCTIBLE" and self.input_tax_account_code:
-            raise ValueError("不可抵扣进项税不能指定进项税科目")
+        tax_codes = set(self.input_tax_account_codes)
+        allowed_codes = set(self.allowed_account_codes)
+        if self.tax_treatment == "DEDUCTIBLE" and not tax_codes.issubset(allowed_codes):
+            raise ValueError("进项税科目必须在允许科目范围内")
+        if self.tax_treatment == "NON_DEDUCTIBLE" and tax_codes.intersection(allowed_codes):
+            raise ValueError("不可抵扣政策不能允许进项税科目入账")
+        if len(self.allowed_account_codes) != len(set(self.allowed_account_codes)):
+            raise ValueError("允许科目不能重复")
+        if len(self.input_tax_account_codes) != len(tax_codes):
+            raise ValueError("进项税科目不能重复")
         return self
 
 
@@ -390,9 +395,7 @@ def save_accounting_policy(business_type: str, body: AccountingPolicyInput,
     expected_treatment = {"EXPENSE": "EXPENSE", "ASSET_PURCHASE": "CAPITALIZE", "RENTAL": "DIRECT_EXPENSE"}[business_type]
     if body.accounting_treatment != expected_treatment:
         raise HTTPException(422, f"{business_type} 必须由财务负责人确认处理方式 {expected_treatment}")
-    account_codes = [body.debit_account_code, body.bank_account_code]
-    if body.input_tax_account_code:
-        account_codes.append(body.input_tax_account_code)
+    account_codes = [*body.allowed_account_codes, *body.input_tax_account_codes]
     accounts = db.scalars(select(ChartAccount).where(
         ChartAccount.account_set_id == principal.account_set_id,
         ChartAccount.code.in_(account_codes),
@@ -410,16 +413,24 @@ def save_accounting_policy(business_type: str, body: AccountingPolicyInput,
     if previous and previous.configuration == configuration and previous.confirmed_by == principal.actor:
         return {"business_type": business_type, "version": previous.version,
             "configuration": previous.configuration, "unchanged": True}
-    in_flight = db.scalar(select(VoucherDraft.id).join(
+    in_flight = db.scalars(select(VoucherDraft).join(
         BusinessEvent, BusinessEvent.id == VoucherDraft.event_id,
     ).where(
         VoucherDraft.account_set_id == principal.account_set_id,
         BusinessEvent.event_type == business_type,
         VoucherDraft.status.in_(("DRAFT", "NEEDS_REVIEW", "VALIDATED", "PENDING_APPROVAL", "APPROVED",
             "EXPORTED_PENDING_MANUAL_POST", "SUBMITTING", "POSTED_PENDING_VERIFY", "UNKNOWN", "FAILED_POSTING")),
-    ).limit(1))
-    if in_flight:
+    ).with_for_update()).all()
+    removable_statuses = {"DRAFT", "NEEDS_REVIEW", "VALIDATED"}
+    if any(draft.status not in removable_statuses for draft in in_flight):
         raise HTTPException(409, "当前账套有未完成凭证，请先处理后再变更会计政策")
+    for draft in in_flight:
+        deletion_record = {"draft_id": draft.id, "version": draft.version, "status": draft.status}
+        db.add(AuditEvent(tenant_id=principal.tenant_id, actor=principal.actor,
+            event_type="VOUCHER_DRAFT_DELETED_FOR_POLICY_CHANGE", entity_ref=draft.id,
+            source_refs=[draft.event_id],
+            before_hash=sha256(json.dumps(deletion_record, sort_keys=True).encode()).hexdigest()))
+        db.delete(draft)
     version = (previous.version + 1) if previous else 1
     row = AccountingPolicy(account_set_id=principal.account_set_id, business_type=business_type,
         version=version, configuration=configuration, confirmed_by=principal.actor)
@@ -436,7 +447,8 @@ def save_accounting_policy(business_type: str, body: AccountingPolicyInput,
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(409, "政策版本已被其他用户更新，请刷新后重试") from exc
-    return {"business_type": business_type, "version": version, "configuration": configuration, "unchanged": False}
+    return {"business_type": business_type, "version": version, "configuration": configuration,
+            "unchanged": False, "deleted_draft_count": len(in_flight)}
 
 
 @router.put("/chart-accounts")
@@ -480,3 +492,30 @@ def import_chart_accounts(body: ChartAccountsBody, db: Session = Depends(db_sess
                       after_hash=sha256(json.dumps(after_config, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()))
     db.commit()
     return {"account_set_id":principal.account_set_id,"upserted":len(body.accounts)}
+
+
+@router.delete("/chart-accounts/{code}")
+def remove_chart_account(code: str, db: Session = Depends(db_session), principal: Principal = Depends(current_principal)):
+    require(principal, "manage_members")
+    row = db.scalar(select(ChartAccount).where(
+        ChartAccount.account_set_id == principal.account_set_id, ChartAccount.code == code,
+    ))
+    if row is None:
+        raise HTTPException(404, "科目不存在")
+    if db.scalar(select(VoucherDraftLine.id).join(VoucherDraft).where(
+        VoucherDraft.account_set_id == principal.account_set_id,
+        VoucherDraftLine.account_code == code,
+    ).limit(1)):
+        raise HTTPException(409, "科目已被凭证使用，不能删除")
+    policies = db.scalars(select(AccountingPolicy).where(
+        AccountingPolicy.account_set_id == principal.account_set_id,
+    )).all()
+    if any(code in (policy.configuration.get("allowed_account_codes", []) +
+                    policy.configuration.get("input_tax_account_codes", [])) for policy in policies):
+        raise HTTPException(409, "科目已被会计政策使用，不能删除")
+    db.delete(row)
+    db.add(AuditEvent(tenant_id=principal.tenant_id, actor=principal.actor,
+                      event_type="CHART_ACCOUNT_DELETED", entity_ref=principal.account_set_id,
+                      source_refs=[], before_hash=sha256(f"{code}:{row.name}".encode()).hexdigest()))
+    db.commit()
+    return {"deleted": code}

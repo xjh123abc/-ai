@@ -85,7 +85,7 @@ def test_deepseek_provider_sends_only_allowlisted_structured_data_and_parses_sug
     assert suggestion.lines[0].rationale == "商品用于销售"
     assert suggestion.policy_explanation.startswith("依据已确认")
     assert suggestion.trace is not None
-    assert suggestion.trace.prompt_version == "voucher-suggestion-v1"
+    assert suggestion.trace.prompt_version == "voucher-suggestion-v2"
     assert suggestion.trace.call_status == "SUCCEEDED"
     assert suggestion.trace.validation_status == "PASSED"
     assert suggestion.trace.input_digest and suggestion.trace.output_digest
@@ -97,6 +97,28 @@ def test_deepseek_provider_sends_only_allowlisted_structured_data_and_parses_sug
     assert "bank_account_number" not in sent_prompt
     assert requests[0][2]["response_format"] == {"type": "json_object"}
     assert requests[0][3] > 0
+
+
+def test_deepseek_receives_linked_document_facts_with_sources_and_four_tasks():
+    requests = []
+    provider = DeepSeekAccountingSuggestionProvider(
+        api_key="test-secret", base_url="https://deepseek.test",
+        http_post=lambda _url, _headers, payload, _timeout: (requests.append(payload), valid_completion())[1],
+    )
+    source_context = replace(context(), source_documents=(
+        {"evidence_ref": INVOICE_ID, "role": "INVOICE", "fields": {"item": "办公用品", "net_amount": "40000.00"}},
+        {"evidence_ref": RECEIPT_ID, "role": "PAYMENT_PROOF", "fields": {"purpose": "办公室采购报销", "gross_amount": "45200.00"}},
+    ))
+
+    provider.suggest(net=Decimal("40000.00"), tax=Decimal("5200.00"), gross=Decimal("45200.00"),
+                     evidence_refs=(INVOICE_ID, RECEIPT_ID), policy={"policy_ref": "fixture-purchase-v1"},
+                     context=source_context)
+
+    prompt = requests[0]["messages"]
+    sent = json.loads(prompt[1]["content"])
+    assert sent["source_documents"][1] == {"evidence_ref": RECEIPT_ID, "role": "PAYMENT_PROOF",
+                                            "fields": {"purpose": "办公室采购报销", "gross_amount": "45200.00"}}
+    assert all(word in prompt[0]["content"] for word in ("业务性质", "有效科目表", "完整凭证", "每条分录"))
 
 
 def test_deepseek_provider_requires_credentials_and_context():
