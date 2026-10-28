@@ -1,28 +1,1019 @@
-YªçŠx-®éÜj×¢ëiºÚ+Š§j[h‘éÜ¢éí×÷õ:-jZ.¶›­–)Ş³SÇ67&—B6WGWÆæsÒ'G2#à¦–×÷'B²6ö×WFVBÂöäÖ÷VçFVBÂ&VbÒg&öÒwgVRp §G—RFö2Ò²–C¢7G&–æs²f–ÆVæÖS¢7G&–æs²Ö–ÖU÷G—S¢7G&–æs²&ö6W76–æu÷7FGW3¢7G&–æs²WÆöFVEöCó¢7G&–ærĞ§G—RW‡G&7FVDf–VÆBÒ²&u÷fÇVSó¢7G&–ærÂçVÆÃ²æ÷&ÖÆ—¦VE÷fÇVSó¢7G&–ærÂçVÆÃ²6öæf–FVæ6S¢çVÖ&W#²7FGW3ó¢7G&–æs²vSó¢çVÖ&W"ÂçVÆÃ²&&÷ƒó¢çVÖ&W%µÒÂçVÆÃ²Wf–FVæ6U÷FW‡Có¢7G&–ærĞ§G—RWfVçE&÷rÒ²–C¢7G&–æs²WfVçE÷G—S¢7G&–æs²'G•öæÖS¢7G&–ærÂçVÆÃ²7FGW3¢7G&–æs²Ö÷VçC¢7G&–ærÂçVÆÃ²7&VFVEöCó¢7G&–æs²Fö7VÖVçEö6÷VçC¢çVÖ&W#²Fö7VÖVçEö–G3¢7G&–æuµÓ²f÷V6†W%÷7FGW3¢7G&–ærÂçVÆÃ²÷7F–æu÷7FGW3¢7G&–ærĞ§G—RG&gBÒ²–C¢7G&–æs²WfVçEö–C¢7G&–æs²fW'6–öã¢çVÖ&W#²7FGW3¢7G&–æs²W&–öC¢7G&–æs²FV&—E÷F÷FÃ¢7G&–æs²7&VF—E÷F÷FÃ¢7G&–æs²öÆ–7“ó¢&V6÷&CÇ7G&–ærÂVæ¶æ÷vãã²Æ–æW3¢²66÷VçEö6öFS¢7G&–æs²66÷VçEöæÖS¢7G&–æs²FV&—C¢7G&–æs²7&VF—C¢7G&–æs²Wf–FVæ6U÷&Vg3¢7G&–æuµÒÕµÒĞ§G—R66U&÷rÒ²–C¢7G&–æs²WfVçEö–C¢7G&–ærÂçVÆÃ²G—S¢7G&–æs²7FGW3¢7G&–æs²6WfW&—G“¢7G&–æs²FWF–Ç3¢&V6÷&CÇ7G&–ærÂVæ¶æ÷vãã²6÷W&6U÷&Vg3¢7G&–æuµÒĞ§G—RWfVçDFWF–ÂÒ²–C¢7G&–æs²7FGW3¢7G&–æs²Ö÷VçC¢7G&–ærÂçVÆÃ²f–æF–æw3¢&V6÷&CÇ7G&–ærÂVæ¶æ÷vãåµÓ²Fö7VÖVçG3¢²–C¢7G&–æs²f–ÆVæÖS¢7G&–æs²&öÆS¢7G&–æs²W‡G&7F–öå÷fW'6–öã¢çVÖ&W"ÕµÒĞ§G—R66÷T÷F–öâÒ²ÖVÖ&W'6†—ö–C¢7G&–æs²FVæçEö–C¢7G&–æs²66÷VçE÷6WEö–C¢7G&–æs²FVæçEöæÖS¢7G&–æs²66÷VçE÷6WEöæÖS¢7G&–æs²&öÆS¢7G&–ærĞ§G—R66÷VçF–æuW&–öBÒ²W&–öC¢7G&–æs²7FGW3¢7G&–ærĞ§G—RVF—DVçG'’Ò²–C¢7G&–æs²WfVçE÷G—S¢7G&–æs²7F÷#¢7G&–æs²ö67W'&VEöC¢7G&–ærĞ ¦6öç7BFö72Ò&VcÄFö5µÓâ…µÒ¦6öç7BWfVçG2Ò&VcÄWfVçE&÷uµÓâ…µÒ¦6öç7BG&gG2Ò&VcÄG&gEµÓâ…µÒ¦6öç7B66W2Ò&VcÄ66U&÷uµÓâ…µÒ¦6öç7BFö¶VâÒ&Vb‡6W76–öå7F÷&vRævWD—FVÒ‚w§Ö66W72×Fö¶Vâr’ÇÂrr¦6öç7B6–væVD–âÒ&Vb†fÇ6R¦6öç7BFVÖõ6W76–öâÒ&Vb†fÇ6R¦6öç7B7W'&VçE&öÆRÒ&Vb‚rr¦6öç7BÆöv–äVÖ–ÂÒ&Vb‚rr¦6öç7BÆöv–å77v÷&BÒ&Vb‚rr¦6öç7BÖVÖ&W'6†—÷F–öç2Ò&VcÇ²ÖVÖ&W'6†—ö–C¢7G&–æs²FVæçEö–C¢7G&–æs²66÷VçE÷6WEö–C¢7G&–æs²&öÆS¢7G&–ærÕµÓâ…µÒ¦6öç7B6VÆV7FVDÖVÖ&W'6†—Ò&Vb‚rr¦6öç7BFVæçD–BÒ&Vb‚rr¦6öç7B66÷VçE6WD–BÒ&Vb‚rr¦6öç7B66÷T÷F–öç2Ò&VcÅ66÷T÷F–öåµÓâ…µÒ¦6öç7B66÷VçF–æuW&–öG2Ò&VcÄ66÷VçF–æuW&–öEµÓâ…µÒ¦6öç7B6VÆV7FVEW&–öBÒ&Vb‚rr¦6öç7B&Wf–Ww2Ò&VcÅ&V6÷&CÇ7G&–ærÂ7G&–æsãâ‡·Ò¦6öç7B6VÆV7FVBÒ&VcÇ7G&–æuµÓâ…µÒ¦6öç7B&öÆW2Ò&VcÅ&V6÷&CÇ7G&–ærÂ7G&–æsãâ‡·Ò¦6öç7BVF—F–ærÒ&VcÅ&V6÷&CÇ7G&–ærÂ²fW'6–öã¢çVÖ&W#²G—S¢7G&–æs²f–VÆG3¢&V6÷&CÇ7G&–ærÂW‡G&7FVDf–VÆCã²&V6öã¢7G&–æs²gVÆÅFW‡C¢7G&–æs²W‡G&7F–öå7FGW3¢7G&–æs²&÷f–FW#¢7G&–æs²ÖöFVÅfW'6–öã¢7G&–ærÓãâ‡·Ò¦6öç7BÖW76vRÒ&Vb‚rr¦6öç7B7F—fUf–WrÒ&Vb‚wv÷&·76Rr¦6öç7BWfVçD–BÒ&Vb‚rr¦6öç7BWfVçDFWF–ÂÒ&VcÄWfVçDFWF–ÂÂçVÆÃâ†çVÆÂ¦6öç7BG&gBÒ&VcÄG&gBÂçVÆÃâ†çVÆÂ¦6öç7BVF—DVçG&–W2Ò&VcÄVF—DVçG'•µÓâ…µÒ¦6öç7BÆöF–ærÒ&Vb†fÇ6R¦6öç7B'W7’Ò&Vb†fÇ6R¦6öç7B”f–Æ&ÆRÒ&Vb‡G'VR¦6öç7BWÆöD–çWBÒ&VcÄ…DÔÄ–çWDVÆVÖVçBÂçVÆÃâ†çVÆÂ¦6öç7B'W6–æW75vRÒ&Vbƒ¦6öç7Bf÷V6†W%vRÒ&Vbƒ¦6öç7BvU6—¦RÒ€ ¦6öç7Bæd—FV×2Ò°¢²–C¢wv÷&·76RrÂÆ&VÃ¢~‹J.Xª[z^KÙÎXûrÂ–6öã¢~(È"rÒÀ¢²–C¢vFö7VÖVçG2rÂÆ&VÃ¢~XÙ^hÚîKŠŞ[ø2rÂ–6öã¢~)jBrÒÀ¢²–C¢v'W6–æW72rÂÆ&VÃ¢~K‰®XªKŠŞ[ø2rÂ–6öã¢~(xBrÒÀ¢²–C¢wf÷V6†W'2rÂÆ&VÃ¢~XzŞŠøKŠŞ[ø2rÂ–6öã¢~)jrrÒÀ¢²–C¢v66W2rÂÆ&VÃ¢~jZûKˆî[È.[‹‚rÂ–6öã¢~)©rÒÀ¢²–C¢v–ç6–v‡G2rÂÆ&VÃ¢~‹J.XªXˆniérÂ–6öã¢~){rrÒÀ¢²–C¢v–çFVw&F–öç2rÂÆ&VÃ¢~‹ùîhê^KˆîŠëî{ÚârÂ–6öã¢~)©’rÒÀ¥Ğ ¦6öç7BVæF–ætFö72Ò6ö×WFVB‚‚’ÓâFö72çfÇVRæf–ÇFW"‚†—FVÒ’Óâ—FVÒç&ö6W76–æu÷7FGW2ÓÒt4ôäd•$ÔTBr’æÆVæwF‚¦6öç7BÆ–æ¶VDFö7VÖVçD–G2Ò6ö×WFVB‚‚’ÓâæWr6WB†WfVçG2çfÇVRæfÆDÖ‚†—FVÒ’Óâ†—FVÒ2WfVçE&÷rb²Fö7VÖVçEö–G3ó¢7G&–æuµÒÒ’æFö7VÖVçEö–G2ÇÂµÒ’’¦6öç7BVæÆ–æ¶VDFö72Ò6ö×WFVB‚‚’ÓâFö72çfÇVRæf–ÇFW"‚†—FVÒ’ÓâÆ–æ¶VDFö7VÖVçD–G2çfÇVRæ†2†—FVÒæ–B’’æÆVæwF‚¦6öç7BW&–öDG&gG2Ò6ö×WFVB‚‚’Óâ6VÆV7FVEW&–öBçfÇVRòG&gG2çfÇVRæf–ÇFW"‚†—FVÒ’Óâ—FVÒçW&–öBÓÓÒ6VÆV7FVEW&–öBçfÇVR’¢G&gG2çfÇVR¦6öç7BVæF–æt&÷fÇ2Ò6ö×WFVB‚‚’ÓâW&–öDG&gG2çfÇVRæf–ÇFW"‚†—FVÒ’Óâ—FVÒç7FGW2ÓÓÒuTäD”äuô$õdÂr’æÆVæwF‚¦6öç7BfW&–f–VE÷7F–æw2Ò6ö×WFVB‚‚’ÓâW&–öDG&gG2çfÇVRæf–ÇFW"‚†—FVÒ’Óâ—FVÒç7FGW2ÓÓÒudU$”d”TBr’æÆVæwF‚¦6öç7B÷7F–æt—77VW2Ò6ö×WFVB‚‚’ÓâW&–öDG&gG2çfÇVRæf–ÇFW"‚†—FVÒ’Óâ²td”ÄTBrÂuTä´äõtâuÒæ–æ6ÇVFW2†—FVÒç7FGW2’’æÆVæwF‚¦6öç7B÷Vä66W2Ò6ö×WFVB‚‚’Óâ66W2çfÇVRæf–ÇFW"‚†—FVÒ’Óâ—FVÒç7FGW2ÓÓÒtõTâr’¦6öç7B&V6VçDWfVçG2Ò6ö×WFVB‚‚’ÓâWfVçG2çfÇVRç6Æ–6RƒÂb’¦6öç7BvVDWfVçG2Ò6ö×WFVB‚‚’ÓâWfVçG2çfÇVRç6Æ–6R‚†'W6–æW75vRçfÇVRÒ’¢vU6—¦RÂ'W6–æW75vRçfÇVR¢vU6—¦R’¦6öç7BvVDG&gG2Ò6ö×WFVB‚‚’ÓâG&gG2çfÇVRç6Æ–6R‚‡f÷V6†W%vRçfÇVRÒ’¢vU6—¦RÂf÷V6†W%vRçfÇVR¢vU6—¦R’¦6öç7B'W6–æW75vW2Ò6ö×WFVB‚‚’ÓâÖF‚æÖ‚ƒÂÖF‚æ6V–Â†WfVçG2çfÇVRæÆVæwF‚òvU6—¦R’’¦6öç7Bf÷V6†W%vW2Ò6ö×WFVB‚‚’ÓâÖF‚æÖ‚ƒÂÖF‚æ6V–Â†G&gG2çfÇVRæÆVæwF‚òvU6—¦R’’¦6öç7B6å7V&Ö—Ef÷V6†W"Ò6ö×WFVB‚‚’ÓâFVÖõ6W76–öâçfÇVRÇÂ²uDTäåEôDÔ”ârÂt44õTåDåBuÒæ–æ6ÇVFW2†7W'&VçE&öÆRçfÇVR’¦6öç7B6ä&÷fUf÷V6†W"Ò6ö×WFVB‚‚’ÓâFVÖõ6W76–öâçfÇVRÇÂ²uDTäåEôDÔ”ârÂt$õdU"rÂtõtäU"uÒæ–æ6ÇVFW2†7W'&VçE&öÆRçfÇVR’¦6öç7B6äW‡÷'Ef÷V6†W"Ò6ö×WFVB‚‚’ÓâFVÖõ6W76–öâçfÇVRÇÂ²uDTäåEôDÔ”ârÂt44õTåDåBrÂt$õdU"rÂtTD•Dõ"rÂtõtäU"uÒæ–æ6ÇVFW2†7W'&VçE&öÆRçfÇVR’¦6öç7B7FGW4Æ&VÂÒ‡7FGW3¢7G&–ærÂçVÆÂÂVæFVf–æVB’Óâ‡°¢UÄôDTC¢~[è^ŠønXŠ²rÂ$ô4U54”äs¢~ŠønXŠ¾KŠÒrÂäTTE5õ$Ud”Us¢~[è^zîŠêBrÂ4ôäd•$ÔTC¢~[{.zîŠêBrÂd”ÄTC¢~Šz>iéZK‹JRrÀ¢ÔD4„TC¢~jZûKˆˆ{BrÂ%D”Ã¢~˜:XˆnXË˜XÒrÂ”å5Tdd”4”TåEôUd”DTä4S¢~ŠøhÚîKˆŞ‹k2rÂäTTE5õ$Ud”UuôUdTåC¢~[è^ZHŞj‚rÀ¢E$eC¢~ˆØz‹òrÂdÄ”DDTC¢~j
-š¨Î˜	®‹ørrÂTäD”äuô$õdÃ¢~[è^Zêj‚rÂ$õdTC¢~[{.h›XxbrÂ$T¤T5DTC¢~[{.˜Y¹ârÀ¢5T$Ô•ED”äs¢~hùKªNKŠÒrÂõ5DTEõTäD”äuõdU$”e“¢~XZ^‹Jn[è^jZéârÂdU$”d”TC¢~[{.jZéîXZ^‹JbrÂTä´äõtã¢~{¹>iéÎiÊ®yúRrÀ¢d”ÄTEõõ5D”äs¢~XiXZ^ZK‹JRrÂU…õ%DTEõTäD”äuôÔåTÅõõ5C¢~[{.ZûÎX{®[è^K«®[z^XZ^‹JbrÂõTã¢~[è^ZHNybrÂ$U4ôÅdTC¢~[{.Šz>Xk2rÀ§Õ·7FGW2ÇÂruÒÇÂ7FGW2ÇÂ~i¨.izr¦6öç7Bf–æF–ætÆ&VÂÒ†f–æF–æs¢&V6÷&CÇ7G&–ærÂVæ¶æ÷vãâ’Óâ‡°¢$UT•$TEôDô5TÔTåEõ$ôÄU5ôÔ•54”äuôõ%ôEUÄ”4DTC¢~XÙ^hÚîŠy.ˆ›.{Ë®ZKh‰n˜xŞZHÒrÂDô5TÔTåEõE•Uõ$ôÄUô4ôädÄ”5C¢~XÙ^hÚî{¾Yè¾Kˆîh˜˜Šy.ˆ›.KˆŞKˆˆ{BrÀ¢u$õ55ôÔõTåEôÔ•54”äuôõ%ô”ådÄ”C¢~˜yš)Ş{Ë®ZKh‰njÎ[Èşizk9^ŠønXŠ²rÂu$õ55ôÔõTåEôÔ•4ÔD4ƒ¢~XùzZ8XZ^[©>XÙ^KˆîY¹îXÙ^˜yš)ŞKˆŞKˆˆ{BrÀ¢d•…EU$Uô”ådô”4UõD…ôõ%ôäUEôÔ•4ÔD4ƒ¢~XùzZiÊ®zˆî˜yš)Şh‰nzˆîš)ŞKˆîš¨ÎiKnŠxNX‰KˆŞKˆˆ{BrÂtôôE5õ$T4T•EôäõEô4ôäd•$ÔTC¢~[	®iÊ®zîŠêN‹J~xš[{.XZ^[©2rÀ¢$äµõ4UEDÄTÔTåEôäõEô4ôäd•$ÔTC¢~[	®iÊ®zîŠêN™;nŠÎ[{.kˆ^zérrÂDDUôUd”DTä4UôÔ•54”äuôõ%ô”ådÄ”C¢~iz^iÉşŠøhÚî{Ë®ZKh‰njÎ[ÈşiziX‚rÀ¢d•…EU$UõU$”ôEôÔ•4ÔD4ƒ¢~XÙ^hÚîiz^iÉşKˆŞYÊYÎKˆKÉ®ŠêiÉş™{BrÂ%E•ôUd”DTä4UôÔ•54”äs¢~K¹jËîikh‰nKªNi‰>ZûikŠøhÚî{Ë®ZKrÀ¢”U%ô%U”U%ôÔ•4ÔD4ƒ¢~Y¹îXÙ^K¹jËîikKˆîXùzZ‹JŞK›ikKˆŞKˆˆ{BrÂ”TUõ4TÄÄU%ôÔ•4ÔD4ƒ¢~Y¹îXÙ^iKnjËîikKˆîXùzZ™HYJîikKˆŞKˆˆ{BrÀ§Õµ7G&–ær†f–æF–æræ6öFRÇÂrr•ÒÇÂ~jZûŠxNX‰iÊ®˜	®‹ørr¦6öç7B66TÆ&VÂÒ‡G—S¢7G&–ær’Óâ‡²$T4ôä4”Ä”D”ôã¢~K‰®XªjZû[È.[‹‚rÂEUÄ”4DUô”ådô”4S¢~yiKËÎ˜xŞZHŞXùzZ‚rÕ·G—UÒÇÂ~[è^ZHNyn[È.[‹‚r¦6öç7BVF—DÆ&VÂÒ‡G—S¢7G&–ær’Óâ‡°¢dõT4„U%õ%TÄUô4äD”DDUô5$TDTC¢~yIşh‰ŠxNX‰X	˜XzŞŠørÂdõT4„U%õ5T$Ô•EDTC¢~hùKªNXzŞŠøZêj‚rÀ¢dõT4„U%ô$õdS¢~Zêh›˜	®‹ørrÂdõT4„U%õ$T¤T5C¢~Zêh›˜Y¹ârÂdõT4„U%ôU…õ%DTEõTäD”äuôÔåTÅõõ5C¢~ZûÎX{®[è^K«®[z^XZ^‹Jnih~K»brÀ¢dõT4„U%õõ5DTC¢tU%XzŞŠø[{.XiXZRrÂdõT4„U%õdU$”d”TC¢tU%Y¹îŠû¾jZéîZèÎh‰rÂdõT4„U%õõ5D”äuõTä´äõtã¢tU%XiXZ^{¹>iéÎiÊ®yúRrÀ§Õ·G—UÒÇÂ~XzŞŠøŠë[Ù^[{.i»Nikr¦gVæ7F–öâ66U7VÖÖ'’†—FVÓ¢66U&÷r’°¢6öç7Bf–æF–æw2Ò—FVÒæFWF–Ç3òæf–æF–æw0¢–b„'&’æ—4'&’†f–æF–æw2’bbf–æF–æw2æÆVæwF‚’&WGW&âf–æF–æw2æÖ‚†f–æF–ær’Óâf–æF–ætÆ&VÂ†f–æF–ær2&V6÷&CÇ7G&–ærÂVæ¶æ÷vãâ’’æ¦ö–â‚~ûÉ²r¢–b†—FVÒçG—RÓÓÒtEUÄ”4DUô”ådô”4Rr’&WGW&â~j8kX¾X‹˜xŞZHŞXùzZš8î™šûÈÎ[{.™‹¾jÚ.yIşh‰XzŞŠø8"p¢&WGW&â~™ÈŠhj8iú^y»X[>XÙ^hÚîY(ÎK‰®XªŠøhÚî8"p§Ğ¦6öç7B'W6–æW757FGW4Æ&VÂÒ‡7FGW3¢7G&–ær’Óâ7FGW2ÓÓÒtäTTE5õ$Ud”Urrò~[è^ZHŞj‚r¢7FGW4Æ&VÂ‡7FGW2 ¦7–æ2gVæ7F–öâ’‡Fƒ¢7G&–ærÂ–æ—C¢&WVW7D–æ—BÒ·Ò’°¢6öç7B†VFW'2ÒæWr†VFW'2†–æ—Bæ†VFW'2¢–b‡Fö¶VâçfÇVR’†VFW'2ç6WB‚tWF†÷&—¦F–öârÂ&V&W"G·Fö¶VâçfÇVWÖ¢&WGW&âfWF6‚‡F‚Â²ââæ–æ—BÂ†VFW'2Ò§Ğ ¦7–æ2gVæ7F–öâ&VDÆ—7CÅCâ‡Fƒ¢7G&–ær“¢&öÖ—6SÅEµÓâ°¢6öç7B&W7öç6RÒv—B’‡F‚¢–b‡&W7öç6Rç7FGW2ÓÓÒC2’F‡&÷ræWrW'&÷"‚~[Ù>X˜Ş‹JnXû~k*iÈiú^yÈ¾jÚN[z^KÙÎXË®i[hÚîy¨NiØ>™™8"r¢–b‚&W7öç6Ræö²’F‡&÷ræWrW'&÷"†Šû¾Xùni[hÚîZK‹J^ûÈ‚G·&W7öç6Rç7FGW7ŞûÈ–¢&WGW&â&W7öç6Ræ§6öâ‚§Ğ ¦7–æ2gVæ7F–öâÆöB‚’°¢ÆöF–ærçfÇVRÒG'VP¢G'’°¢6öç7B–FVçF—G•&W7öç6RÒv—B’‚rö’÷cöWF‚öÖRr¢–b‚–FVçF—G•&W7öç6Ræö²’²6–væVD–âçfÇVRÒfÇ6S²”f–Æ&ÆRçfÇVRÒ–FVçF—G•&W7öç6Rç7FGW2ÓÒ²&WGW&âĞ¢6öç7B–FVçF—G’Òv—B–FVçF—G•&W7öç6Ræ§6öâ‚¢6–væVD–âçfÇVRÒG'VP¢FVÖõ6W76–öâçfÇVRÒ–FVçF—G’æFVÖğ¢7W'&VçE&öÆRçfÇVRÒ–FVçF—G’ç&öÆP¢FVæçD–BçfÇVRÒ–FVçF—G’çFVæçEö–@¢66÷VçE6WD–BçfÇVRÒ–FVçF—G’æ66÷VçE÷6WEö–@¢66÷T÷F–öç2çfÇVRÒ–FVçF—G’ç66÷W2ÇÂµĞ¢6öç7B¶Fö7VÖVçG2Â'W6–æW74WfVçG2Âf÷V6†W$G&gG2ÂW†6WF–öä66W2ÂW&–öG5ÒÒv—B&öÖ—6RæÆÂ…°¢&VDÆ—7CÄFö3â‚rö’÷cöFö7VÖVçG2r’Â&VDÆ—7CÄWfVçE&÷sâ‚rö’÷cö'W6–æW72ÖWfVçG2r’À¢&VDÆ—7CÄG&gCâ‚rö’÷c÷f÷V6†W"ÖG&gG2r’Â&VDÆ—7CÄ66U&÷sâ‚rö’÷cöW†6WF–öâÖ66W2r’Â&VDÆ—7CÄ66÷VçF–æuW&–öCâ‚rö’÷cöWF‚ö66÷VçF–ær×W&–öG2r’À¢Ò¢Fö72çfÇVRÒFö7VÖVçG0¢WfVçG2çfÇVRÒ'W6–æW74WfVçG0¢G&gG2çfÇVRÒf÷V6†W$G&gG0¢66W2çfÇVRÒW†6WF–öä66W0¢66÷VçF–æuW&–öG2çfÇVRÒW&–öG0¢–b‚W&–öG2ç6öÖR‚‡W&–öB’ÓâW&–öBçW&–öBÓÓÒ6VÆV7FVEW&–öBçfÇVR’’6VÆV7FVEW&–öBçfÇVRÒW&–öG5³ÓòçW&–öBÇÂrp¢f÷"†6öç7BW&Âöbö&¦V7BçfÇVW2‡&Wf–Ww2çfÇVR’’U$Âç&Wfö¶Tö&¦V7EU$Â‡W&Â¢&Wf–Ww2çfÇVRÒ·Ğ¢v—B&öÖ—6RæÆÂ†Fö72çfÇVRç6Æ–6RƒÂƒ’æÖ†7–æ2†Fö7VÖVçB’Óâ°¢6öç7B&W7öç6RÒv—B’†ö’÷cöFö7VÖVçG2òG¶Fö7VÖVçBæ–GÒö6öçFVçF¢–b‡&W7öç6Ræö²’&Wf–Ww2çfÇVU¶Fö7VÖVçBæ–EÒÒU$Âæ7&VFTö&¦V7EU$Â†v—B&W7öç6Ræ&Æö"‚’¢Ò’¢”f–Æ&ÆRçfÇVRÒG'VP¢Ò6F6‚†W'&÷"’°¢”f–Æ&ÆRçfÇVRÒfÇ6P¢ÖW76vRçfÇVRÒW'&÷"–ç7Fæ6VöbW'&÷"òW'&÷"æÖW76vR¢t’[	®iÊ®‹ùîhê^ûÈÎŠû~j8iú^iÊÎYËiÈŞXª8"p¢Òf–æÆÇ’²ÆöF–ærçfÇVRÒfÇ6RĞ§Ğ ¦7–æ2gVæ7F–öâ7v—F6…66÷R†WfVçC¢WfVçB’°¢6öç7BæW‡D66÷VçE6WBÒ†WfVçBçF&vWB2…DÔÅ6VÆV7DVÆVÖVçB’çfÇVP¢6öç7BF&vWBÒ66÷T÷F–öç2çfÇVRæf–æB‚‡66÷R’Óâ66÷Ræ66÷VçE÷6WEö–BÓÓÒæW‡D66÷VçE6WB¢–b‚F&vWBÇÂF&vWBæ66÷VçE÷6WEö–BÓÓÒ66÷VçE6WD–BçfÇVR’&WGW&à¢6öç7B&Wf–÷W2Ò66÷VçE6WD–BçfÇVP¢6öç7B&W7öç6RÒv—B’‚rö’÷cöWF‚÷7v—F6‚×66÷RrÂ²ÖWF†öC¢uõ5BrÂ†VFW'3¢²t6öçFVçBÕG—Rs¢vÆ–6F–öâö§6öârÒÂ&öG“¢¥4ôâç7G&–æv–g’‡²ÖVÖ&W'6†—ö–C¢F&vWBæÖVÖ&W'6†—ö–BÒ’Ò¢6öç7B&öG’Òv—B&W7öç6Ræ§6öâ‚¢–b‚&W7öç6Ræö²’²66÷VçE6WD–BçfÇVRÒ&Wf–÷W3²ÖW76vRçfÇVRÒ&öG’æFWF–ÂÇÂ~Xˆ~hÚ.‹JnZY~ZK‹J^8"s²&WGW&âĞ¢Fö¶VâçfÇVRÒ&öG’æ66W75÷Fö¶Và¢6W76–öå7F÷&vRç6WD—FVÒ‚w§Ö66W72×Fö¶VârÂFö¶VâçfÇVR¢FVæçD–BçfÇVRÒ&öG’çFVæçEö–@¢66÷VçE6WD–BçfÇVRÒ&öG’æ66÷VçE÷6WEö–@¢6VÆV7FVEW&–öBçfÇVRÒrp¢v—BÆöB‚¢ÖW76vRçfÇVRÒ[{.Xˆ~hÚ.X‹G·F&vWBçFVæçEöæÖWÒ+rG·F&vWBæ66÷VçE÷6WEöæÖWŞ8& §Ğ ¦7–æ2gVæ7F–öâÆöv–â‚’°¢6öç7B&W7öç6RÒv—B’‚rö’÷cöWF‚öÆöv–ârÂ²ÖWF†öC¢uõ5BrÂ†VFW'3¢²t6öçFVçBÕG—Rs¢vÆ–6F–öâö§6öârÒÂ&öG“¢¥4ôâç7G&–æv–g’‡²VÖ–Ã¢Æöv–äVÖ–ÂçfÇVRÂ77v÷&C¢Æöv–å77v÷&BçfÇVRÂâââ‡6VÆV7FVDÖVÖ&W'6†—çfÇVRò²ÖVÖ&W'6†—ö–C¢6VÆV7FVDÖVÖ&W'6†—çfÇVRÒ¢·Ò’Ò’Ò¢6öç7B&öG’Òv—B&W7öç6Ræ§6öâ‚¢–b‡&W7öç6Rç7FGW2ÓÓÒC’bb&öG’æFWF–ÃòæÖVÖ&W'6†—2’²ÖVÖ&W'6†—÷F–öç2çfÇVRÒ&öG’æFWF–ÂæÖVÖ&W'6†—3²ÖW76vRçfÇVRÒ~jÚN‹JnXû~{¹Zé®K¨nZI®KŠ®‹JnZY~ûÈÎŠû~˜hºiÊÎjÊŠh‹ù¾XZ^y¨N‹JnZY~8"s²&WGW&âĞ¢–b‚&W7öç6Ræö²’²ÖW76vRçfÇVRÒG—Vöb&öG’æFWF–ÂÓÓÒw7G&–ærrò&öG’æFWF–Â¢~y›¾[Ù^ZK‹J^ûÈÎŠû~j8iú^‹JnXû~Kúhş8"s²&WGW&âĞ¢Fö¶VâçfÇVRÒ&öG’æ66W75÷Fö¶Và¢6W76–öå7F÷&vRç6WD—FVÒ‚w§Ö66W72×Fö¶VârÂFö¶VâçfÇVR¢Æöv–å77v÷&BçfÇVRÒrp¢v—BÆöB‚§Ğ ¦7–æ2gVæ7F–öâÆöv÷WB‚’°¢–b‚FVÖõ6W76–öâçfÇVR’v—B’‚rö’÷cöWF‚öÆöv÷WBrÂ²ÖWF†öC¢uõ5BrÒ¢6W76–öå7F÷&vRç&VÖ÷fT—FVÒ‚w§Ö66W72×Fö¶Vâr¢Fö¶VâçfÇVRÒrp¢6–væVD–âçfÇVRÒfÇ6P¢Fö72çfÇVRÒµÓ²WfVçG2çfÇVRÒµÓ²G&gG2çfÇVRÒµÓ²66W2çfÇVRÒµĞ§Ğ ¦gVæ7F–öâ÷VåWÆöB‚’²7F—fUf–WrçfÇVRÒvFö7VÖVçG2s²WÆöD–çWBçfÇVSòæ6Æ–6²‚’Ğ¦gVæ7F–öâöäG&÷†WfVçC¢G&tWfVçB’°¢6öç7Bf–ÆW2ÒWfVçBæFFG&ç6fW#òæf–ÆW0¢–b‚f–ÆW3òæÆVæwF‚ÇÂWÆöD–çWBçfÇVR’&WGW&à¢6öç7BG&ç6fW"ÒæWrFFG&ç6fW"‚¢'&’æg&öÒ†f–ÆW2’æf÷$V6‚‚†f–ÆR’ÓâG&ç6fW"æ—FV×2æFB†f–ÆR’¢WÆöD–çWBçfÇVRæf–ÆW2ÒG&ç6fW"æf–ÆW0¢fö–BWÆöB‡²F&vWC¢WÆöD–çWBçfÇVRÒ2Væ¶æ÷vâ2WfVçB§Ğ ¦7–æ2gVæ7F–öâWÆöB†WfVçC¢WfVçB’°¢6öç7B–çWBÒWfVçBçF&vWB2…DÔÄ–çWDVÆVÖVç@¢6öç7Bf–ÆW2Ò–çWBæf–ÆW0¢–b‚f–ÆW3òæÆVæwF‚’&WGW&à¢'W7’çfÇVRÒG'VP¢ÖW76vRçfÇVRÒrp¢ÆWBWÆöFVBÒ ¢G'’°¢f÷"†6öç7Bf–ÆRöb'&’æg&öÒ†f–ÆW2’’°¢6öç7Bf÷&ÒÒæWrf÷&ÔFF‚“²f÷&ÒæVæB‚vf–ÆRrÂf–ÆR¢6öç7B&W7öç6RÒv—B’‚rö’÷cöFö7VÖVçG2rÂ²ÖWF†öC¢uõ5BrÂ&öG“¢f÷&ÒÒ¢6öç7B&öG’Òv—B&W7öç6Ræ§6öâ‚¢–b‚&W7öç6Ræö²’F‡&÷ræWrW'&÷"†&öG’æFWF–ÂÇÂG¶f–ÆRææÖWÒKˆ®KÊZK‹JV¢WÆöFVB³Ò¢Ğ¢ÖW76vRçfÇVRÒ[{.Kˆ®KÊG·WÆöFVGÒK»ŞXÙ^hÚî8.ŠønXŠ¾{¹>iéÎK¸Ş™ÈZûxZ~XéşK»nzîŠêN8& ¢v—BÆöB‚¢Ò6F6‚†W'&÷"’²ÖW76vRçfÇVRÒW'&÷"–ç7Fæ6VöbW'&÷"òW'&÷"æÖW76vR¢7G&–ær†W'&÷"’Ğ¢f–æÆÇ’²'W7’çfÇVRÒfÇ6S²–çWBçfÇVRÒrrĞ§Ğ ¦gVæ7F–öâFövvÆR†–C¢7G&–ær’²6VÆV7FVBçfÇVRÒ6VÆV7FVBçfÇVRæ–æ6ÇVFW2†–B’ò6VÆV7FVBçfÇVRæf–ÇFW"‚‡fÇVR’ÓâfÇVRÓÒ–B’¢²ââç6VÆV7FVBçfÇVRÂ–EÒĞ¦7–æ2gVæ7F–öâ–ç7V7B†Fö7VÖVçC¢Fö2’°¢–b†VF—F–ærçfÇVU¶Fö7VÖVçBæ–EÒ’²FVÆWFRVF—F–ærçfÇVU¶Fö7VÖVçBæ–EÓ²&WGW&âĞ¢6öç7B&W7öç6RÒv—B’†ö’÷cöFö7VÖVçG2òG¶Fö7VÖVçBæ–GÖ¢6öç7B&öG’Òv—B&W7öç6Ræ§6öâ‚¢–b‚&W7öç6Ræö²ÇÂ&öG’æW‡G&7F–öâ’²ÖW76vRçfÇVRÒ&öG’æFWF–ÂÇÂ~k*iÈXúş{Én‹éy¨NŠønXŠ¾{¹>iéÎ8"s²&WGW&âĞ¢VF—F–ærçfÇVU¶Fö7VÖVçBæ–EÒÒ²fW'6–öã¢&öG’æW‡G&7F–öâçfW'6–öâÂG—S¢&öG’æW‡G&7F–öâæFö7VÖVçE÷G—RÂf–VÆG3¢&öG’æW‡G&7F–öâæf–VÆG2Â&V6öã¢~K«®[z^ZûxZ~XéşK»nzîŠêBrÂgVÆÅFW‡C¢&öG’æW‡G&7F–öâægVÆÅ÷FW‡BÇÂrrÂW‡G&7F–öå7FGW3¢&öG’æW‡G&7F–öâç7FGW2ÇÂ&öG’ç7FGW2ÇÂtäTTE5õ$Ud”UrrÂ&÷f–FW#¢&öG’æW‡G&7F–öâç&÷f–FW"ÇÂ~iÊ®yú^ŠønXŠ¾Yš‚rÂÖöFVÅfW'6–öã¢&öG’æW‡G&7F–öâæÖöFVÅ÷fW'6–öâÇÂ~iÊ®yú^x˜iÊÂrĞ¢Vç7W&U&Wf–Wtf–VÆG2†Fö7VÖVçB§Ğ¦gVæ7F–öâVç7W&U&Wf–Wtf–VÆG2†Fö7VÖVçC¢Fö2’°¢6öç7Bf÷&ÒÒVF—F–ærçfÇVU¶Fö7VÖVçBæ–EĞ¢6öç7B¶W—3¢&V6÷&CÇ7G&–ærÂ7G&–æuµÓâÒ²dEô”ådô”4S¢²v–çfö–6UöçVÖ&W"rÂv—77VUöFFRrÂv'W–W"rÂw6VÆÆW"rÂvæWEöÖ÷VçBrÂwF…öÖ÷VçBrÂvw&÷75öÖ÷VçBuÒÂtôôE5õ$T4T•C¢²w&V6V—EöçVÖ&W"rÂw&V6V—EöFFRrÂv—FVÒrÂwVçF—G’rÂvw&÷75öÖ÷VçBrÂw&V6V—fVBuÒÂ$äµõ$T4T•C¢²w–W"rÂw–VRrÂw6WGFÆVÖVçEöFF^{ßÛh‘éì¶»§q«^um‘½Õµ•¹Ğ¹¥‘tˆ…±Ğô‹–6Wš6»–:’îÛ¦Š¢ ˆøñ„Øµ•±Í”µ¥˜ô‰ÁÉ•Ù¥•İÍm‘½Õµ•¹Ğ¹¥‘tˆ€é¡É•˜ô‰ÁÉ•Ù¥•İÍm‘½Õµ•¹Ğ¹¥‘tˆÑ…É•Ğô‰}‰±…¹¬ˆÉ•°ô‰¹½É•™•ÉÉ•Èˆùíì‘½Õµ•¹Ğ¹µ¥µ•}ÑåÁ”€ôôô€…ÁÁ±¥…Ñ¥½¸½Á‘˜œ€ü€Aœ€è‘½Õµ•¹Ğ¹µ¥µ•}ÑåÁ”€ôôô€Ñ•áĞ½ÍØœ€ü€MXœ€è€a1M`œõôğ½„øñÍÁ…¸Øµ•±Í”ûšZ’îØğ½ÍÁ…¸øğ½‘¥Øøñ‘¥Ø±…ÍÌô‰‘½Õµ•¹Ğµµ…¥¸ˆøñÍÑÉ½¹œùíì‘½Õµ•¹Ğ¹™¥±•¹…µ”õôğ½ÍÑÉ½¹œøñÍµ…±°ùíì‘½Õµ•¹Ğ¹ÕÁ±½…‘•‘}…Ğ€ü¹•Ü…Ñ”¡‘½Õµ•¹Ğ¹ÕÁ±½…‘•‘}…Ğ¤¹Ñ½1½…±•MÑÉ¥¹œ é µ8œ¤€è€Ÿ’â+’òƒš^Û¦^Óšr«š>C’úlœõôƒ
-Üíì‘½Õµ•¹Ğ¹¥¹Í±¥” À°€à¤õôğ½Íµ…±°øğ½‘¥ØøñÍÁ…¸±…ÍÌô‰ÍÑ…ÑÕÌµÁ¥±°ˆ€é±…ÍÌô‰ÍÑ…ÑÕÌ´‘í‘½Õµ•¹Ğ¹ÁÉ½•ÍÍ¥¹}ÍÑ…ÑÕÌ¹Ñ½1½İ•É…Í” ¥õ€ˆùíìÍÑ…ÑÕÍ1…‰•°¡‘½Õµ•¹Ğ¹ÁÉ½•ÍÍ¥¹}ÍÑ…ÑÕÌ¤õôğ½ÍÁ…¸øñÍ•±•ĞØµ¥˜ô‰Í•±•Ñ•¹¥¹±Õ‘•Ì¡‘½Õµ•¹Ğ¹¥¤ˆØµµ½‘•°ô‰É½±•Ím‘½Õµ•¹Ğ¹¥‘tˆ…É¥„µ±…‰•°ô‹–6Wš6»’âk–*‡¢K¢&Èˆøñ½ÁÑ¥½¸Ù…±Õ”ôˆˆû¦'š.§’âk–*‡¢K¢&Èğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ô‰%9Y=%ˆû–>G– ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ô‰==M}I%APˆû–—–êL€¼ƒšRÛ¢Òœğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ô‰	9-}I%APˆû¦NÛ¢†3–n{–6Tğ½½ÁÑ¥½¸øğ½Í•±•Ğøñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÅÕ¥•Ğˆ±¥¬ô‰¥¹ÍÁ•Ğ¡‘½Õµ•¹Ğ¤ˆùíì•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t€ü€ŸšRÛ¢Öß–¶_šºÔœ€è€Ÿš~—r/–æÛ†»¢º“–¶_šºÔœõôğ½‰ÕÑÑ½¸øğ½…ÉÑ¥±”ø(€€€€€€€€€€€€€€ñ‘¥ØØµ™½Èô‰‘½Õµ•¹Ğ¥¸‘½Ì¹™¥±Ñ•È ¡¥Ñ•´¤€ôø•‘¥Ñ¥¹m¥Ñ•´¹¥‘t¤ˆ€é­•äô‰•‘¥Ğ´‘í‘½Õµ•¹Ğ¹¥‘õ€ˆ±…ÍÌô‰™¥•±µ•‘¥Ñ½Èˆøñ‘¥Ø±…ÍÌô‰™¥•±µ•‘¥Ñ½Èµ¡•…‘¥¹œˆøñ‘¥ØøñÍÑÉ½¹œûš‚ã–¾ç¢¾–"¯–¶_šºÔğ½ÍÑÉ½¹œøñÍµ…±°û–¾çŸ–:’îÛ’ş»šRç¾òošÊ‡šr'¢¾š6»’ö7ö»š^Û’â7šbû’ë’ò«¦ƒjš†¦'ğ½Íµ…±°øğ½‘¥ØøñÍ•±•ĞØµµ½‘•°ô‰•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹ÑåÁ”ˆ¡…¹”ô‰•¹ÍÕÉ•I•Ù¥•İ¥•±‘Ì¡‘½Õµ•¹Ğ¤ˆøñ½ÁÑ¥½¸ùU91MM%%ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ùYQ}%9Y=%ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ù==M}I%APğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ù	9-}I%APğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ù=Q!Hğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½‘¥Øøñ‘•Ñ…¥±Ì±…ÍÌô‰½ÈµÑ•áĞˆøñÍÕµµ…Éäûš~—r,=Hƒ¢¾–"¯–:šZğ½ÍÕµµ…Éäøñ‘¥Ø±…ÍÌô‰½Èµµ•Ñ„ˆùíì•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹ÁÉ½Ù¥‘•Èõôƒ
-Üíì•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹µ½‘•±Y•ÉÍ¥½¸õôƒ
-ÜíìÍÑ…ÑÕÍ1…‰•°¡•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹•áÑÉ…Ñ¥½¹MÑ…ÑÕÌ¤õôğ½‘¥ØøñÁÉ”Øµ¥˜ô‰•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹™Õ±±Q•áĞˆùíì•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹™Õ±±Q•áĞõôğ½ÁÉ”øñÀØµ•±Í”µ¥˜ô‰•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹•áÑÉ…Ñ¥½¹MÑ…ÑÕÌ€ôôô€%1œˆû¢¾–"¯–’Ç¢Ò—¾ò3ÎïîšÊ‡šr'š>C–>[–"ÃšZ–¶_¦Rg¢¾¿Æï–z/¾òiíì•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹™¥•±‘Ì¹•ÉÉ½Èü¹É…İ}Ù…±Õ”ñğ€Ÿšr«~”œõôğ½ÀøñÀØµ•±Í”ù=HƒšÊ‡šr'¢şS–n{–>¿–ÆW’ëjšZ–¶_¾ò3¢¾ßšš~—–:’îÛšâšfÃ–ê›š"[š&/–*£–†¯–g–¶_šº×ğ½Àøğ½‘•Ñ…¥±Ìøñ‘¥Ø±…ÍÌô‰™¥•±µÉ¥ˆøñ±…‰•°Øµ™½Èôˆ¡™¥•±°­•ä¤¥¸•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹™¥•±‘Ìˆ€é­•äô‰­•äˆùíì­•äõôñÍµ…±°û¢¾–"¯ö»’ş‡–ê˜íì™¥•±¹½¹™¥‘•¹”õôƒ
-Üíì™¥•±¹ÍÑ…ÑÕÌñğ€Ÿ–ú†»¢ºœõôƒ
-Üƒ²°íì™¥•±¹Á…”ñğ€Äõôƒ¦†Ôğ½Íµ…±°øñÍµ…±°Øµ¥˜ô‰™¥•±¹•Ù¥‘•¹•}Ñ•áĞˆû–:šZ¢¾š6»¾òiíì™¥•±¹•Ù¥‘•¹•}Ñ•áĞõôğ½Íµ…±°øñÍµ…±°Øµ¥˜ô‰™¥•±¹‰‰½àü¹±•¹Ñ ˆûšv—šêC’ö7ö»¾òiíì™¥•±¹‰‰½à¹©½¥¸ œ°€œ¤õôğ½Íµ…±°øñ¥¹ÁÕĞØµµ½‘•°ô‰™¥•±¹¹½Éµ…±¥é•‘}Ù…±Õ”ˆ€é…É¥„µ±…‰•°ô‰MÑÉ¥¹œ¡­•ä¤ˆøğ½±…‰•°øğ½‘¥Øøñ‘¥Ø±…ÍÌô‰™¥•±µ•‘¥Ñ½Èµ™½½Ñ•Èˆøñ¥¹ÁÕĞØµµ½‘•°ô‰•‘¥Ñ¥¹m‘½Õµ•¹Ğ¹¥‘t¹É•…Í½¸ˆ…É¥„µ±…‰•°ô‹’êë–Ş—†»¢º“–:–n€ˆøñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÁÉ¥µ…Éäˆ±¥¬ô‰½¹™¥É´¡‘½Õµ•¹Ğ¤ˆû’şw–¶c†»¢º“&#šr°ğ½‰ÕÑÑ½¸øğ½‘¥Øøğ½‘¥Øø(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥ØØµ¥˜ô‰Í•±•Ñ•¹±•¹Ñ ˆ±…ÍÌô‰…ÍÍ½¥…Ñ¥½¸µ‰…ÈˆøñÍÁ…¸û–ŞË¦$íìÍ•±•Ñ•¹±•¹Ñ õôƒ’îôƒ
-Üƒ–Ï¢S–&7¢¾ß’âëš¾?’î÷–6Wš6»š2–ºk¢K¢&Ë–æÛ†»¢º“–¶_šºÔğ½ÍÁ…¸øñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÁÉ¥µ…Éäˆ±¥¬ô‰±¥¹­½Ìˆ€é‘¥Í…‰±•ô‰‰ÕÍäˆû†»¢º“–Ï¢S–æÛš‚ã–¾äğ½‰ÕÑÑ½¸øğ½‘¥Øø(€€€€€€€€€€ğ½Í•Ñ¥½¸ø(€€€€€€€€ğ½Ñ•µÁ±…Ñ”ø((€€€€€€€€ñÑ•µÁ±…Ñ”Øµ•±Í”µ¥˜ô‰…Ñ¥Ù•Y¥•Ü€ôôô€‰ÕÍ¥¹•ÍÌœˆø(€€€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰İ•±½µ”µÉ½Üˆøñ‘¥ØøñÀ±…ÍÌô‰•å•‰É½Üˆû’âk–*‡’â·–şğ½Àøñ Äû’âk–*‡–Ï¢S’â;š‚ã–¾äğ½ ÄøñÀ±…ÍÌô‰Á…”µÍÕ‰Ñ¥Ñ±”ˆûš¾?šv‡¢ºÃ–öW’î¢†£’â²SRÇšN7’ös’êëšb;†»–Ï¢Sj’âk–*‡ğ½Àøğ½‘¥Øøñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÁÉ¥µ…Éäˆ±¥¬ô‰½Á•¹UÁ±½…ˆû¾ò,ƒ’â+’òƒ–æÛ–îë®/’âk–*„ğ½‰ÕÑÑ½¸øğ½Í•Ñ¥½¸ø(€€€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰‰ÕÍ¥¹•ÍÌµ±…å½ÕĞˆøñ‘¥Ø±…ÍÌô‰½¹Ñ•¹Ğµ…É‰ÕÍ¥¹•ÍÌµ±¥ÍĞˆøñ‘¥Ø±…ÍÌô‰…Éµ¡•…‘¥¹œˆøñ‘¥Øøñ Èû’âk–*‡¢ºÃ–öTğ½ ÈøñÀùíì•Ù•¹ÑÌ¹±•¹Ñ õôƒ²S’âk–*„ğ½Àøğ½‘¥Øøğ½‘¥Øøñ‘¥ØØµ¥˜ôˆ…•Ù•¹ÑÌ¹±•¹Ñ ˆ±…ÍÌô‰•µÁÑäµÍÑ…Ñ”½µÁ…ĞˆøñÍÑÉ½¹œûšjš^ƒ’âk–*‡¢ºÃ–öTğ½ÍÑÉ½¹œøñÀû–#†»¢º“–6Wš6»–¶_šº×¾ò3–7¦'š.§–6Wš6»¢K¢&Ë–îë®/–Ï¢Sğ½Àøñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÍ•½¹‘…Éäˆ±¥¬ô‰½Á•¹UÁ±½…ˆû–&7–ú–6Wš6»’â·–şğ½‰ÕÑÑ½¸øğ½‘¥Øøñ‰ÕÑÑ½¸Øµ™½Èô‰¥Ñ•´¥¸Á…•‘Ù•¹ÑÌˆ€é­•äô‰¥Ñ•´¹¥ˆ±…ÍÌô‰‰ÕÍ¥¹•ÍÌµ±¥ÍĞµ¥Ñ•´ˆ€é±…ÍÌô‰ìÍ•±•Ñ•è•Ù•¹Ñ%€ôôô¥Ñ•´¹¥ôˆ±¥¬ô‰Í•±•ÑÙ•¹Ğ¡¥Ñ•´¹¥¤ˆøñÍÁ…¸øñÍÑÉ½¹œû’âk–*„íì¥Ñ•´¹¥¹Í±¥” À°€à¤õôğ½ÍÑÉ½¹œøñÍµ…±°ùíì¥Ñ•´¹‘½Õµ•¹Ñ}½Õ¹Ğõôƒ’î÷–Ï¢S–6Wš6¸ƒ
-Üíì¥Ñ•´¹…µ½Õ¹Ğ€üƒ
-”‘í¥Ñ•´¹…µ½Õ¹Ñõ€€è€Ÿ¦G¦Šw–úš‚ã–¾äœõôğ½Íµ…±°øğ½ÍÁ…¸øñÍÁ…¸±…ÍÌô‰ÍÑ…ÑÕÌµÁ¥±°ˆùíìÍÑ…ÑÕÍ1…‰•°¡¥Ñ•´¹ÍÑ…ÑÕÌ¤õôğ½ÍÁ…¸øğ½‰ÕÑÑ½¸øñ‘¥ØØµ¥˜ô‰‰ÕÍ¥¹•ÍÍA…•Ì€ø€Äˆ±…ÍÌô‰Á…¥¹…Ñ¥½¸ˆøñ‰ÕÑÑ½¸±¥¬ô‰‰ÕÍ¥¹•ÍÍA…”€ô5…Ñ ¹µ…à Ä°‰ÕÍ¥¹•ÍÍA…”€´€Ä¤ˆ€é‘¥Í…‰±•ô‰‰ÕÍ¥¹•ÍÍA…”€ôôô€Äˆû’â+’â¦†Ôğ½‰ÕÑÑ½¸øñÍÁ…¸ùíì‰ÕÍ¥¹•ÍÍA…”õô€¼íì‰ÕÍ¥¹•ÍÍA…•Ìõôğ½ÍÁ…¸øñ‰ÕÑÑ½¸±¥¬ô‰‰ÕÍ¥¹•ÍÍA…”€ô5…Ñ ¹µ¥¸¡‰ÕÍ¥¹•ÍÍA…•Ì°‰ÕÍ¥¹•ÍÍA…”€¬€Ä¤ˆ€é‘¥Í…‰±•ô‰‰ÕÍ¥¹•ÍÍA…”€ôôô‰ÕÍ¥¹•ÍÍA…•Ìˆû’â/’â¦†Ôğ½‰ÕÑÑ½¸øğ½‘¥Øøğ½‘¥Øø(€€€€€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰½¹Ñ•¹Ğµ…É‘•Ñ…¥°µ…ÉˆøñÑ•µÁ±…Ñ”Øµ¥˜ô‰•Ù•¹Ñ•Ñ…¥°ˆøñ‘¥Ø±…ÍÌô‰…Éµ¡•…‘¥¹œˆøñ‘¥ØøñÀ±…ÍÌô‰•å•‰É½Üˆû’âk–*‡¢¾›šğ½Àøñ Èû¦¢Ò·’âk–*„íì•Ù•¹Ñ•Ñ…¥°¹¥¹Í±¥” À°€à¤õôğ½ ÈøñÀùíì•Ù•¹Ñ•Ñ…¥°¹…µ½Õ¹Ğ€üƒ’âk–*‡¦G¦Štƒ
-”‘í9Õµ‰•È¡•Ù•¹Ñ•Ñ…¥°¹…µ½Õ¹Ğ¤¹Ñ½1½…±•MÑÉ¥¹œ é µ8œ°ìµ¥¹¥µÕµÉ…Ñ¥½¹¥¥ÑÌè€Èô¥õ€€è€Ÿ¦G¦Šw–úš‚ã–¾äœõôƒ
-ÜíìÍÑ…ÑÕÍ1…‰•°¡•Ù•¹Ñ•Ñ…¥°¹ÍÑ…ÑÕÌ¤õôğ½Àøğ½‘¥ØøñÍÁ…¸±…ÍÌô‰ÍÑ…ÑÕÌµÁ¥±°ˆùíìÍÑ…ÑÕÍ1…‰•°¡•Ù•¹Ñ•Ñ…¥°¹ÍÑ…ÑÕÌ¤õôğ½ÍÁ…¸øğ½‘¥Øøñ Ìû–Ï¢S¢¾š6¸ğ½ Ìøñ‘¥Ø±…ÍÌô‰•Ù¥‘•¹”µÑ¥µ•±¥¹”ˆøñ‘¥ØØµ™½Èô‰‘½Õµ•¹Ğ¥¸•Ù•¹Ñ•Ñ…¥°¹‘½Õµ•¹ÑÌˆ€é­•äô‰‘½Õµ•¹Ğ¹¥ˆ±…ÍÌô‰•Ù¥‘•¹”µ¥Ñ•´ˆøñÍÁ…¸±…ÍÌô‰Ñ¥µ•±¥¹”µ‘½Ğˆøğ½ÍÁ…¸øñ‘¥ØøñÍÑÉ½¹œùíì€¡ì%9Y=%è€Ÿ–>G– œ°==M}I%APè€Ÿ–—–êL€¼ƒšRÛ¢ÒŸ–·¢¾œ°	9-}I%APè€Ÿ¦NÛ¢†3–n{–6Tœô…ÌI•½ÉñÍÑÉ¥¹œ°ÍÑÉ¥¹œø¥m‘½Õµ•¹Ğ¹É½±•tñğ‘½Õµ•¹Ğ¹É½±”õôğ½ÍÑÉ½¹œøñÍµ…±°ùíì‘½Õµ•¹Ğ¹™¥±•¹…µ”õôƒ
-Üƒ’êë–Ş—†»¢º“&#šr°íì‘½Õµ•¹Ğ¹•áÑÉ…Ñ¥½¹}Ù•ÉÍ¥½¸õôğ½Íµ…±°øğ½‘¥Øøñ‰ÕÑÑ½¸±…ÍÌô‰Ñ•áĞµ‰ÕÑÑ½¸ˆ±¥¬ô‰…Ñ¥Ù•Y¥•Ü€ô€‘½Õµ•¹ÑÌœˆûš~—r/–6Wš6¸ğ½‰ÕÑÑ½¸øğ½‘¥Øøğ½‘¥Øøñ Ìûš‚ã–¾çîOšzpğ½ Ìøñ‘¥ØØµ¥˜ô‰•Ù•¹Ñ•Ñ…¥°¹™¥¹‘¥¹Ìü¹±•¹Ñ ˆ±…ÍÌô‰™¥¹‘¥¹œµ±¥ÍĞˆøñ‘¥ØØµ™½Èôˆ¡™¥¹‘¥¹œ°¥¹‘•à¤¥¸•Ù•¹Ñ•Ñ…¥°¹™¥¹‘¥¹Ìˆ€é­•äô‰¥¹‘•àˆ±…ÍÌô‰™¥¹‘¥¹œµ¥Ñ•´ˆøñÍÁ…¸€é±…ÍÌô‰™¥¹‘¥¹œ¹Í•Ù•É¥Ñä€ôôô€	1=-%9œ€ü€…ÑÑ•¹Ñ¥½¸µµ…É¬œ€è€¡•¬µµ…É¬œˆùíì™¥¹‘¥¹œ¹Í•Ù•É¥Ñä€ôôô€	1=-%9œ€ü€œ„œ€è€ŸŠrLœõôğ½ÍÁ…¸øñÍÁ…¸ùíì™¥¹‘¥¹1…‰•°¡™¥¹‘¥¹œ¤õôñÍµ…±°Øµ¥˜ô‰™¥¹‘¥¹œ¹É½±”ˆøƒ
-Üíì™¥¹‘¥¹œ¹É½±”õôğ½Íµ…±°øğ½ÍÁ…¸øğ½‘¥Øøğ½‘¥Øøñ‘¥ØØµ•±Í”±…ÍÌô‰ÅÕ¥•Ğµ•µÁÑäˆøñÍÁ…¸±…ÍÌô‰¡•¬µµ…É¬ˆù¤ğ½ÍÁ…¸øñ‘¥ØøñÍÑÉ½¹œû–Âkš^ƒš‚ã–¾çšb;îğ½ÍÑÉ½¹œøñÀû¢¾ß¦7¢ŞGš‚ã–¾ç’î—š~—r/¦G¦Šw’âï’öOšRÛ¢ÒŸ–J3îOº_¢¾š6»šš~—îOšzsğ½Àøğ½‘¥Øøğ½‘¥Øøñ‘¥Ø±…ÍÌô‰‘•Ñ…¥°µ™½½Ñ•ÈˆøñÍÁ…¸û–>«šr'š‚ã–¾ç¦k¢ş’âS¢¾š6»––"š^Ûš&7¢÷Rš"C–·¢¾ğ½ÍÁ…¸øñ‘¥Ø±…ÍÌô‰…Ñ¥½¸µÉ½Üˆøñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÅÕ¥•Ğˆ±¥¬ô‰É•ÉÕ¹I•½¹¥±¥…Ñ¥½¸ˆ€é‘¥Í…‰±•ô‰‰ÕÍäˆû¦7šZÃ¢şC¢†3š‚ã–¾äğ½‰ÕÑÑ½¸øñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÁÉ¥µ…Éäˆ±¥¬ô‰µ…­•Y½Õ¡•Èˆ€é‘¥Í…‰±•ô‰‰ÕÍäñğ•Ù•¹Ñ•Ñ…¥°¹ÍÑ…ÑÕÌ€„ôô€5Q!œˆûRš"C–·¢¾¢6'¢üğ½‰ÕÑÑ½¸øğ½‘¥Øøğ½‘¥Øøğ½Ñ•µÁ±…Ñ”øñ‘¥ØØµ•±Í”±…ÍÌô‰•µÁÑäµÍÑ…Ñ”ˆøñÍÑÉ½¹œû¦'š.§’â²S’âk–*‡š~—r/¢¾›šğ½ÍÑÉ½¹œøñÀû¢şg¦3’òkšbû’ë–Ï¢S–6Wš6»š‚ã–¾çîOšzs–J3–>¿š&Ÿ¢†3j’â/’âš¶—ğ½Àøğ½‘¥Øøğ½Í•Ñ¥½¸øğ½Í•Ñ¥½¸ø(€€€€€€€€ğ½Ñ•µÁ±…Ñ”ø((€€€€€€€€ñÑ•µÁ±…Ñ”Øµ•±Í”µ¥˜ô‰…Ñ¥Ù•Y¥•Ü€ôôô€Ù½Õ¡•ÉÌœˆø(€€€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰İ•±½µ”µÉ½Üˆøñ‘¥ØøñÀ±…ÍÌô‰•å•‰É½Üˆû–·¢¾’â·–şğ½Àøñ Äû–·¢¾¢6'¢ÿ’â;–º‡š&äğ½ ÄøñÀ±…ÍÌô‰Á…”µÍÕ‰Ñ¥Ñ±”ˆû–º‡š&ç¦R–ºk–·¢¾&#šr³¾òo–¾ó–ë’â7¶'’ê8I@ƒ–—¢Ò›ğ½Àøğ½‘¥ØøñÍÁ…¸±…ÍÌô‰½¹¹•Ñ¥½¸µ‰…‘”ˆùI@ƒ–g–—šr«¢ş{š:”ğ½ÍÁ…¸øğ½Í•Ñ¥½¸ø(€€€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰Ù½Õ¡•Èµ±…å½ÕĞˆøñ‘¥Ø±…ÍÌô‰½¹Ñ•¹Ğµ…ÉÙ½Õ¡•Èµ±¥ÍĞˆøñ‘¥Ø±…ÍÌô‰…Éµ¡•…‘¥¹œˆøñ‘¥Øøñ Èû–·¢¾–"_¢† ğ½ ÈøñÀùíì‘É…™ÑÌ¹±•¹Ñ õôƒ’î÷–·¢¾ğ½Àøğ½‘¥Øøğ½‘¥Øøñ‘¥ØØµ¥˜ôˆ…‘É…™ÑÌ¹±•¹Ñ ˆ±…ÍÌô‰•µÁÑäµÍÑ…Ñ”½µÁ…ĞˆøñÍÑÉ½¹œû¢şcšÊ‡šr'–·¢¾¢6'¢üğ½ÍÑÉ½¹œøñÀû–#–º3š"C’âk–*‡–Ï¢S–J3š‚ã–¾ç¾ò3–7Rš"C–·¢¾–g¦'ğ½Àøñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÍ•½¹‘…Éäˆ±¥¬ô‰…Ñ¥Ù•Y¥•Ü€ô€‰ÕÍ¥¹•ÍÌœˆûš~—r/’âk–*„ğ½‰ÕÑÑ½¸øğ½‘¥Øøñ‰ÕÑÑ½¸Øµ™½Èô‰¥Ñ•´¥¸Á…•‘É…™ÑÌˆ€é­•äô‰¥Ñ•´¹¥ˆ±…ÍÌô‰Ù½Õ¡•Èµ±¥ÍĞµ¥Ñ•´ˆ€é±…ÍÌô‰ìÍ•±•Ñ•è‘É…™Ğü¹¥€ôôô¥Ñ•´¹¥ôˆ±¥¬ô‰¡½½Í•É…™Ğ¡¥Ñ•´¤ˆøñÍÁ…¸øñÍÑÉ½¹œùíì¥Ñ•´¹¥¹Í±¥” À°€à¤õôƒ
-ÜYíì¥Ñ•´¹Ù•ÉÍ¥½¸õôğ½ÍÑÉ½¹œøñÍµ…±°ùíì¥Ñ•´¹Á•É¥½õôƒ
-Üƒ–šZäƒ
-•íì¥Ñ•´¹‘•‰¥Ñ}Ñ½Ñ…°õôğ½Íµ…±°øğ½ÍÁ…¸øñÍÁ…¸±…ÍÌô‰ÍÑ…ÑÕÌµÁ¥±°ˆùíìÍÑ…ÑÕÍ1…‰•°¡¥Ñ•´¹ÍÑ…ÑÕÌ¤õôğ½ÍÁ…¸øğ½‰ÕÑÑ½¸øñ‘¥ØØµ¥˜ô‰Ù½Õ¡•ÉA…•Ì€ø€Äˆ±…ÍÌô‰Á…¥¹…Ñ¥½¸ˆøñ‰ÕÑÑ½¸±¥¬ô‰Ù½Õ¡•ÉA…”€ô5…Ñ ¹µ…à Ä°Ù½Õ¡•ÉA…”€´€Ä¤ˆ€é‘¥Í…‰±•ô‰Ù½Õ¡•ÉA…”€ôôô€Äˆû’â+’â¦†Ôğ½‰ÕÑÑ½¸øñÍÁ…¸ùíìÙ½Õ¡•ÉA…”õô€¼íìÙ½Õ¡•ÉA…•Ìõôğ½ÍÁ…¸øñ‰ÕÑÑ½¸±¥¬ô‰Ù½Õ¡•ÉA…”€ô5…Ñ ¹µ¥¸¡Ù½Õ¡•ÉA…•Ì°Ù½Õ¡•ÉA…”€¬€Ä¤ˆ€é‘¥Í…‰±•ô‰Ù½Õ¡•ÉA…”€ôôôÙ½Õ¡•ÉA…•Ìˆû’â/’â¦†Ôğ½‰ÕÑÑ½¸øğ½‘¥Øøğ½‘¥Øø(€€€€€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰½¹Ñ•¹Ğµ…ÉÙ½Õ¡•Èµ‘•Ñ…¥°ˆøñÑ•µÁ±…Ñ”Øµ¥˜ô‰‘É…™Ğˆøñ‘¥Ø±…ÍÌô‰…Éµ¡•…‘¥¹œˆøñ‘¥ØøñÀ±…ÍÌô‰•å•‰É½Üˆûšr³–rÃ¢–"g–g¦$ƒ
-Üƒ’â7šb¼$ğ½Àøñ Èû–·¢¾íì‘É…™Ğ¹¥¹Í±¥” À°€à¤õô€ñÍÁ…¸±…ÍÌô‰Ù•ÉÍ¥½¸µÑ…œˆùYíì‘É…™Ğ¹Ù•ÉÍ¥½¸õôğ½ÍÁ…¸øğ½ ÈøñÀû’òk¢º‡šr¦^Ğíì‘É…™Ğ¹Á•É¥½õôƒ
-Üƒ*ÛšíìÍÑ…ÑÕÍ1…‰•°¡‘É…™Ğ¹ÍÑ…ÑÕÌ¤õôğ½Àøğ½‘¥ØøñÍÁ…¸±…ÍÌô‰ÍÑ…ÑÕÌµÁ¥±°ˆùíìÍÑ…ÑÕÍ1…‰•°¡‘É…™Ğ¹ÍÑ…ÑÕÌ¤õôğ½ÍÁ…¸øğ½‘¥Øøñ‘¥Ø±…ÍÌô‰Ù½Õ¡•ÈµÍÕµµ…Éäˆøñ‘¥ØøñÍµ…±°û–šZç–B#¢º„ğ½Íµ…±°øñÍÑÉ½¹œû
-”íì9Õµ‰•È¡‘É…™Ğ¹‘•‰¥Ñ}Ñ½Ñ…°¤¹Ñ½1½…±•MÑÉ¥¹œ é µ8œ°ìµ¥¹¥µÕµÉ…Ñ¥½¹¥¥ÑÌè€Èô¤õôğ½ÍÑÉ½¹œøğ½‘¥Øøñ‘¥ØøñÍµ…±°û¢ÒßšZç–B#¢º„ğ½Íµ…±°øñÍÑÉ½¹œû
-”íì9Õµ‰•È¡‘É…™Ğ¹É•‘¥Ñ}Ñ½Ñ…°¤¹Ñ½1½…±•MÑÉ¥¹œ é µ8œ°ìµ¥¹¥µÕµÉ…Ñ¥½¹¥¥ÑÌè€Èô¤õôğ½ÍÑÉ½¹œøğ½‘¥Øøñ‘¥ØøñÍµ…±°ûšv—šêC’âk–*„ğ½Íµ…±°øñ‰ÕÑÑ½¸±…ÍÌô‰Ñ…‰±”µ±¥¹¬ˆ±¥¬ô‰Í•±•ÑÙ•¹Ğ¡‘É…™Ğ„¹•Ù•¹Ñ}¥¤ì…Ñ¥Ù•Y¥•Ü€ô€‰ÕÍ¥¹•ÍÌœˆùíì‘É…™Ğ¹•Ù•¹Ñ}¥¹Í±¥” À°€à¤õôƒŠHğ½‰ÕÑÑ½¸øğ½‘¥Øøğ½‘¥Øøñ‘¥Ø±…ÍÌô‰Ñ…‰±”µÍÉ½±°ˆøñÑ…‰±”±…ÍÌô‰•¹ÑÉäµÑ…‰±”ˆøñÑ¡•…øñÑÈøñÑ ûGn»ò[‚ğ½Ñ øñÑ û’òk¢º‡Gn¸ğ½Ñ øñÑ û–šZäğ½Ñ øñÑ û¢ÒßšZäğ½Ñ øñÑ ûšv—šê@ğ½Ñ øğ½ÑÈøğ½Ñ¡•…øñÑ‰½‘äøñÑÈØµ™½Èô‰±¥¹”¥¸‘É…™Ğ¹±¥¹•Ìˆ€é­•äô‰±¥¹”¹…½Õ¹Ñ}½‘”ˆøñÑùíì±¥¹”¹…½Õ¹Ñ}½‘”õôğ½ÑøñÑùíì±¥¹”¹…½Õ¹Ñ}¹…µ”õôğ½ÑøñÑ±…ÍÌô‰…µ½Õ¹Ğˆùíì±¥¹”¹‘•‰¥Ğ€ôôô€œÀ¸ÀÀœ€ü€ŸŠPœ€èƒ
-”€‘í±¥¹”¹‘•‰¥Ñõ€õôğ½ÑøñÑ±…ÍÌô‰…µ½Õ¹Ğˆùíì±¥¹”¹É•‘¥Ğ€ôôô€œÀ¸ÀÀœ€ü€ŸŠPœ€èƒ
-”€‘í±¥¹”¹É•‘¥Ñõ€õôğ½ÑøñÑùíì±¥¹”¹•Ù¥‘•¹•}É•™Ì¹±•¹Ñ õôƒ’î÷–6Wš6¸ğ½Ñøğ½ÑÈøğ½Ñ‰½‘äøğ½Ñ…‰±”øğ½‘¥Øøñ‘¥Ø±…ÍÌô‰Ù…±¥‘…Ñ¥½¸µÁ…¹•°ˆøñ Ìû¢–"gšš~”ğ½ Ìøñ‘¥Ø±…ÍÌô‰Ù…±¥‘…Ñ¥½¸µÉ½ÜˆøñÍÁ…¸±…ÍÌô‰¡•¬µµ…É¬ˆûŠrLğ½ÍÁ…¸øñÍÁ…¸û–¢Òß–æÏ¢†„ğ½ÍÁ…¸øñÍÑÉ½¹œùíì‘É…™Ğ¹‘•‰¥Ñ}Ñ½Ñ…°€ôôô‘É…™Ğ¹É•‘¥Ñ}Ñ½Ñ…°€ü€Ÿ¦k¢şœ€è€Ÿ¦G¦Šw’â7–æÌœõôğ½ÍÑÉ½¹œøğ½‘¥Øøñ‘¥Ø±…ÍÌô‰Ù…±¥‘…Ñ¥½¸µÉ½ÜˆøñÍÁ…¸±…ÍÌô‰¡•¬µµ…É¬ˆûŠrLğ½ÍÁ…¸øñÍÁ…¸û¢Ò›––_Gn»’â;’òk¢º‡šr¦^Ğğ½ÍÁ…¸øñÍÑÉ½¹œûšr7–*‡®¿–ŞËš‚‡¦ª0ğ½ÍÑÉ½¹œøğ½‘¥Øøñ‘¥Ø±…ÍÌô‰Ù…±¥‘…Ñ¥½¸µÉ½ÜˆøñÍÁ…¸±…ÍÌô‰¡•¬µµ…É¬ˆûŠrLğ½ÍÁ…¸øñÍÁ…¸ûšv—šêC¢¾š6»îG–ºhğ½ÍÁ…¸øñÍÑÉ½¹œùíì‘É…™Ğ¹±¥¹•Ì¹É•‘Õ” ¡Ñ½Ñ…°°±¥¹”¤€ôøÑ½Ñ…°€¬±¥¹”¹•Ù¥‘•¹•}É•™Ì¹±•¹Ñ °€À¤õôƒ’â«–òWR ğ½ÍÑÉ½¹œøğ½‘¥Øøñ‘¥Ø±…ÍÌô‰Ù…±¥‘…Ñ¥½¸µÉ½ÜˆøñÍÁ…¸±…ÍÌô‰…ÑÑ•¹Ñ¥½¸µµ…É¬ˆø„ğ½ÍÁ…¸øñÍÁ…¸ùI@ƒ–g–—’â;–n{¢¾ìğ½ÍÁ…¸øñÍÑÉ½¹œûšr«š:—–—¾ò3’â7¢÷š‚¢ºÃ–ŞË–—¢Ò˜ğ½ÍÑÉ½¹œøğ½‘¥Øøğ½‘¥ØøñÍ•Ñ¥½¸±…ÍÌô‰…Õ‘¥ĞµÑ¥µ•±¥¹”ˆøñ Ìû–’B¢ºÃ–öTğ½ Ìøñ‘¥ØØµ¥˜ôˆ……Õ‘¥Ñ¹ÑÉ¥•Ì¹±•¹Ñ ˆ±…ÍÌô‰…Õ‘¥Ğµ•µÁÑäˆû–öO–&7šÊ‡šr'–>¿šbû’ëj–º‡š&çš"[–—¢Ò›¢ºÃ–öWğ½‘¥Øøñ‘¥ØØµ™½Èô‰•¹ÑÉä¥¸…Õ‘¥Ñ¹ÑÉ¥•Ìˆ€é­•äô‰•¹ÑÉä¹¥ˆ±…ÍÌô‰…Õ‘¥Ğµ•¹ÑÉäˆøñÍÁ…¸±…ÍÌô‰…Õ‘¥Ğµ‘½Ğˆøğ½ÍÁ…¸øñ‘¥ØøñÍÑÉ½¹œùíì…Õ‘¥Ñ1…‰•°¡•¹ÑÉä¹•Ù•¹Ñ}ÑåÁ”¤õôğ½ÍÑÉ½¹œøñÍµ…±°ùíì•¹ÑÉä¹…Ñ½Èõôƒ
-Üíì¹•Ü…Ñ”¡•¹ÑÉä¹½ÕÉÉ•‘}…Ğ¤¹Ñ½1½…±•MÑÉ¥¹œ é µ8œ¤õôğ½Íµ…±°øğ½‘¥Øøğ½‘¥Øøğ½Í•Ñ¥½¸øñ‘¥Ø±…ÍÌô‰…ÁÁÉ½Ù…°µ¹½Ñ¥”ˆû–º‡š&ç¦rRÇ’â;–"Û–6W’êë’â7–B3jšr'šv¦fCR£š"ß–º3š"CšòS’ë–º‡š&ç–>«R£’ê;šr³–rÃ¦ª3šRÛğ½‘¥Øøñ‘¥Ø±…ÍÌô‰…Ñ¥½¸µÉ½Üˆøñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÍ•½¹‘…Éäˆ±¥¬ô‰ÍÕ‰µ¥ÑI•Ù¥•Üˆ€é‘¥Í…‰±•ô‰‘É…™Ğ¹ÍÑ…ÑÕÌ€„ôô€Y1%Qœñğ€……¹MÕ‰µ¥ÑY½Õ¡•Èˆ€éÑ¥Ñ±”ô‰…¹MÕ‰µ¥ÑY½Õ¡•È€ü€Ÿš>C’ê“–º‡š‚àœ€è€Ÿ–öO–&7¢K¢&ËšÊ‡šr'š>C’ê“–º‡š‚ãšv¦f@œˆûš>C’ê“–º‡š‚àğ½‰ÕÑÑ½¸øñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÍ•½¹‘…Éäˆ±¥¬ô‰…ÁÁÉ½Ù•É…™Ğˆ€é‘¥Í…‰±•ô‰‘É…™Ğ¹ÍÑ…ÑÕÌ€„ôô€A9%9}AAI=Y0œñğ€……¹ÁÁÉ½Ù•Y½Õ¡•Èˆ€éÑ¥Ñ±”ô‰…¹ÁÁÉ½Ù•Y½Õ¡•È€ü€Ÿš&ç––·¢¾œ€è€Ÿ–öO–&7¢K¢&ËšÊ‡šr'–º‡š&çšv¦f@œˆûš&ç––·¢¾ğ½‰ÕÑÑ½¸øñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÁÉ¥µ…Éäˆ±¥¬ô‰•áÁ½ÉÑÉ…™Ğˆ€é‘¥Í…‰±•ô‰‘É…™Ğ¹ÍÑ…ÑÕÌ€„ôô€AAI=Yœñğ€……¹áÁ½ÉÑY½Õ¡•Èˆ€éÑ¥Ñ±”ô‰…¹áÁ½ÉÑY½Õ¡•È€ü€Ÿ–¾ó–ë–ú’êë–Ş—–—¢Ò˜MXœ€è€Ÿ–öO–&7¢K¢&ËšÊ‡šr'–¾ó–ëšv¦f@œˆû–¾ó–ë–ú’êë–Ş—–—¢Ò˜MXğ½‰ÕÑÑ½¸øğ½‘¥Øøñ‘¥ØØµ¥˜ô‰‘É…™Ğ¹ÍÑ…ÑÕÌ€ôôô€aA=IQ}A9%9}59U1}A=MPœˆ±…ÍÌô‰•áÁ½ÉĞµÍÑ…Ñ”ˆøñÍÑÉ½¹œû–ŞË–¾ó–ë–ú’êë–Ş—–—¢Ò˜ğ½ÍÑÉ½¹œøñÀûš¶“–·¢¾šZ’îÛ–Âkšr«–g–”IC¾ò3’æšÊ‡šr$I@ƒ–·¢¾–>ßš"[–n{¢¾ïš‚ã–º{îOšzsğ½Àøğ½‘¥Øøğ½Ñ•µÁ±…Ñ”øñ‘¥ØØµ•±Í”±…ÍÌô‰•µÁÑäµÍÑ…Ñ”ˆøñÍÑÉ½¹œû¦'š.§’â’î÷–·¢¾š~—r/¢¾›šğ½ÍÑÉ½¹œøñÀû–·¢¾*Ûš–¢Òß–"–öW–J3š‚‡¦ª3îOšzs’òkšbû’ë–r£¢şg¦3ğ½Àøğ½‘¥Øøğ½Í•Ñ¥½¸øğ½Í•Ñ¥½¸ø(€€€€€€€€ğ½Ñ•µÁ±…Ñ”ø((€€€€€€€€ñÑ•µÁ±…Ñ”Øµ•±Í”µ¥˜ô‰…Ñ¥Ù•Y¥•Ü€ôôô€…Í•Ìœˆø(€€€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰İ•±½µ”µÉ½Üˆøñ‘¥ØøñÀ±…ÍÌô‰•å•‰É½Üˆûš‚ã–¾ç’â;–ò–âàğ½Àøñ Äû¦r¢š–’Bj¦^»¦Š`ğ½ ÄøñÀ±…ÍÌô‰Á…”µÍÕ‰Ñ¥Ñ±”ˆûšbû’ë–öO–&7¢Ò›––_j–ò–âã–J3¢¾š6»òë–>ğ½Àøğ½‘¥Øøğ½Í•Ñ¥½¸øñÍ•Ñ¥½¸±…ÍÌô‰½¹Ñ•¹Ğµ…Éˆøñ‘¥Ø±…ÍÌô‰…Éµ¡•…‘¥¹œˆøñ‘¥Øøñ Èû–ò–âã–"_¢† ğ½ ÈøñÀùíì½Á•¹…Í•Ì¹±•¹Ñ õôƒšv‡–ú–’Bğ½Àøğ½‘¥Øøğ½‘¥Øøñ‘¥ØØµ¥˜ôˆ……Í•Ì¹±•¹Ñ ˆ±…ÍÌô‰•µÁÑäµÍÑ…Ñ”ˆøñÍÑÉ½¹œûšÊ‡šr'–ò–âã¢ºÃ–öTğ½ÍÑÉ½¹œøñÀû–ë:Ãš‚ã–¾ç–Ş»–ò¦7–’7–>G–£š"[òë–ÂG¢¾š6»š^Û’òk–r£¢şg¦3–"o–îë¢ºÃ–öWğ½Àøğ½‘¥Øøñ‘¥ØØµ•±Í”±…ÍÌô‰…Í”µ±¥ÍĞˆøñ…ÉÑ¥±”Øµ™½Èô‰¥Ñ•´¥¸…Í•Ìˆ€é­•äô‰¥Ñ•´¹¥ˆ±…ÍÌô‰…Í”µÉ½ÜˆøñÍÁ…¸±…ÍÌô‰…ÑÑ•¹Ñ¥½¸µµ…É¬ˆø„ğ½ÍÁ…¸øñ‘¥ØøñÍÑÉ½¹œùíì…Í•1…‰•°¡¥Ñ•´¹ÑåÁ”¤õôğ½ÍÑÉ½¹œøñÍµ…±°ùíì…Í•MÕµµ…Éä¡¥Ñ•´¤õôğ½Íµ…±°øñÍµ…±°û–Ï¢S¢¾š6¸íì¥Ñ•´¹Í½ÕÉ•}É•™Ìü¹±•¹Ñ ñğ€Àõôƒ’îôƒ
-Üíì¥Ñ•´¹•Ù•¹Ñ}¥€üƒ’âk–*„€‘í¥Ñ•´¹•Ù•¹Ñ}¥¹Í±¥” À°€à¥õ€€è€Ÿšr«–Ï¢S’âk–*„œõôğ½Íµ…±°øğ½‘¥ØøñÍÁ…¸±…ÍÌô‰ÍÑ…ÑÕÌµÁ¥±°ˆùíìÍÑ…ÑÕÍ1…‰•°¡¥Ñ•´¹ÍÑ…ÑÕÌ¤õôğ½ÍÁ…¸øğ½…ÉÑ¥±”øğ½‘¥Øøğ½Í•Ñ¥½¸ø(€€€€€€€€ğ½Ñ•µÁ±…Ñ”ø((€€€€€€€€ñÑ•µÁ±…Ñ”Øµ•±Í”µ¥˜ô‰…Ñ¥Ù•Y¥•Ü€ôôô€¥¹Í¥¡ÑÌœñğ…Ñ¥Ù•Y¥•Ü€ôôô€¥¹Ñ•É…Ñ¥½¹ÌœˆøñÍ•Ñ¥½¸±…ÍÌô‰İ•±½µ”µÉ½Üˆøñ‘¥ØøñÀ±…ÍÌô‰•å•‰É½Üˆùíì…Ñ¥Ù•Y¥•Ü€ôôô€¥¹Í¥¡ÑÌœ€ü€Ÿ¢Ò‹–*‡–"šz@œ€è€Ÿ¢ş{š:—’â;¢ºûö¸œõôğ½Àøñ Äùíì…Ñ¥Ù•Y¥•Ü€ôôô€¥¹Í¥¡ÑÌœ€ü€Ÿ¢Ò‹–*‡šVÃš6»šFc¢šœ€è€Ÿ¢ş{š:—’â;¢Ò›––_¢ºûö¸œõôğ½ ÄøñÀ±…ÍÌô‰Á…”µÍÕ‰Ñ¥Ñ±”ˆùíì…Ñ¥Ù•Y¥•Ü€ôôô€¥¹Í¥¡ÑÌœ€ü€Ÿ–>«–ÆW’ë–öO–&7–ŞËš:#švšVÃš6»¢2–nÓ––>¿¢ş÷šê¿jš2š‚œ€è€Ÿš~—r/–öO–&7¢Ò›––_’â;–’[¦£Îïî¢ş{š:—¢÷–*oœõôğ½Àøğ½‘¥Øøğ½Í•Ñ¥½¸øñÍ•Ñ¥½¸±…ÍÌô‰½¹Ñ•¹Ğµ…É…Ù…¥±…‰¥±¥Ñäµ…Éˆøñ‘¥Ø±…ÍÌô‰…Ù…¥±…‰¥±¥Ñäµ¥½¸ˆù¤ğ½‘¥Øøñ‘¥Øøñ Èùíì…Ñ¥Ù•Y¥•Ü€ôôô€¥¹Í¥¡ÑÌœ€ü€Ÿ–öO–&7¢ÖšZg’â7¢ÚÌœ€è€Ÿ–Âkšr«¢ş{š:”I@ƒ–g–—šr7–*„œõôğ½ ÈøñÀùíì…Ñ¥Ù•Y¥•Ü€ôôô€¥¹Í¥¡ÑÌœ€ü€Ÿ–öO–&7–B;®¿šÊ‡šr'š>C’úo–>¿š‚ã¦ª3jšÆšïš2š‚¾ò3–nƒš¶“’â7–ÆW’ëš:£šÖ/jšRÛ–—–"§šÚ›š"[’ög¦Šw–º3š"C–6Wš6»’â;¢Ò›––_šVÃš6»š:—–—–B;–7š~—r/–"šzCœ€è€Ÿ–öO–&7–>¿’î—š~—r/–J3–¾ó–ë–ŞË–º‡š&ç–·¢¾¾òoÎïîšÊ‡šr'š:#švjI@ƒ–g–—–J3–n{¢¾ï¢÷–*o¾ò3’â7¢÷šbû’ëŠs–ŞË–—¢Ò›Šwš"[Šs–ŞËš‚ã–º{Šwœõôğ½Àøñ‰ÕÑÑ½¸Øµ¥˜ô‰…Ñ¥Ù•Y¥•Ü€ôôô€¥¹Í¥¡ÑÌœˆ±…ÍÌô‰‰ÕÑÑ½¸‰ÕÑÑ½¸µÍ•½¹‘…Éäˆ±¥¬ô‰…Ñ¥Ù•Y¥•Ü€ô€‘½Õµ•¹ÑÌœˆû–&7–ú–6Wš6»’â·–şğ½‰ÕÑÑ½¸øñÍÁ…¸Øµ•±Í”±…ÍÌô‰½¹¹•Ñ¥½¸µ‰…‘”ˆû–g–—¾òkšr«š:#šv€¼ƒšr«¢ş{š:—
-ß–n{¢¾ï¾òk’â7–>¿R ğ½ÍÁ…¸øğ½‘¥Øøğ½Í•Ñ¥½¸øğ½Ñ•µÁ±…Ñ”ø(€€€€€€ğ½‘¥Øø(€€€€€€ñ™½½Ñ•È±…ÍÌô‰…ÁÀµ™½½Ñ•Èˆû’âk–*‡*ÛšRÇšr7–*‡®¿š>C’úlƒ
-Üƒ–g¦'–·¢¾’â7¶'’ê;š¶–ò?–·¢¾ƒ
-ÜI@ƒšb¿š¶–ò?¢Ò›–*‡šv—šê@ğ½™½½Ñ•Èø(€€€€ğ½‘¥Øø(€€ğ½‘¥Øø(ğ½Ñ•µÁ±…Ñ”ø(
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+
+type Doc = { id: string; filename: string; mime_type: string; processing_status: string; uploaded_at?: string; uploaded_by?: string; document_type?: string; key_amount?: string | null; business_events?: { id: string; status: string; role: string }[]; missing_fields?: string[] }
+type ExtractedField = { raw_value?: string | null; normalized_value?: string | null; confidence: number; evidence_confidence?: number; status?: string; message?: string; page?: number | null; bbox?: (number | number[])[] | null; evidence_text?: string; coordinate_space?: string | null; page_size_points?: number[] | null }
+type ExtractionHistory = { version: number; document_type: string; status: string; created_by: string; created_at: string; reason: string | null; fields: Record<string, ExtractedField> }
+type EventRow = { id: string; event_type: string; party_name: string | null; status: string; amount: string | null; created_at?: string; document_count: number; document_ids: string[]; voucher_status: string | null; posting_status: string }
+type Draft = { id: string; event_id: string; version: number; status: string; period: string; debit_total: string; credit_total: string; policy?: Record<string, unknown>; validations?: { code: string; passed: boolean; required_fields?: Record<string, string[]>; reason?: string }[]; lines: { account_code: string; account_name: string; debit: string; credit: string; description?: string; rationale?: string; auxiliary: Record<string, string>; auxiliary_text?: string; required_auxiliary_fields?: string[]; evidence_refs: string[] }[] }
+type CaseRow = { id: string; event_id: string | null; type: string; status: string; severity: string; details: Record<string, unknown>; source_refs: string[] }
+type CaseDetail = CaseRow & { event_status: string; findings: Record<string, unknown>[]; source_documents: { id: string; filename: string; role: string; extraction_version: number | null; mime_type: string }[]; unavailable_source_count: number; assignees: BusinessUserOption[]; audit_trail: { actor: string; event_type: string; occurred_at: string }[] }
+type EventDetail = { id: string; event_type: string; status: string; amount: string | null; findings: Record<string, unknown>[]; rental_direct_expense_confirmed?: boolean; rental_direct_expense_confirmed_by?: string | null; rental_direct_expense_policy_version?: string | null; documents: { id: string; filename: string; role: string; extraction_version: number }[] }
+type ScopeOption = { membership_id: string; tenant_id: string; account_set_id: string; tenant_name: string; account_set_name: string; role: string }
+type BusinessUserOption = { user_id: string; email: string; display_name: string }
+type AccountingPeriod = { period: string; status: string }
+type ChartAccount = { code: string; name: string; is_active: boolean; is_leaf: boolean; requires_auxiliary: boolean; required_auxiliary_fields: string[]; auxiliary_input?: string }
+type AccountingPolicyForm = { debit_account_code: string; bank_account_code: string; tax_treatment: 'DEDUCTIBLE' | 'NON_DEDUCTIBLE'; input_tax_account_code: string; accounting_treatment: string; confirmed: boolean; version: number | null }
+type AuditEntry = { id: string; event_type: string; actor: string; occurred_at: string }
+type UploadItem = { id: number; file: File; status: 'uploading' | 'done' | 'failed'; progress: number; error: string }
+type PageResult<T> = { items: T[]; page: number; page_size: number; total: number; [key: string]: unknown }
+type VoucherStatusCount = { period: string; status: string; count: number }
+type CorrectionStats = { corrected_documents: number; correction_versions: number; field_changes: { field: string; count: number }[] }
+type InsightsSummary = { scope: { tenant: string; account_set: string }; period_scope: string; as_of: string; event_count: number; matched_event_count: number; matched_event_amount: string; needs_review_count: number; open_case_count: number; voucher_metrics_visible: boolean; pending_manual_post_count: number; verified_voucher_count: number; source_events: { id: string; status: string; amount: string | null; created_at: string }[]; limitations: string }
+
+const docs = ref<Doc[]>([])
+const events = ref<EventRow[]>([])
+const dashboardEvents = ref<EventRow[]>([])
+const drafts = ref<Draft[]>([])
+const cases = ref<CaseRow[]>([])
+const selectedCase = ref<CaseDetail | null>(null)
+const caseDetailLoading = ref(false)
+const token = ref(sessionStorage.getItem('zq-access-token') || '')
+const demoSession = ref(false)
+const currentRole = ref('')
+const tenantId = ref('')
+const accountSetId = ref('')
+const scopeOptions = ref<ScopeOption[]>([])
+const businessUsers = ref<BusinessUserOption[]>([])
+const eventAssignments = ref<BusinessUserOption[]>([])
+const selectedAssignee = ref('')
+const accountingPeriods = ref<AccountingPeriod[]>([])
+const chartAccounts = ref<ChartAccount[]>([])
+const chartAccountsLoading = ref(false)
+const chartAccountsSaving = ref(false)
+const newChartAccount = ref({ code: '', name: '' })
+const policyForms = ref<Record<string, AccountingPolicyForm>>({
+  EXPENSE: { debit_account_code: '', bank_account_code: '', tax_treatment: 'DEDUCTIBLE', input_tax_account_code: '', accounting_treatment: 'EXPENSE', confirmed: false, version: null },
+  ASSET_PURCHASE: { debit_account_code: '', bank_account_code: '', tax_treatment: 'DEDUCTIBLE', input_tax_account_code: '', accounting_treatment: 'CAPITALIZE', confirmed: false, version: null },
+  RENTAL: { debit_account_code: '', bank_account_code: '', tax_treatment: 'DEDUCTIBLE', input_tax_account_code: '', accounting_treatment: 'DIRECT_EXPENSE', confirmed: false, version: null },
+})
+const selectedPeriod = ref('')
+const previews = ref<Record<string, string>>({})
+const evidencePreview = ref<{ documentId: string; url: string; page: number; pageCount: number; pageWidthPoints: number; pageHeightPoints: number } | null>(null)
+const evidenceSelection = ref<{ documentId: string; fieldKey: string } | null>(null)
+const previewImageSize = ref<Record<string, { width: number; height: number }>>({})
+const selected = ref<string[]>([])
+const roles = ref<Record<string, string>>({})
+const selectedEventType = ref<'PURCHASE' | 'EXPENSE' | 'ASSET_PURCHASE' | 'RENTAL'>('PURCHASE')
+const rentalDirectExpenseConfirmed = ref(false)
+const editing = ref<Record<string, { version: number; type: string; typeCandidate?: ExtractedField; fields: Record<string, ExtractedField>; reason: string; fullText: string; extractionStatus: string; provider: string; modelVersion: string; history: ExtractionHistory[] }>>({})
+const message = ref('')
+const activeView = ref('workspace')
+const eventId = ref('')
+const eventDetail = ref<EventDetail | null>(null)
+const draft = ref<Draft | null>(null)
+const editingVoucher = ref(false)
+const voucherLines = ref<Draft['lines']>([])
+const voucherCorrectionReason = ref('')
+const auditEntries = ref<AuditEntry[]>([])
+const voucherEvidence = ref<{ id: string; filename: string; version: number; fields: Record<string, ExtractedField> } | null>(null)
+const originalAiDraft = ref<Draft | null>(null)
+const loading = ref(false)
+const busy = ref(false)
+const apiAvailable = ref(true)
+const uploadInput = ref<HTMLInputElement | null>(null)
+const uploadQueue = ref<UploadItem[]>([])
+let nextUploadId = 1
+const documentPage = ref(1)
+const businessPage = ref(1)
+const voucherPage = ref(1)
+const casePage = ref(1)
+const documentTotal = ref(0)
+const unlinkedDocumentTotal = ref(0)
+const documentStatusCounts = ref<Record<string, number>>({})
+const correctionStats = ref<CorrectionStats>({ corrected_documents: 0, correction_versions: 0, field_changes: [] })
+const correctionStatsError = ref('')
+const insightsSummary = ref<InsightsSummary | null>(null)
+const insightsError = ref('')
+const insightsLoading = ref(false)
+const eventTotal = ref(0)
+const draftTotal = ref(0)
+const voucherStatusCounts = ref<VoucherStatusCount[]>([])
+const caseTotal = ref(0)
+const openCaseTotal = ref(0)
+const pageSize = 8
+
+const navItems = [
+  { id: 'workspace', label: 'è´¢åŠ¡å·¥ä½œå°', icon: 'âŒ‚' },
+  { id: 'documents', label: 'å•æ®ä¸­å¿ƒ', icon: 'â–¤' },
+  { id: 'business', label: 'ä¸šåŠ¡ä¸­å¿ƒ', icon: 'â‡„' },
+  { id: 'vouchers', label: 'å‡­è¯ä¸­å¿ƒ', icon: 'â–§' },
+  { id: 'cases', label: 'æ ¸å¯¹ä¸å¼‚å¸¸', icon: 'âš‘' },
+  { id: 'insights', label: 'è´¢åŠ¡åˆ†æ', icon: 'â—·' },
+  { id: 'integrations', label: 'è¿æ¥ä¸è®¾ç½®', icon: 'âš™' },
+]
+const configurablePolicyTypes = ['EXPENSE', 'ASSET_PURCHASE', 'RENTAL']
+const visibleNavItems = computed(() => currentRole.value === 'BUSINESS_USER'
+  ? navItems.filter((item) => ['workspace', 'documents', 'business', 'cases'].includes(item.id))
+  : navItems)
+
+const pendingDocs = computed(() => Object.entries(documentStatusCounts.value).filter(([status]) => status !== 'CONFIRMED').reduce((sum, [, count]) => sum + count, 0))
+const unlinkedDocs = computed(() => unlinkedDocumentTotal.value)
+const periodVoucherCounts = computed(() => voucherStatusCounts.value.filter((item) => !selectedPeriod.value || item.period === selectedPeriod.value))
+const countVoucherStatus = (statuses: string[]) => periodVoucherCounts.value.filter((item) => statuses.includes(item.status)).reduce((sum, item) => sum + item.count, 0)
+const pendingApprovals = computed(() => countVoucherStatus(['PENDING_APPROVAL']))
+const verifiedPostings = computed(() => countVoucherStatus(['VERIFIED']))
+const postingIssues = computed(() => countVoucherStatus(['FAILED', 'FAILED_POSTING', 'UNKNOWN']))
+const openCases = computed(() => cases.value.filter((item) => item.status === 'OPEN'))
+const recentEvents = computed(() => dashboardEvents.value.slice(0, 6))
+const pagedEvents = computed(() => events.value)
+const pagedDrafts = computed(() => drafts.value)
+const documentPages = computed(() => Math.max(1, Math.ceil(documentTotal.value / pageSize)))
+const businessPages = computed(() => Math.max(1, Math.ceil(eventTotal.value / pageSize)))
+const voucherPages = computed(() => Math.max(1, Math.ceil(draftTotal.value / pageSize)))
+const casePages = computed(() => Math.max(1, Math.ceil(caseTotal.value / pageSize)))
+const canSubmitVoucher = computed(() => demoSession.value || ['TENANT_ADMIN', 'ACCOUNTANT'].includes(currentRole.value))
+const canApproveVoucher = computed(() => demoSession.value || ['TENANT_ADMIN', 'APPROVER', 'OWNER'].includes(currentRole.value))
+const canExportVoucher = computed(() => demoSession.value || ['TENANT_ADMIN', 'ACCOUNTANT', 'APPROVER', 'AUDITOR', 'OWNER'].includes(currentRole.value))
+const canManageAccountingPolicy = computed(() => ['TENANT_ADMIN', 'ACCOUNTANT'].includes(currentRole.value))
+const statusLabel = (status: string | null | undefined) => ({
+  UPLOADED: 'å¾…è¯†åˆ«', PROCESSING: 'è¯†åˆ«ä¸­', NEEDS_REVIEW: 'å¾…ç¡®è®¤', CONFIRMED: 'å·²ç¡®è®¤', FAILED: 'è§£æå¤±è´¥',
+  MATCHED: 'æ ¸å¯¹ä¸€è‡´', PARTIAL: 'éƒ¨åˆ†åŒ¹é…', INSUFFICIENT_EVIDENCE: 'è¯æ®ä¸è¶³', NEEDS_REVIEW_EVENT: 'å¾…å¤æ ¸',
+  DRAFT: 'è‰ç¨¿', VALIDATED: 'æ ¡éªŒé€šè¿‡', PENDING_APPROVAL: 'å¾…å®¡æ ¸', APPROVED: 'å·²æ‰¹å‡†', REJECTED: 'å·²é€€å›',
+  SUBMITTING: 'æäº¤ä¸­', POSTED_PENDING_VERIFY: 'å…¥è´¦å¾…æ ¸å®', VERIFIED: 'å·²æ ¸å®å…¥è´¦', UNKNOWN: 'ç»“æœæœªçŸ¥',
+  FAILED_POSTING: 'å†™å…¥å¤±è´¥', EXPORTED_PENDING_MANUAL_POST: 'å·²å¯¼å‡ºå¾…äººå·¥å…¥è´¦', OPEN: 'å¾…å¤„ç†', RESOLVED: 'å·²è§£å†³',
+}[status || ''] || status || 'æš‚æ— ')
+function findingLabel(finding: Record<string, unknown>) {
+  const code = String(finding.code || '')
+  if (code === 'REQUIRED_DOCUMENT_ROLES_MISSING_OR_DUPLICATED') {
+    const roleNames: Record<string, string> = {
+      INVOICE: 'å‘ç¥¨', GOODS_RECEIPT: 'å…¥åº“å•', BANK_RECEIPT: 'é“¶è¡Œå›å•', CONTRACT: 'åˆåŒ',
+    }
+    const missing = Array.isArray(finding.missing_roles) ? finding.missing_roles.map(String) : []
+    const duplicated = Array.isArray(finding.duplicated_roles) ? finding.duplicated_roles.map(String) : []
+    const details = [
+      missing.length ? `ç¼ºå°‘${missing.map((role) => roleNames[role] || role).join('ã€')}` : '',
+      duplicated.length ? `é‡å¤${duplicated.map((role) => roleNames[role] || role).join('ã€')}` : '',
+    ].filter(Boolean)
+    return details.length ? details.join('ï¼›') : 'å•æ®è§’è‰²ç¼ºå¤±æˆ–é‡å¤'
+  }
+  return ({
+    DOCUMENT_TYPE_ROLE_CONFLICT: 'å•æ®ç±»å‹ä¸æ‰€é€‰è§’è‰²ä¸ä¸€è‡´',
+    GROSS_AMOUNT_MISSING_OR_INVALID: 'é‡‘é¢ç¼ºå¤±æˆ–æ ¼å¼æ— æ³•è¯†åˆ«', GROSS_AMOUNT_MISMATCH: 'å‘ç¥¨ã€å…¥åº“å•ä¸å›å•é‡‘é¢ä¸ä¸€è‡´',
+    FIXTURE_INVOICE_TAX_OR_NET_MISMATCH: 'å‘ç¥¨æœªç¨é‡‘é¢æˆ–ç¨é¢ä¸éªŒæ”¶è§„åˆ™ä¸ä¸€è‡´', INVOICE_TAX_OR_NET_MISMATCH: 'å‘ç¥¨å‡€é¢ã€ç¨é¢ä¸ä»·ç¨åˆè®¡ä¸ä¸€è‡´', GOODS_RECEIPT_NOT_CONFIRMED: 'å°šæœªç¡®è®¤è´§ç‰©å·²å…¥åº“',
+    ORDER_OR_RECEIPT_QUANTITY_MISSING_OR_INVALID: 'åˆåŒæˆ–å…¥åº“å•ç¼ºå°‘å¯æ ¸å¯¹çš„æ•°é‡', GOODS_RECEIPT_QUANTITY_SHORTFALL: `å®é™…æ”¶è´§å°‘äºåˆåŒæ•°é‡ï¼ˆ${String(finding.received_quantity || '')}/${String(finding.ordered_quantity || '')}ï¼‰`, GOODS_RECEIPT_QUANTITY_EXCEEDS_ORDER: 'å®é™…æ”¶è´§æ•°é‡è¶…è¿‡åˆåŒæ•°é‡',
+    BANK_SETTLEMENT_NOT_CONFIRMED: 'å°šæœªç¡®è®¤é“¶è¡Œå·²æ¸…ç®—', DATE_EVIDENCE_MISSING_OR_INVALID: 'æ—¥æœŸè¯æ®ç¼ºå¤±æˆ–æ ¼å¼æ— æ•ˆ',
+    EXPENSE_ACCOUNT_POLICY_REVIEW_REQUIRED: 'è´¹ç”¨ç§‘ç›®æ”¿ç­–å°šæœªç¡®è®¤ï¼Œä¸èƒ½ç”Ÿæˆå‡­è¯',
+    ASSET_CAPITALIZATION_POLICY_REVIEW_REQUIRED: 'å›ºå®šèµ„äº§èµ„æœ¬åŒ–æ”¿ç­–å°šæœªç¡®è®¤ï¼Œä¸èƒ½ç”Ÿæˆå‡­è¯',
+    RENTAL_ACCOUNT_POLICY_REVIEW_REQUIRED: 'ç§Ÿèµä¼šè®¡æ”¿ç­–å°šæœªç¡®è®¤ï¼Œä¸èƒ½ç”Ÿæˆå‡­è¯',
+    ACCOUNTING_POLICY_ACCOUNT_UNAVAILABLE: `ä¼šè®¡æ”¿ç­–ä½¿ç”¨çš„ç§‘ç›® ${String(finding.account_code || '')} å·²åœç”¨æˆ–ä¸æ˜¯æœ«çº§ç§‘ç›®`,
+    RENTAL_CONTRACT_MISSING: 'ç¼ºå°‘ç§ŸèµåˆåŒï¼Œéœ€è¡¥å……åå¤æ ¸',
+    RENTAL_DIRECT_EXPENSE_NOT_CONFIRMED: 'å°šæœªé€ç¬”ç¡®è®¤è¯¥ç§Ÿèµç¬¦åˆç›´æ¥è´¹ç”¨æ”¿ç­–ï¼›éœ€è´¢åŠ¡æ ¸å¯¹åˆåŒåç¡®è®¤',
+    RENTAL_DIRECT_EXPENSE_CONFIRMATION_STALE: 'ç§Ÿèµæ”¿ç­–ç‰ˆæœ¬å·²å˜åŒ–ï¼Œéœ€æŒ‰å½“å‰ç‰ˆæœ¬é‡æ–°ç¡®è®¤æœ¬ç¬”åˆåŒ',
+    FIXTURE_PERIOD_MISMATCH: 'å•æ®æ—¥æœŸä¸åœ¨åŒä¸€ä¼šè®¡æœŸé—´', PARTY_EVIDENCE_MISSING: 'ä»˜æ¬¾æ–¹æˆ–äº¤æ˜“å¯¹æ–¹è¯æ®ç¼ºå¤±',
+    PAYER_BUYER_MISMATCH: 'å›å•ä»˜æ¬¾æ–¹ä¸å‘ç¥¨è´­ä¹°æ–¹ä¸ä¸€è‡´', PAYEE_SELLER_MISMATCH: 'å›å•æ”¶æ¬¾æ–¹ä¸å‘ç¥¨é”€å”®æ–¹ä¸ä¸€è‡´',
+  } as Record<string, string>)[code] || 'æ ¸å¯¹è§„åˆ™æœªé€šè¿‡'
+}
+const caseLabel = (type: string) => ({ RECONCILIATION: 'ä¸šåŠ¡æ ¸å¯¹å¼‚å¸¸', DUPLICATE_INVOICE: 'ç–‘ä¼¼é‡å¤å‘ç¥¨' }[type] || 'å¾…å¤„ç†å¼‚å¸¸')
+const auditLabel = (type: string) => ({
+  BUSINESS_EVENT_RECONCILED: 'é‡æ–°è¿è¡Œä¸šåŠ¡æ ¸å¯¹', BUSINESS_EVENT_CREATED: 'åˆ›å»ºä¸šåŠ¡å…³è”',
+  VOUCHER_AI_CANDIDATE_CREATED: 'DeepSeek ç”Ÿæˆ AI å‡­è¯è‰ç¨¿', VOUCHER_CORRECTED_NEW_VERSION: 'ä¿®æ­£å¹¶ä¿å­˜å‡­è¯æ–°ç‰ˆæœ¬', VOUCHER_SUBMITTED: 'æäº¤å‡­è¯å®¡æ ¸',
+  VOUCHER_APPROVE: 'å®¡æ‰¹é€šè¿‡', VOUCHER_REJECT: 'å®¡æ‰¹é€€å›', VOUCHER_EXPORTED_PENDING_MANUAL_POST: 'å¯¼å‡ºå¾…äººå·¥å…¥è´¦æ–‡ä»¶',
+  VOUCHER_POSTED: 'ERP å‡­è¯å·²å†™å…¥', VOUCHER_VERIFIED: 'ERP å›è¯»æ ¸å®å®Œæˆ', VOUCHER_POSTING_UNKNOWN: 'ERP å†™å…¥ç»“æœæœªçŸ¥',
+}[type] || 'å‡­è¯è®°å½•å·²æ›´æ–°')
+function caseSummary(item: CaseRow) {
+  const findings = item.details?.findings
+  if (Array.isArray(findings) && findings.length) return findings.map((finding) => findingLabel(finding as Record<string, unknown>)).join('ï¼›')
+  if (item.type === 'DUPLICATE_INVOICE') return 'æ£€æµ‹åˆ°é‡å¤å‘ç¥¨é£é™©ï¼Œå·²é˜»æ­¢ç”Ÿæˆå‡­è¯ã€‚'
+  return 'éœ€è¦æ£€æŸ¥ç›¸å…³å•æ®å’Œä¸šåŠ¡è¯æ®ã€‚'
+}
+const businessStatusLabel = (status: string) => status === 'NEEDS_REVIEW' ? 'å¾…å¤æ ¸' : statusLabel(status)
+const voucherStatusLabel = (status: string) => status === 'NEEDS_REVIEW' ? 'å¾…è¡¥è¾…åŠ©æ ¸ç®—' : statusLabel(status)
+const eventTypeLabel = (type: string) => ({ EXPENSE: 'è´¹ç”¨æŠ¥é”€', PURCHASE: 'é‡‡è´­ä¸šåŠ¡', ASSET_PURCHASE: 'è®¾å¤‡è´­ç½®', RENTAL: 'ç§Ÿèµä¸šåŠ¡' } as Record<string, string>)[type] || type
+function voucherPolicySummary(policy?: Record<string, unknown>) {
+  if (!policy?.policy_ref) return 'æ”¿ç­–ç‰ˆæœ¬æœªè®°å½•'
+  const summary = policy.policy_summary as Record<string, unknown> | undefined
+  return `æ”¿ç­–ç‰ˆæœ¬ ${String(policy.policy_ref)} Â· ç¡®è®¤äºº ${String(policy.confirmed_by || 'æœªè®°å½•')} Â· ${String(summary?.accounting_treatment || 'å·²ç¡®è®¤ä¼šè®¡æ”¿ç­–')} Â· ${String(policy.policy_explanation || '')}`
+}
+const validationLabel = (code: string) => ({ SOURCE_CURRENT: 'æ¥æºç‰ˆæœ¬ä»ä¸ºå½“å‰ç¡®è®¤ç‰ˆæœ¬', INVOICE_NET_TAX_GROSS: 'å‘ç¥¨æœªç¨é‡‘é¢ã€ç¨é¢ä¸ä»·ç¨åˆè®¡', ACCOUNT_PERIOD_OPEN: 'ä¼šè®¡æœŸé—´å¼€æ”¾', POLICY_CURRENT: 'ä¼šè®¡æ”¿ç­–ç‰ˆæœ¬æœ‰æ•ˆ', EVIDENCE_REFERENCES: 'æ¥æºè¯æ®å¼•ç”¨æœ‰æ•ˆ', AMOUNTS_MATCHED: 'AI é‡‘é¢ä¸æ¥æºåŠæ”¿ç­–ä¸€è‡´', BALANCED: 'å€Ÿè´·å¹³è¡¡', CHART_ACCOUNTS: 'è´¦å¥—ç§‘ç›®æœ‰æ•ˆ', AUXILIARY_COMPLETE: 'è¾…åŠ©æ ¸ç®—å®Œæ•´' } as Record<string, string>)[code] || code
+function correctedFromDraftId(policy?: Record<string, unknown>) {
+  const source = policy?.corrected_from
+  return source && typeof source === 'object' && 'draft_id' in source ? String(source.draft_id) : ''
+}
+function correctedFromVersion(policy?: Record<string, unknown>) {
+  const source = policy?.corrected_from
+  return source && typeof source === 'object' && 'version' in source ? String(source.version) : '?'
+}
+async function showOriginalAiDraft() {
+  const id = correctedFromDraftId(draft.value?.policy)
+  if (!id) return
+  const response = await api(`/api/v1/voucher-drafts/${id}`)
+  const body = await response.json()
+  if (!response.ok) { message.value = body.detail || 'æ— æ³•è¯»å–åŸ AI å‡­è¯ç‰ˆæœ¬ã€‚'; return }
+  originalAiDraft.value = body
+}
+const documentRoleLabel = (role: string) => ({
+  INVOICE: 'å‘ç¥¨', GOODS_RECEIPT: 'å…¥åº“ / æ”¶è´§å‡­è¯', BANK_RECEIPT: 'é“¶è¡Œå›å•',
+  CONTRACT: 'åˆåŒ', PAYMENT_PROOF: 'æ”¯ä»˜è¯æ˜',
+} as Record<string, string>)[role] || role
+const documentTypeLabel = (type: string | undefined) => ({
+  VAT_INVOICE: 'å¢å€¼ç¨å‘ç¥¨', GOODS_RECEIPT: 'å…¥åº“ / æ”¶è´§å•', BANK_RECEIPT: 'é“¶è¡Œå›å•',
+  CONTRACT: 'åˆåŒ', PAYMENT_PROOF: 'æ”¯ä»˜è¯æ˜', ACCEPTANCE_REPORT: 'éªŒæ”¶æŠ¥å‘Š',
+  TAXI_RECEIPT: 'å‡ºç§Ÿè½¦ç¥¨æ®', TOLL_RECEIPT: 'é€šè¡Œè´¹ç¥¨æ®',
+  UNCLASSIFIED: 'æœªåˆ†ç±»', OTHER: 'å…¶ä»–æ–‡ä»¶',
+} as Record<string, string>)[type || 'UNCLASSIFIED'] || type || 'æœªåˆ†ç±»'
+const documentFieldKeys: Record<string, string[]> = {
+  VAT_INVOICE: ['invoice_number', 'issue_date', 'buyer', 'seller', 'net_amount', 'tax_rate', 'tax_amount', 'gross_amount'],
+  GOODS_RECEIPT: ['receipt_number', 'receipt_date', 'item', 'quantity', 'gross_amount', 'received'],
+  BANK_RECEIPT: ['payer', 'payee', 'settlement_date', 'gross_amount', 'settled'],
+  PAYMENT_PROOF: ['proof_number', 'payment_date', 'payer', 'payee', 'purpose', 'gross_amount', 'approved'],
+  CONTRACT: ['contract_number', 'contract_date', 'buyer', 'seller', 'item', 'ordered_quantity', 'gross_amount'],
+  ACCEPTANCE_REPORT: ['acceptance_date', 'acceptance_result'],
+  TAXI_RECEIPT: ['invoice_number', 'issue_date', 'gross_amount'],
+  TOLL_RECEIPT: ['receipt_number', 'issue_date', 'gross_amount'],
+}
+function visibleDocumentFields(documentId: string) {
+  const form = editing.value[documentId]
+  const allowed = documentFieldKeys[form.type]
+  if (!allowed) return form.fields
+  return Object.fromEntries(Object.entries(form.fields).filter(([key]) => allowed.includes(key)))
+}
+const fieldLabel = (key: string) => ({
+  document_type: 'å•æ®ç±»å‹', document_type_candidate: 'å•æ®ç±»å‹å»ºè®®',
+  invoice_number: 'å‘ç¥¨å·ç ', issue_date: 'å¼€ç¥¨æ—¥æœŸ', payment_date: 'è¯æ˜æ—¥æœŸ', buyer: 'è´­ä¹°æ–¹', seller: 'é”€å”®æ–¹',
+  net_amount: 'æœªç¨é‡‘é¢', tax_rate: 'ç¨ç‡', tax_amount: 'ç¨é¢', gross_amount: 'ä»·ç¨åˆè®¡', purpose: 'æŠ¥é”€äº‹ç”±',
+  receipt_number: 'å…¥åº“å•å·', receipt_date: 'å…¥åº“æ—¥æœŸ', item: 'è´§ç‰©åç§°', quantity: 'æ•°é‡', received: 'å·²æ”¶è´§',
+  contract_number: 'åˆåŒç¼–å·', contract_date: 'åˆåŒæ—¥æœŸ', ordered_quantity: 'åˆåŒé‡‡è´­æ•°é‡',
+  payer: 'ä»˜æ¬¾æ–¹', payee: 'æ”¶æ¬¾æ–¹', settlement_date: 'ç»“ç®—æ—¥æœŸ', settled: 'å·²æ¸…ç®—',
+  acceptance_date: 'éªŒæ”¶æ—¥æœŸ', acceptance_result: 'éªŒæ”¶ç»“è®º',
+}[key] || key)
+function documentFieldLabel(key: string, documentType: string) {
+  if (key === 'receipt_number' && documentType === 'TOLL_RECEIPT') return 'ç¥¨æ®å·ç '
+  if (key === 'gross_amount' && documentType === 'PAYMENT_PROOF') return 'è¯æ˜é‡‘é¢'
+  return fieldLabel(key)
+}
+
+async function api(path: string, init: RequestInit = {}) {
+  const headers = new Headers(init.headers)
+  if (token.value) headers.set('Authorization', `Bearer ${token.value}`)
+  return fetch(path, { ...init, headers })
+}
+
+async function readList<T>(path: string): Promise<T[]> {
+  const response = await api(path)
+  if (response.status === 403) throw new Error('å½“å‰è´¦å·æ²¡æœ‰æŸ¥çœ‹æ­¤å·¥ä½œåŒºæ•°æ®çš„æƒé™ã€‚')
+  if (!response.ok) throw new Error(`è¯»å–æ•°æ®å¤±è´¥ï¼ˆ${response.status}ï¼‰`)
+  return response.json()
+}
+
+async function readCorrectionStats(): Promise<CorrectionStats | null> {
+  try {
+    const response = await api('/api/v1/documents/correction-stats')
+    if (!response.ok) throw new Error(`è¯»å–çº é”™ç»Ÿè®¡å¤±è´¥ï¼ˆ${response.status}ï¼‰`)
+    correctionStatsError.value = ''
+    return await response.json()
+  } catch {
+    correctionStatsError.value = 'çº é”™ç»Ÿè®¡æš‚æ—¶ä¸å¯ç”¨ï¼Œè¯·ç¨ååˆ·æ–°ã€‚'
+    return null
+  }
+}
+
+async function readPage<T>(path: string, page: number): Promise<PageResult<T>> {
+  const response = await api(`${path}?page=${page}&page_size=${pageSize}`)
+  if (response.status === 403) throw new Error('å½“å‰è´¦å·æ²¡æœ‰æŸ¥çœ‹æ­¤å·¥ä½œåŒºæ•°æ®çš„æƒé™ã€‚')
+  if (!response.ok) throw new Error(`è¯»å–æ•°æ®å¤±è´¥ï¼ˆ${response.status}ï¼‰`)
+  return response.json()
+}
+
+async function loadInsights() {
+  insightsLoading.value = true
+  insightsError.value = ''
+  try {
+    const response = await api('/api/v1/insights/summary')
+    if (!response.ok) throw new Error(`è¯»å–åˆ†ææ‘˜è¦å¤±è´¥ï¼ˆ${response.status}ï¼‰`)
+    insightsSummary.value = await response.json()
+  } catch (error) {
+    insightsError.value = error instanceof Error ? error.message : 'åˆ†ææ‘˜è¦æš‚æ—¶ä¸å¯ç”¨ã€‚'
+    insightsSummary.value = null
+  } finally {
+    insightsLoading.value = false
+  }
+}
+
+async function loadChartAccounts() {
+  if (!canManageAccountingPolicy.value) return
+  chartAccountsLoading.value = true
+  try {
+    const [accountResponse, policyResponse] = await Promise.all([
+      api('/api/v1/auth/chart-accounts'), api('/api/v1/auth/accounting-policies'),
+    ])
+    if (!accountResponse.ok) throw new Error(`è¯»å–ç§‘ç›®é…ç½®å¤±è´¥ï¼ˆ${accountResponse.status}ï¼‰`)
+    if (!policyResponse.ok) throw new Error(`è¯»å–ä¼šè®¡æ”¿ç­–å¤±è´¥ï¼ˆ${policyResponse.status}ï¼‰`)
+    const body = await accountResponse.json()
+    chartAccounts.value = (body.accounts || []).map((account: ChartAccount) => ({
+      ...account, auxiliary_input: (account.required_auxiliary_fields || []).join('ã€'),
+    }))
+    const policyBody = await policyResponse.json()
+    for (const policy of policyBody.policies || []) {
+      const current = policyForms.value[policy.business_type]
+      if (!current) continue
+      policyForms.value[policy.business_type] = {
+        ...current, ...policy.configuration, version: policy.version,
+        input_tax_account_code: policy.configuration.input_tax_account_code || '', confirmed: false,
+      }
+    }
+  } catch (error) {
+    message.value = error instanceof Error ? error.message : 'è¯»å–ç§‘ç›®é…ç½®å¤±è´¥ã€‚'
+  } finally {
+    chartAccountsLoading.value = false
+  }
+}
+
+async function saveAccountingPolicy(businessType: string) {
+  const form = policyForms.value[businessType]
+  if (!form) return
+  chartAccountsSaving.value = true
+  try {
+    const response = await api(`/api/v1/auth/accounting-policies/${businessType}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...form, input_tax_account_code: form.input_tax_account_code || null }),
+    })
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.detail || `ä¿å­˜ä¼šè®¡æ”¿ç­–å¤±è´¥ï¼ˆ${response.status}ï¼‰`)
+    policyForms.value[businessType].version = body.version
+    policyForms.value[businessType].confirmed = false
+    message.value = `${businessTypeLabel(businessType)}æ”¿ç­–å·²ä¿å­˜ä¸º V${body.version}ã€‚æ–°æ ¸å¯¹ä¸šåŠ¡å°†ä½¿ç”¨æ­¤ç‰ˆæœ¬ã€‚`
+  } catch (error) {
+    message.value = error instanceof Error ? error.message : 'ä¿å­˜ä¼šè®¡æ”¿ç­–å¤±è´¥ã€‚'
+  } finally {
+    chartAccountsSaving.value = false
+  }
+}
+
+const businessTypeLabel = (type: string) => ({ EXPENSE: 'è´¹ç”¨æŠ¥é”€', ASSET_PURCHASE: 'è®¾å¤‡è´­ç½®', RENTAL: 'ç§Ÿèµä¸šåŠ¡' } as Record<string, string>)[type] || type
+
+async function saveChartAccounts() {
+  chartAccountsSaving.value = true
+  try {
+    const accounts = chartAccounts.value.map(({ auxiliary_input, ...account }) => ({
+      ...account,
+      requires_auxiliary: Boolean(auxiliary_input?.trim()),
+      required_auxiliary_fields: auxiliary_input?.split(/[ã€,ï¼Œ]/).map((field) => field.trim()).filter(Boolean) || [],
+    }))
+    const response = await api('/api/v1/auth/chart-accounts', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accounts }),
+    })
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.detail || `ä¿å­˜ç§‘ç›®é…ç½®å¤±è´¥ï¼ˆ${response.status}ï¼‰`)
+    message.value = `å·²ä¿å­˜ ${body.upserted} ä¸ªç§‘ç›®é…ç½®ã€‚`
+    await loadChartAccounts()
+  } catch (error) {
+    message.value = error instanceof Error ? error.message : 'ä¿å­˜ç§‘ç›®é…ç½®å¤±è´¥ã€‚'
+  } finally {
+    chartAccountsSaving.value = false
+  }
+}
+
+function addChartAccount() {
+  const code = newChartAccount.value.code.trim()
+  const name = newChartAccount.value.name.trim()
+  if (!code || !name || chartAccounts.value.some((account) => account.code === code)) return
+  chartAccounts.value.push({ code, name, is_active: true, is_leaf: true, requires_auxiliary: false, required_auxiliary_fields: [], auxiliary_input: '' })
+  newChartAccount.value = { code: '', name: '' }
+}
+
+async function load() {
+  loading.value = true
+  try {
+    const identityResponse = await api('/api/v1/auth/me')
+    if (!identityResponse.ok) { apiAvailable.value = identityResponse.status !== 0; throw new Error('æ— æ³•è¯»å–å½“å‰è´¦å¥—ï¼Œè¯·æ£€æŸ¥ API æœåŠ¡å’Œè´¦å¥—è¿æ¥ã€‚') }
+    const identity = await identityResponse.json()
+    demoSession.value = identity.demo
+    currentRole.value = identity.role
+    tenantId.value = identity.tenant_id
+    accountSetId.value = identity.account_set_id
+    scopeOptions.value = identity.scopes || []
+    const canReadFinancialData = identity.role !== 'BUSINESS_USER'
+    const [documentPageResult, eventPageResult, dashboardEventResult, voucherPageResult, casePageResult, periods, assignableUsers, correctionStatsResult] = await Promise.all([
+      readPage<Doc>('/api/v1/documents', documentPage.value), readPage<EventRow>('/api/v1/business-events', businessPage.value),
+      readPage<EventRow>('/api/v1/business-events', 1),
+      canReadFinancialData ? readPage<Draft>('/api/v1/voucher-drafts', voucherPage.value) : Promise.resolve({ items: [], page: 1, page_size: pageSize, total: 0, status_counts: [] }),
+      readPage<CaseRow>('/api/v1/exception-cases', casePage.value),
+      canReadFinancialData ? readList<AccountingPeriod>('/api/v1/auth/accounting-periods') : Promise.resolve([]),
+      identity.role === 'TENANT_ADMIN' ? readList<BusinessUserOption>('/api/v1/auth/memberships?role=BUSINESS_USER') : Promise.resolve([]),
+      readCorrectionStats(),
+    ])
+    docs.value = documentPageResult.items
+    documentTotal.value = documentPageResult.total
+    unlinkedDocumentTotal.value = Number(documentPageResult.unlinked_total || 0)
+    documentStatusCounts.value = (documentPageResult.status_counts || {}) as Record<string, number>
+    correctionStats.value = correctionStatsResult || { corrected_documents: 0, correction_versions: 0, field_changes: [] }
+    events.value = eventPageResult.items
+    dashboardEvents.value = dashboardEventResult.items
+    eventTotal.value = eventPageResult.total
+    drafts.value = voucherPageResult.items
+    voucherStatusCounts.value = (voucherPageResult.status_counts || []) as VoucherStatusCount[]
+    draftTotal.value = voucherPageResult.total
+    cases.value = casePageResult.items
+    caseTotal.value = casePageResult.total
+    openCaseTotal.value = Number(casePageResult.open_total || 0)
+    accountingPeriods.value = periods
+    businessUsers.value = assignableUsers
+    if (!periods.some((period) => period.period === selectedPeriod.value)) selectedPeriod.value = periods[0]?.period || ''
+    for (const url of Object.values(previews.value)) URL.revokeObjectURL(url)
+    previews.value = {}
+    await Promise.all(docs.value.slice(0, 80).map(async (document) => {
+      const response = await api(`/api/v1/documents/${document.id}/content`)
+      if (response.ok) previews.value[document.id] = URL.createObjectURL(await response.blob())
+    }))
+    apiAvailable.value = true
+  } catch (error) {
+    apiAvailable.value = false
+    message.value = error instanceof Error ? error.message : 'API å°šæœªè¿æ¥ï¼Œè¯·æ£€æŸ¥æœ¬åœ°æœåŠ¡ã€‚'
+  } finally { loading.value = false }
+}
+
+async function changePage(kind: 'documents' | 'business' | 'vouchers' | 'cases', nextPage: number) {
+  if (kind === 'documents') documentPage.value = nextPage
+  if (kind === 'business') businessPage.value = nextPage
+  if (kind === 'vouchers') voucherPage.value = nextPage
+  if (kind === 'cases') casePage.value = nextPage
+  await load()
+}
+
+async function inspectCase(item: CaseRow) {
+  caseDetailLoading.value = true
+  selectedCase.value = null
+  try {
+    const response = await api(`/api/v1/exception-cases/${item.id}`)
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.detail || 'è¯»å–å¼‚å¸¸è¯¦æƒ…å¤±è´¥ã€‚')
+    selectedCase.value = body
+  } catch (error) {
+    message.value = error instanceof Error ? error.message : 'è¯»å–å¼‚å¸¸è¯¦æƒ…å¤±è´¥ã€‚'
+  } finally { caseDetailLoading.value = false }
+}
+
+async function continueCaseBusiness() {
+  if (!selectedCase.value) return
+  const id = selectedCase.value.event_id
+  selectedCase.value = null
+  if (!id) return
+  activeView.value = 'business'
+  await selectEvent(id)
+}
+
+async function switchScope(event: Event) {
+  const nextAccountSet = (event.target as HTMLSelectElement).value
+  const target = scopeOptions.value.find((scope) => scope.account_set_id === nextAccountSet)
+  if (!target || target.account_set_id === accountSetId.value) return
+  const previous = accountSetId.value
+  const response = await api('/api/v1/auth/switch-scope', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ membership_id: target.membership_id }),
+  })
+  const body = await response.json()
+  if (!response.ok) {
+    accountSetId.value = previous
+    message.value = body.detail || 'åˆ‡æ¢è´¦å¥—å¤±è´¥ã€‚'
+    return
+  }
+  token.value = body.access_token
+  sessionStorage.setItem('zq-access-token', token.value)
+  tenantId.value = body.tenant_id
+  accountSetId.value = body.account_set_id
+  selectedPeriod.value = ''
+  documentPage.value = 1
+  businessPage.value = 1
+  voucherPage.value = 1
+  casePage.value = 1
+  await load()
+  message.value = `å·²åˆ‡æ¢åˆ° ${target.tenant_name} Â· ${target.account_set_name}ã€‚`
+}
+
+function openUpload() { activeView.value = 'documents'; uploadInput.value?.click() }
+function onDrop(event: DragEvent) {
+  const files = event.dataTransfer?.files
+  if (files?.length) void uploadFiles(Array.from(files))
+}
+
+function upload(event: Event) {
+  const input = event.target as HTMLInputElement
+  if (input.files?.length) void uploadFiles(Array.from(input.files))
+  input.value = ''
+}
+
+function sendUpload(item: UploadItem): Promise<void> {
+  item.status = 'uploading'; item.progress = 0; item.error = ''
+  return new Promise((resolve) => {
+    const request = new XMLHttpRequest()
+    request.open('POST', '/api/v1/documents')
+    if (token.value) request.setRequestHeader('Authorization', `Bearer ${token.value}`)
+    request.upload.onprogress = (event) => {
+      if (event.lengthComputable) item.progress = Math.round(event.loaded / event.total * 100)
+    }
+    request.onload = () => {
+      let body: Record<string, unknown> = {}
+      try { body = JSON.parse(request.responseText) } catch { /* The API returned no JSON. */ }
+      if (request.status >= 200 && request.status < 300) {
+        item.status = 'done'; item.progress = 100
+        item.error = body.duplicate ? 'æ–‡ä»¶å·²å­˜åœ¨ï¼Œæœªé‡å¤ä¿å­˜ã€‚' : ''
+      } else {
+        item.status = 'failed'; item.error = String(body.detail || `${item.file.name} ä¸Šä¼ å¤±è´¥ï¼ˆ${request.status}ï¼‰`)
+      }
+      resolve()
+    }
+    request.onerror = () => { item.status = 'failed'; item.error = 'ç½‘ç»œè¿æ¥ä¸­æ–­ï¼Œè¯·é‡è¯•ã€‚'; resolve() }
+    request.onabort = () => { item.status = 'failed'; item.error = 'ä¸Šä¼ å·²ä¸­æ–­ï¼Œè¯·é‡è¯•ã€‚'; resolve() }
+    const form = new FormData(); form.append('file', item.file)
+    request.send(form)
+  })
+}
+
+async function uploadFiles(files: File[]) {
+  const items: UploadItem[] = files.map((file) => ({ id: nextUploadId++, file, status: 'uploading', progress: 0, error: '' }))
+  uploadQueue.value = [...items, ...uploadQueue.value.filter((item) => item.status === 'failed')]
+  busy.value = true
+  for (const item of items) await sendUpload(item)
+  busy.value = false
+  const failed = items.filter((item) => item.status === 'failed').length
+  message.value = failed ? `ä¸Šä¼ ç»“æŸï¼Œ${failed} ä»½å¤±è´¥ï¼Œå¯åœ¨åˆ—è¡¨ä¸­é‡è¯•ã€‚` : `å·²å¤„ç† ${items.length} ä»½æ–‡ä»¶ï¼›é‡å¤æ–‡ä»¶ä¸ä¼šé‡å¤ä¿å­˜ã€‚`
+  if (items.some((item) => item.status === 'done')) { documentPage.value = 1; await load() }
+}
+
+async function retryUpload(item: UploadItem) {
+  busy.value = true
+  await sendUpload(item)
+  busy.value = false
+  if (item.status === 'done') { documentPage.value = 1; await load() }
+}
+
+function toggle(id: string) { selected.value = selected.value.includes(id) ? selected.value.filter((value) => value !== id) : [...selected.value, id] }
+async function inspect(document: Doc) {
+  if (editing.value[document.id]) { delete editing.value[document.id]; return }
+  const response = await api(`/api/v1/documents/${document.id}`)
+  const body = await response.json()
+  if (!response.ok || !body.extraction) { message.value = body.detail || 'æ²¡æœ‰å¯ç¼–è¾‘çš„è¯†åˆ«ç»“æœã€‚'; return }
+  const fields = { ...body.extraction.fields }
+  const typeCandidate = body.extraction.document_type_candidate || fields.document_type_candidate
+  delete fields.document_type_candidate
+  editing.value[document.id] = { version: body.extraction.version, type: body.extraction.document_type, typeCandidate, fields, reason: 'äººå·¥å¯¹ç…§åŸä»¶ç¡®è®¤', fullText: body.extraction.full_text || '', extractionStatus: body.extraction.status || body.status || 'NEEDS_REVIEW', provider: body.extraction.provider || 'æœªçŸ¥è¯†åˆ«å™¨', modelVersion: body.extraction.model_version || 'æœªçŸ¥ç‰ˆæœ¬', history: body.extraction_history || [] }
+  ensureReviewFields(document)
+}
+async function focusEvidence(documentId: string, fieldKey: string) {
+  evidenceSelection.value = { documentId, fieldKey }
+  const field = editing.value[documentId]?.fields[fieldKey]
+  if (!field?.page) {
+    if (evidencePreview.value) URL.revokeObjectURL(evidencePreview.value.url)
+    evidencePreview.value = null
+    return
+  }
+  await showEvidencePage(documentId, field.page)
+}
+async function showEvidencePage(documentId: string, page: number) {
+  const response = await api(`/api/v1/documents/${documentId}/preview?page=${page}`)
+  if (!response.ok) { message.value = 'æ— æ³•è¯»å–è¯¥å­—æ®µå¯¹åº”çš„åŸä»¶é¡µé¢ã€‚'; return }
+  const url = URL.createObjectURL(await response.blob())
+  if (evidencePreview.value) URL.revokeObjectURL(evidencePreview.value.url)
+  evidencePreview.value = {
+    documentId,
+    url,
+    page: Number(response.headers.get('X-Preview-Page') || page),
+    pageCount: Number(response.headers.get('X-Preview-Page-Count') || 1),
+    pageWidthPoints: Number(response.headers.get('X-Preview-Page-Width-Points') || 0),
+    pageHeightPoints: Number(response.headers.get('X-Preview-Page-Height-Points') || 0),
+  }
+}
+async function browseOriginal(documentId: string) {
+  evidenceSelection.value = { documentId, fieldKey: '' }
+  const page = evidencePreview.value?.documentId === documentId ? evidencePreview.value.page : 1
+  await showEvidencePage(documentId, page)
+}
+function recordPreviewSize(documentId: string, event: Event) {
+  const image = event.target as HTMLImageElement
+  previewImageSize.value[documentId] = { width: image.naturalWidth, height: image.naturalHeight }
+}
+function evidenceBoxStyle(documentId: string, field: ExtractedField | undefined): Record<string, string> {
+  if (!field || evidencePreview.value?.documentId !== documentId || evidencePreview.value.page !== field.page) return {}
+  const bbox = field.bbox
+  if (!bbox?.length) return {}
+  let xValues: number[]
+  let yValues: number[]
+  if (Array.isArray(bbox[0])) {
+    const points = bbox as number[][]
+    xValues = points.map((point) => point[0]).filter(Number.isFinite)
+    yValues = points.map((point) => point[1]).filter(Number.isFinite)
+  } else if (bbox.length === 4 && bbox.every((point) => typeof point === 'number')) {
+    const [left, top, right, bottom] = bbox as number[]
+    xValues = [left, right]; yValues = [top, bottom]
+  } else return {}
+  const imageSize = previewImageSize.value[documentId]
+  const usePdfPoints = field.coordinate_space === 'pdf_points'
+  const width = usePdfPoints ? (field.page_size_points?.[0] || evidencePreview.value?.pageWidthPoints) : imageSize?.width
+  const height = usePdfPoints ? (field.page_size_points?.[1] || evidencePreview.value?.pageHeightPoints) : imageSize?.height
+  if (!width || !height || !xValues.length || !yValues.length) return {}
+  const left = Math.min(...xValues), top = Math.min(...yValues)
+  return {
+    left: `${left / width * 100}%`, top: `${top / height * 100}%`,
+    width: `${(Math.max(...xValues) - left) / width * 100}%`,
+    height: `${(Math.max(...yValues) - top) / height * 100}%`,
+  }
+}
+function ensureReviewFields(document: Doc) {
+  const form = editing.value[document.id]
+  for (const key of documentFieldKeys[form.type] || []) if (!form.fields[key]) form.fields[key] = { raw_value: null, normalized_value: '', confidence: 0, status: 'NEEDS_REVIEW', page: null, bbox: null, evidence_text: '' }
+  const dateKey = ({ VAT_INVOICE: 'issue_date', GOODS_RECEIPT: 'receipt_date', BANK_RECEIPT: 'settlement_date', PAYMENT_PROOF: 'payment_date', CONTRACT: 'contract_date', ACCEPTANCE_REPORT: 'acceptance_date' } as Record<string, string>)[form.type]
+  const genericDate = form.fields.issue_date
+  if (dateKey && dateKey !== 'issue_date' && !['PAYMENT_PROOF', 'BANK_RECEIPT', 'GOODS_RECEIPT', 'ACCEPTANCE_REPORT'].includes(form.type) && !form.fields[dateKey]?.normalized_value && genericDate?.normalized_value) {
+    form.fields[dateKey] = { ...genericDate }
+  }
+}
+function applyDocumentTypeSuggestion(document: Doc) {
+  const form = editing.value[document.id]
+  const suggestedType = form.typeCandidate?.normalized_value
+  if (!suggestedType) return
+  form.type = suggestedType
+  ensureReviewFields(document)
+}
+async function confirm(document: Doc) {
+  const form = editing.value[document.id]
+  const fields = Object.fromEntries(Object.entries(visibleDocumentFields(document.id)).map(([key, value]) => [key, String(value.normalized_value ?? '')]))
+  const response = await api(`/api/v1/documents/${document.id}/extraction`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ expected_version: form.version, document_type: form.type, fields, reason: form.reason }) })
+  const body = await response.json()
+  if (!response.ok) { message.value = body.detail || 'å­—æ®µä¿å­˜å¤±è´¥ã€‚'; return }
+  delete editing.value[document.id]
+  message.value = `${document.filename} å·²ä¿å­˜ä¸ºäººå·¥ç¡®è®¤ç‰ˆæœ¬ ${body.version}ã€‚`
+  await load()
+}
+
+async function linkDocs() {
+  if (selected.value.length < 2 || selected.value.some((id) => !roles.value[id])) { message.value = 'è¯·è‡³å°‘é€‰æ‹©ä¸¤ä»½å•æ®ï¼Œå¹¶é€ä»½æŒ‡å®šä¸šåŠ¡è§’è‰²ã€‚'; return }
+  busy.value = true
+  try {
+    const response = await api('/api/v1/business-events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_type: selectedEventType.value, document_ids: selected.value, roles: selected.value.map((id) => roles.value[id]), reason: 'ç”±æ“ä½œäººæ˜ç¡®é€‰æ‹©å…³è”ï¼›éœ€é€ä»½ç¡®è®¤å•æ®å­—æ®µ', rental_direct_expense_confirmed: selectedEventType.value === 'RENTAL' && rentalDirectExpenseConfirmed.value }) })
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.detail)
+    eventId.value = body.id
+    businessPage.value = 1
+    const check = await api(`/api/v1/business-events/${eventId.value}/reconcile`, { method: 'POST' })
+    const result = await check.json()
+    if (!check.ok) throw new Error(result.detail)
+    message.value = `æ ¸å¯¹å®Œæˆï¼š${businessStatusLabel(result.status)}ï¼Œé‡‘é¢ ${result.amount ?? 'å¾…æ ¸å¯¹'}ã€‚${result.note || ''}`
+    selected.value = []
+    selectedEventType.value = 'PURCHASE'
+    rentalDirectExpenseConfirmed.value = false
+    activeView.value = 'business'
+    await load()
+    await selectEvent(eventId.value)
+  } catch (error) { message.value = error instanceof Error ? error.message : String(error) }
+  finally { busy.value = false }
+}
+
+async function selectEvent(id: string) {
+  eventId.value = id
+  const response = await api(`/api/v1/business-events/${id}`)
+  if (!response.ok) { message.value = 'è¯»å–ä¸šåŠ¡è¯¦æƒ…å¤±è´¥ï¼Œè¯·æ£€æŸ¥æƒé™æˆ–ç½‘ç»œåé‡è¯•ã€‚'; return }
+  eventDetail.value = await response.json()
+  eventAssignments.value = []
+  if (currentRole.value === 'TENANT_ADMIN') {
+    const assignmentResponse = await api(`/api/v1/business-events/${id}/assignments`)
+    if (assignmentResponse.ok) eventAssignments.value = await assignmentResponse.json()
+  }
+  const relatedDraft = drafts.value.find((item) => item.event_id === id)
+  draft.value = relatedDraft || null
+}
+async function assignBusinessUser() {
+  if (!eventId.value || !selectedAssignee.value) return
+  const user = businessUsers.value.find((item) => item.user_id === selectedAssignee.value)
+  if (!user) return
+  const response = await api(`/api/v1/business-events/${eventId.value}/assignments`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: user.email }),
+  })
+  const body = await response.json()
+  if (!response.ok) { message.value = body.detail || 'æŒ‡æ´¾ä¸šåŠ¡äººå‘˜å¤±è´¥ã€‚'; return }
+  selectedAssignee.value = ''
+  await selectEvent(eventId.value)
+  message.value = `å·²å°†ä¸šåŠ¡æŒ‡æ´¾ç»™ ${user.display_name}ã€‚`
+}
+async function unassignBusinessUser(userId: string) {
+  if (!eventId.value) return
+  const response = await api(`/api/v1/business-events/${eventId.value}/assignments/${userId}`, { method: 'DELETE' })
+  const body = await response.json()
+  if (!response.ok) { message.value = body.detail || 'å–æ¶ˆæŒ‡æ´¾å¤±è´¥ã€‚'; return }
+  await selectEvent(eventId.value)
+  message.value = 'å·²å–æ¶ˆä¸šåŠ¡äººå‘˜æŒ‡æ´¾ã€‚'
+}
+
+async function loadAudit(draftId: string) {
+  const response = await api(`/api/v1/voucher-drafts/${draftId}/audit`)
+  auditEntries.value = response.ok ? await response.json() : []
+}
+
+async function openVoucherEvidence(documentId: string) {
+  const snapshots = draft.value?.policy?.source_snapshot
+  const source = Array.isArray(snapshots) ? snapshots.find((item) => item && typeof item === 'object' && 'document_id' in item && item.document_id === documentId) as { extraction_version?: number } | undefined : undefined
+  if (!source?.extraction_version) { message.value = 'å½“å‰å‡­è¯æœªä¿å­˜è¯¥æ¥æºçš„ç¡®è®¤ç‰ˆæœ¬å¿«ç…§ã€‚'; return }
+  const response = await api(`/api/v1/documents/${documentId}?version=${source.extraction_version}`)
+  const body = await response.json()
+  if (!response.ok || !body.extraction) { message.value = body.detail || 'å½“å‰è´¦å·æ— æ³•æŸ¥çœ‹è¿™ä»½æ¥æºå•æ®ã€‚'; return }
+  const linked = eventDetail.value?.documents.find((document) => document.id === documentId)
+  voucherEvidence.value = { id: documentId, filename: linked?.filename || documentId,
+    version: body.extraction.version, fields: body.extraction.fields || {} }
+}
+
+async function rerunReconciliation() {
+  if (!eventId.value) return
+  busy.value = true
+  try {
+    const response = await api(`/api/v1/business-events/${eventId.value}/reconcile`, { method: 'POST' })
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.detail || 'é‡æ–°æ ¸å¯¹å¤±è´¥ã€‚')
+    await load()
+    await selectEvent(eventId.value)
+    message.value = `å·²é‡æ–°æ ¸å¯¹ï¼š${businessStatusLabel(body.status)}ã€‚${body.note || ''}`
+  } catch (error) { message.value = error instanceof Error ? error.message : String(error) }
+  finally { busy.value = false }
+}
+
+async function makeVoucher() {
+  if (!eventId.value) return
+  busy.value = true
+  try {
+    const response = await api(`/api/v1/business-events/${eventId.value}/voucher-drafts`, { method: 'POST' })
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.detail)
+    voucherPage.value = 1
+    await load()
+    draft.value = drafts.value.find((item) => item.id === body.id) || body
+    await loadAudit(body.id)
+    message.value = body.status === 'NEEDS_REVIEW'
+      ? 'AI å‡­è¯è‰ç¨¿å·²ç”Ÿæˆï¼Œä½†å¿…å¡«è¾…åŠ©æ ¸ç®—å°šæœªè¡¥é½ã€‚è¯·ä¿®æ­£å‡­è¯å¹¶å¡«å†™å¿…å¡«ç»´åº¦åå†æäº¤å®¡æ ¸ã€‚'
+      : 'AI å‡­è¯è‰ç¨¿å·²ç”Ÿæˆã€‚è¯·æ£€æŸ¥åˆ†å½•ä¸æ ¡éªŒç»“æœï¼Œå†æäº¤ç»™å¦ä¸€ä½æœ‰å®¡æ‰¹æƒé™çš„ç”¨æˆ·ã€‚'
+    activeView.value = 'vouchers'
+  } catch (error) { message.value = error instanceof Error ? error.message : String(error) }
+  finally { busy.value = false }
+}
+
+async function submitReview() {
+  if (!draft.value) return
+  const response = await api(`/api/v1/voucher-drafts/${draft.value.id}/submit-review`, { method: 'POST' })
+  const body = await response.json()
+  if (!response.ok) { message.value = body.detail || 'æäº¤å®¡æ ¸å¤±è´¥ã€‚'; return }
+  draft.value = body
+  await load()
+  draft.value = drafts.value.find((item) => item.id === body.id) || body
+  await loadAudit(body.id)
+  message.value = 'å·²æäº¤å®¡æ ¸ï¼Œéœ€ç”±ä¸åŒçš„æœ‰å®¡æ‰¹æƒé™ç”¨æˆ·æ‰¹å‡†ã€‚'
+}
+async function approveDraft() {
+  if (!draft.value) return
+  await decideVoucher('APPROVE', demoSession.value ? 'æœ¬åœ°æ¼”ç¤ºå®¡æ‰¹' : 'ç”¨æˆ·å®¡æ‰¹',
+    demoSession.value ? 'æ¼”ç¤ºè§’è‰²å·²å®¡æ‰¹ã€‚æ­¤æ“ä½œä»…ä¸ºæœ¬åœ°æµ‹è¯•å®¡æ‰¹ã€‚' : 'å®¡æ‰¹å®Œæˆã€‚')
+}
+async function decideVoucher(decision: 'APPROVE' | 'REJECT', reason: string, successMessage: string) {
+  if (!draft.value) return
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (demoSession.value) headers['X-Actor'] = 'demo-reviewer'
+  const response = await api(`/api/v1/voucher-drafts/${draft.value.id}/approve`, { method: 'POST', headers, body: JSON.stringify({ decision, reason }) })
+  const body = await response.json()
+  if (!response.ok) { message.value = body.detail || (decision === 'APPROVE' ? 'å®¡æ‰¹å¤±è´¥ã€‚' : 'é€€å›å‡­è¯å¤±è´¥ã€‚'); return }
+  draft.value = body
+  await load()
+  draft.value = drafts.value.find((item) => item.id === body.id) || body
+  await loadAudit(body.id)
+  message.value = successMessage
+}
+async function returnDraft() {
+  if (!draft.value || !canApproveVoucher.value) return
+  const reason = window.prompt('è¯·å¡«å†™é€€å›åŸå› ')?.trim()
+  if (!reason) return
+  await decideVoucher('REJECT', reason, 'å·²é€€å›å‡­è¯ï¼ŒåŸ AI è‰ç¨¿åŠæœ¬ç‰ˆæœ¬ä»ä¿ç•™ã€‚')
+}
+async function exportDraft() {
+  if (!draft.value) return
+  const response = await api(`/api/v1/voucher-drafts/${draft.value.id}/export`, { method: 'POST' })
+  if (!response.ok) { message.value = (await response.json()).detail || 'å¯¼å‡ºå¤±è´¥ã€‚'; return }
+  const blob = await response.blob(); const url = URL.createObjectURL(blob); const anchor = document.createElement('a')
+  anchor.href = url; anchor.download = `${draft.value.id}.csv`; anchor.click(); URL.revokeObjectURL(url)
+  message.value = 'å‡­è¯æ–‡ä»¶å·²å¯¼å‡ºï¼Œå½“å‰çŠ¶æ€ä¸ºå¾…äººå·¥å…¥è´¦ï¼›ERP å°šæœªå†™å…¥ã€‚'
+  await load()
+  draft.value = drafts.value.find((item) => item.id === draft.value?.id) || draft.value
+  if (draft.value) await loadAudit(draft.value.id)
+}
+function startVoucherCorrection() {
+  if (!draft.value) return
+  voucherLines.value = draft.value.lines.map((line) => ({ ...line,
+    auxiliary: { ...line.auxiliary }, auxiliary_text: JSON.stringify(line.auxiliary || {}, null, 2),
+    evidence_refs: [...line.evidence_refs],
+  }))
+  voucherCorrectionReason.value = ''
+  editingVoucher.value = true
+}
+function cancelVoucherCorrection() { editingVoucher.value = false; voucherLines.value = [] }
+async function saveVoucherCorrection() {
+  if (!draft.value) return
+  let lines: { account_code: string; debit: string; credit: string; description?: string;
+    evidence_refs: string[]; auxiliary: Record<string, string> }[]
+  try {
+    lines = voucherLines.value.map(({ account_code, debit, credit, description, evidence_refs, auxiliary_text }) => {
+      const auxiliary: unknown = JSON.parse(auxiliary_text || '{}')
+      if (!auxiliary || typeof auxiliary !== 'object' || Array.isArray(auxiliary)
+        || Object.values(auxiliary).some((value) => typeof value !== 'string')) {
+        throw new Error('è¾…åŠ©æ ¸ç®—å¿…é¡»æ˜¯å­—ç¬¦ä¸²é”®å€¼ç»„æˆçš„ JSON å¯¹è±¡ã€‚')
+      }
+      return { account_code, debit, credit, description, evidence_refs, auxiliary: auxiliary as Record<string, string> }
+    })
+  } catch (error) {
+    message.value = error instanceof SyntaxError
+      ? 'è¾…åŠ©æ ¸ç®—å¿…é¡»æ˜¯æœ‰æ•ˆçš„ JSON å¯¹è±¡ã€‚'
+      : error instanceof Error ? error.message : 'è¾…åŠ©æ ¸ç®— JSON æ ¼å¼æ— æ•ˆã€‚'
+    return
+  }
+  const response = await api(`/api/v1/voucher-drafts/${draft.value.id}/versions`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expected_version: draft.value.version, reason: voucherCorrectionReason.value,
+      lines: lines.map((line) => ({ ...line, description: line.description || line.account_code })) }),
+  })
+  const body = await response.json()
+  if (!response.ok) { message.value = body.detail || 'å‡­è¯ä¿®æ­£æœªé€šè¿‡æ£€æŸ¥ã€‚'; return }
+  editingVoucher.value = false
+  voucherPage.value = 1
+  await load()
+  draft.value = drafts.value.find((item) => item.id === body.id) || body
+  await loadAudit(body.id)
+  message.value = `ä¿®æ­£å·²ä¿å­˜ä¸ºå‡­è¯æ–°ç‰ˆæœ¬ V${body.version}ï¼Œéœ€è¦é‡æ–°æäº¤å®¡æ‰¹ã€‚`
+}
+
+function auxiliaryLabel(auxiliary: Record<string, string> | null | undefined) {
+  return Object.entries(auxiliary || {}).map(([key, value]) => `${key}ï¼š${value}`).join('ã€') || 'â€”'
+}
+
+async function chooseDraft(item: Draft) {
+  draft.value = item
+  originalAiDraft.value = null
+  eventId.value = item.event_id
+  activeView.value = 'vouchers'
+  await selectEvent(item.event_id)
+  draft.value = drafts.value.find((candidate) => candidate.id === item.id) || item
+  await loadAudit(item.id)
+}
+
+onMounted(load)
+onBeforeUnmount(() => {
+  Object.values(previews.value).forEach(URL.revokeObjectURL)
+  if (evidencePreview.value) URL.revokeObjectURL(evidencePreview.value.url)
+})
+</script>
+
+<template>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">è´¦</div><div><strong>è´¦æ¸… AI</strong><small>è´¢åŠ¡è¿è¥å·¥ä½œå°</small></div></div>
+      <div class="nav-caption">å·¥ä½œç©ºé—´</div>
+      <nav aria-label="ä¸»å¯¼èˆª">
+        <button v-for="item in visibleNavItems" :key="item.id" class="nav-item" :class="{ active: activeView === item.id }" @click="activeView = item.id; if (item.id === 'insights') loadInsights(); if (item.id === 'integrations') loadChartAccounts()"><span class="nav-icon">{{ item.icon }}</span>{{ item.label }}<span v-if="item.id === 'cases' && openCaseTotal" class="nav-count">{{ openCaseTotal }}</span></button>
+      </nav>
+      <div class="sidebar-bottom"><span class="connection-dot" :class="{ offline: !apiAvailable }"></span><div><strong>{{ apiAvailable ? 'æ•°æ®æœåŠ¡å·²è¿æ¥' : 'æ•°æ®æœåŠ¡ä¸å¯ç”¨' }}</strong><small>{{ demoSession ? 'æœ¬åœ°æµ‹è¯•è´¦å¥—' : 'ä¼ä¸šæˆæƒæ•°æ®' }}</small></div></div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <div class="breadcrumbs"><span>è´¦æ¸… AI</span><span class="crumb-separator">/</span><strong>{{ visibleNavItems.find((item) => item.id === activeView)?.label || 'è´¢åŠ¡å·¥ä½œå°' }}</strong></div>
+        <div class="topbar-actions"><label class="scope-picker"><span class="scope-label">ä¼ä¸š / è´¦å¥—</span><select class="scope-select" :value="accountSetId" @change="switchScope" :disabled="scopeOptions.length < 2 || demoSession" aria-label="åˆ‡æ¢ä¼ä¸šè´¦å¥—"><option v-for="scope in scopeOptions" :key="scope.membership_id" :value="scope.account_set_id">{{ scope.tenant_name }} Â· {{ scope.account_set_name }}</option></select></label><label class="period-picker"><span class="scope-label">ä¼šè®¡æœŸé—´</span><select v-model="selectedPeriod" :disabled="!accountingPeriods.length" aria-label="é€‰æ‹©ä¼šè®¡æœŸé—´"><option v-if="!accountingPeriods.length" value="">å°šæœªé…ç½®</option><option v-for="period in accountingPeriods" :key="period.period" :value="period.period">{{ period.period }} Â· {{ period.status === 'OPEN' ? 'å¼€æ”¾' : 'å·²å…³é—­' }}</option></select></label><button class="button button-quiet" @click="load" :disabled="loading">{{ loading ? 'åˆ·æ–°ä¸­â€¦' : 'åˆ·æ–°æ•°æ®' }}</button></div>
+      </header>
+
+      <div class="page-content">
+        <div v-if="!apiAvailable" class="alert alert-error"><strong>æš‚æ—¶æ— æ³•è¯»å–å·¥ä½œå°æ•°æ®</strong><span>{{ message || 'è¯·æ£€æŸ¥ API æœåŠ¡å’Œç½‘ç»œè¿æ¥ã€‚' }}</span><button class="button button-quiet" @click="load">é‡è¯•</button></div>
+        <div v-else-if="message" class="alert alert-info"><span>{{ message }}</span><button class="alert-close" aria-label="å…³é—­æç¤º" @click="message = ''">Ã—</button></div>
+
+        <template v-if="activeView === 'workspace'">
+          <section class="welcome-row"><div><p class="eyebrow">è´¢åŠ¡å·¥ä½œå°</p><h1>å·¥ä½œå°å¤„ç†æ¦‚è§ˆ</h1><p class="page-subtitle">æŸ¥çœ‹å½“å‰è´¦å¥—çš„å¾…å¤„ç†å•æ®ã€ä¸šåŠ¡å…³è”å’Œå‡­è¯å®¡æ ¸ã€‚</p></div><button class="button button-primary" @click="openUpload">ï¼‹ ä¸Šä¼ å•æ®å¼€å§‹å¤„ç†</button></section>
+          <section v-if="demoSession" class="demo-banner"><span class="demo-icon">i</span><div><strong>æœ¬åœ°éªŒæ”¶æ¼”ç¤ºç¯å¢ƒ</strong><p>å½“å‰ä½¿ç”¨æµ‹è¯•è´¦å¥—å’Œè§„åˆ™å€™é€‰ã€‚æ­¤å¤„çš„å®¡æ‰¹ä¸ä»£è¡¨çœŸå®è´¢åŠ¡å®¡æ‰¹ï¼Œå¯¼å‡ºæ–‡ä»¶ä¸ä¼šå†™å…¥ ERPã€‚</p></div><span class="demo-tag">æµ‹è¯•æ•°æ®</span></section>
+          <section class="kpi-grid" aria-label="å¾…å¤„ç†ç»Ÿè®¡">
+            <article class="kpi-card"><span class="kpi-label">å¾…ç¡®è®¤å•æ®</span><strong>{{ pendingDocs }}</strong><small>éœ€è¦å¯¹ç…§åŸä»¶æ ¸å®å­—æ®µ</small><button @click="activeView = 'documents'">æŸ¥çœ‹å•æ® <span>â†’</span></button></article>
+            <article class="kpi-card"><span class="kpi-label">å¾…å…³è”å•æ®</span><strong>{{ unlinkedDocs }}</strong><small>å°šæœªåŠ å…¥å·²ç¡®è®¤ä¸šåŠ¡</small><button @click="activeView = 'documents'">å¼€å§‹å…³è” <span>â†’</span></button></article>
+            <article class="kpi-card"><span class="kpi-label">å¾…å®¡æ ¸å‡­è¯</span><strong>{{ pendingApprovals }}</strong><small>ç­‰å¾…å¦ä¸€ä½æœ‰æƒé™ç”¨æˆ·å®¡æ ¸</small><button @click="activeView = 'vouchers'">æŸ¥çœ‹å‡­è¯ <span>â†’</span></button></article>
+            <article class="kpi-card"><span class="kpi-label">å·²æ ¸å®å…¥è´¦</span><strong>{{ verifiedPostings }}</strong><small>ä»…ç»Ÿè®¡ ERP å›è¯»æ ¸å®ç»“æœ</small><span class="kpi-footnote">å½“å‰æ—  ERP å†™å›è¿æ¥</span></article>
+            <article class="kpi-card kpi-card-warning"><span class="kpi-label">å†™å›å¤±è´¥ / æœªçŸ¥</span><strong>{{ postingIssues }}</strong><small>éœ€è¦æ ¸æŸ¥ç»“æœåå†æ“ä½œ</small><button @click="activeView = 'vouchers'">æŸ¥çœ‹çŠ¶æ€ <span>â†’</span></button></article>
+          </section>
+          <div class="dashboard-grid">
+            <section class="content-card recent-card"><div class="card-heading"><div><h2>æœ€è¿‘å¤„ç†çš„ä¸šåŠ¡</h2><p>ä¸šåŠ¡çŠ¶æ€æ¥è‡ªå½“å‰è´¦å¥—çš„æœåŠ¡ç«¯è®°å½•</p></div><button class="text-button" @click="activeView = 'business'">æŸ¥çœ‹å…¨éƒ¨ <span>â†’</span></button></div>
+              <div v-if="loading && !events.length" class="loading-state">æ­£åœ¨è¯»å–ä¸šåŠ¡è®°å½•â€¦</div>
+              <div v-else-if="!events.length" class="empty-state"><div class="empty-icon">â–¤</div><strong>è¿˜æ²¡æœ‰ä¸šåŠ¡è®°å½•</strong><p>ä¸Šä¼ å•æ®å¹¶ç¡®è®¤å­—æ®µåï¼Œå¯ä»¥åœ¨è¿™é‡Œå»ºç«‹ä¸šåŠ¡å…³è”ã€‚</p><button class="button button-secondary" @click="openUpload">ä¸Šä¼ ç¬¬ä¸€ä»½å•æ®</button></div>
+              <div v-else class="table-scroll"><table><thead><tr><th>ä¸šåŠ¡ç¼–å· / å¯¹æ–¹</th><th>é‡‘é¢</th><th>å…³è”å•æ®</th><th>ä¸šåŠ¡çŠ¶æ€</th><th>å‡­è¯çŠ¶æ€</th><th>ERP çŠ¶æ€</th><th></th></tr></thead><tbody><tr v-for="item in recentEvents" :key="item.id"><td><button class="table-link" @click="selectEvent(item.id); activeView = 'business'">{{ item.id.slice(0, 8) }}</button><small>{{ item.party_name || 'äº¤æ˜“å¯¹æ–¹æœªæå–' }}</small></td><td class="amount">{{ item.amount ? `Â¥ ${Number(item.amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}` : 'å¾…æ ¸å¯¹' }}</td><td>{{ item.document_count }} ä»½</td><td><span class="status-pill" :class="`status-${item.status.toLowerCase()}`">{{ businessStatusLabel(item.status) }}</span></td><td>{{ statusLabel(item.voucher_status) }}</td><td>{{ item.posting_status }}</td><td><button class="continue-button" @click="selectEvent(item.id); activeView = 'business'">ç»§ç»­å¤„ç† â†’</button></td></tr></tbody></table></div>
+            </section>
+            <section class="content-card attention-card"><div class="card-heading"><div><h2>éœ€è¦å…³æ³¨</h2><p>å¾…å¤„ç†å¼‚å¸¸ä¸é£é™©æç¤º</p></div><button class="text-button" @click="activeView = 'cases'">å¼‚å¸¸ä¸­å¿ƒ <span>â†’</span></button></div>
+              <div v-if="!openCases.length" class="quiet-empty"><span class="check-mark">âœ“</span><div><strong>ç›®å‰æ²¡æœ‰å¾…å¤„ç†å¼‚å¸¸</strong><p>æœ‰å·®å¼‚æˆ–ç¼ºå°‘è¯æ®æ—¶ä¼šæ˜¾ç¤ºåœ¨è¿™é‡Œã€‚</p></div></div>
+              <button v-for="item in openCases.slice(0, 5)" :key="item.id" class="attention-item" @click="activeView = 'cases'"><span class="attention-mark">!</span><span><strong>{{ item.type }}</strong><small>{{ item.event_id ? `ä¸šåŠ¡ ${item.event_id.slice(0, 8)}` : 'å•æ®å¾…æ ¸æŸ¥' }} Â· {{ item.severity }}</small></span><span class="chevron">â€º</span></button>
+              <div class="source-note">ç»Ÿè®¡èŒƒå›´ï¼šå½“å‰æœ‰æƒè®¿é—®çš„ä¼ä¸šä¸è´¦å¥—</div>
+            </section>
+          </div>
+        </template>
+
+        <template v-else-if="activeView === 'documents'">
+          <section class="welcome-row"><div><p class="eyebrow">å•æ®ä¸­å¿ƒ</p><h1>ä¸Šä¼ ä¸è¯†åˆ«</h1><p class="page-subtitle">åŸä»¶ä¿ç•™åœ¨å½“å‰è´¦å¥—ï¼›è¯†åˆ«å­—æ®µéœ€äººå·¥ç¡®è®¤åæ‰èƒ½ç”¨äºä¸šåŠ¡æ ¸å¯¹ã€‚</p></div><button class="button button-primary" @click="openUpload">ï¼‹ æ‰¹é‡ä¸Šä¼ </button></section>
+          <section class="content-card correction-stats"><div class="card-heading"><div><h2>äººå·¥çº é”™ç»Ÿè®¡</h2><p>ä»…ç»Ÿè®¡å½“å‰è´¦å·å¯æŸ¥çœ‹çš„å•æ®ç‰ˆæœ¬ï¼Œä¸å±•ç¤ºå•æ®å­—æ®µå†…å®¹ã€‚</p></div></div><p v-if="correctionStatsError" class="quiet-empty">{{ correctionStatsError }}</p><template v-else><div class="correction-stat-summary"><span><strong>{{ correctionStats.corrected_documents }}</strong><small>æœ‰äººå·¥æ›´æ­£çš„å•æ®</small></span><span><strong>{{ correctionStats.correction_versions }}</strong><small>äººå·¥ç¡®è®¤ç‰ˆæœ¬</small></span><span v-for="item in correctionStats.field_changes.slice(0, 5)" :key="item.field"><strong>{{ item.count }}</strong><small>{{ fieldLabel(item.field) }}è¢«ä¿®æ”¹</small></span></div><p v-if="!correctionStats.correction_versions" class="quiet-empty">å½“å‰å¯è§å•æ®è¿˜æ²¡æœ‰äººå·¥æ›´æ­£è®°å½•ã€‚</p></template></section>
+          <section class="upload-zone" @dragover.prevent @drop.prevent="onDrop"><input ref="uploadInput" type="file" accept="image/jpeg,image/png,application/pdf,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple @change="upload"><div class="upload-symbol">â†‘</div><strong>æ‹–æ”¾æ–‡ä»¶åˆ°è¿™é‡Œï¼Œæˆ–é€‰æ‹©æ–‡ä»¶ä¸Šä¼ </strong><p>æ”¯æŒ JPGã€PNGã€PDFã€CSVã€XLSX</p><button class="button button-secondary" @click="uploadInput?.click()" :disabled="busy">{{ busy ? 'æ­£åœ¨ä¸Šä¼ â€¦' : 'é€‰æ‹©æ–‡ä»¶' }}</button></section>
+          <section v-if="uploadQueue.length" class="content-card upload-queue"><div class="card-heading"><div><h2>æœ¬æ¬¡ä¸Šä¼ </h2><p>æ¯ä¸ªæ–‡ä»¶å•ç‹¬æ˜¾ç¤ºç»“æœï¼›å¤±è´¥æ–‡ä»¶å¯ä»¥å•ç‹¬é‡è¯•ã€‚</p></div><button class="text-button" @click="uploadQueue = uploadQueue.filter((item) => item.status !== 'done')">æ¸…é™¤å·²å®Œæˆ</button></div><div v-for="item in uploadQueue" :key="item.id" class="upload-queue-item"><div class="upload-queue-name"><strong>{{ item.file.name }}</strong><small v-if="item.error">{{ item.error }}</small><small v-else>{{ item.status === 'done' ? 'å·²å®Œæˆ' : `ä¸Šä¼ ä¸­ ${item.progress}%` }}</small></div><progress :value="item.progress" max="100"></progress><button v-if="item.status === 'failed'" class="button button-quiet" @click="retryUpload(item)" :disabled="busy">é‡è¯•</button><span v-else class="status-pill">{{ item.status === 'done' ? 'å®Œæˆ' : 'ä¸Šä¼ ä¸­' }}</span></div></section>
+          <section class="content-card document-card"><div class="card-heading"><div><h2>å•æ®åˆ—è¡¨ <span class="count-badge">{{ documentTotal }}</span></h2><p>ä¼˜å…ˆå¤„ç†è¯†åˆ«å¤±è´¥å’Œå¾…ç¡®è®¤å•æ®</p></div><button class="button button-quiet" @click="load" :disabled="loading">åˆ·æ–°åˆ—è¡¨</button></div>
+            <div v-if="!docs.length" class="empty-state"><div class="empty-icon">â–¤</div><strong>å½“å‰è´¦å¥—æ²¡æœ‰å•æ®</strong><p>ä¸Šä¼ å‘ç¥¨ã€å…¥åº“å•æˆ–é“¶è¡Œå›å•åï¼Œè¯†åˆ«ç»“æœä¼šå‡ºç°åœ¨è¿™é‡Œã€‚</p></div>
+            <div v-else class="document-list"><article v-for="document in docs" :key="document.id" class="document-row"><input type="checkbox" :checked="selected.includes(document.id)" @change="toggle(document.id)"><div class="document-thumb"><img v-if="document.mime_type.startsWith('image/') && previews[document.id]" :src="previews[document.id]" alt="å•æ®åŸä»¶é¢„è§ˆ"><a v-else-if="previews[document.id]" :href="previews[document.id]" target="_blank" rel="noreferrer">{{ document.mime_type === 'application/pdf' ? 'PDF' : document.mime_type === 'text/csv' ? 'CSV' : 'XLSX' }}</a><span v-else>æ–‡ä»¶</span></div><div class="document-main"><strong>{{ document.filename }}</strong><small>{{ documentTypeLabel(document.document_type) }} Â· {{ document.uploaded_at ? new Date(document.uploaded_at).toLocaleString('zh-CN') : 'ä¸Šä¼ æ—¶é—´æœªæä¾›' }} Â· æ¥æº {{ document.uploaded_by || 'æœªçŸ¥' }}</small><small>å…³é”®é‡‘é¢ï¼š{{ document.key_amount ? `Â¥ ${Number(document.key_amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}` : 'æœªè¯†åˆ«' }} Â· {{ document.id.slice(0, 8) }}</small><div class="document-business-links"><span v-if="!document.business_events?.length">æœªå…³è”ä¸šåŠ¡</span><button v-for="business in document.business_events" :key="business.id" class="table-link" @click.stop="activeView = 'business'; selectEvent(business.id)">ä¸šåŠ¡ {{ business.id.slice(0, 8) }} Â· {{ documentRoleLabel(business.role) }} Â· {{ businessStatusLabel(business.status) }}</button></div><small v-if="document.missing_fields?.length">ç¼ºå°‘å­—æ®µï¼š{{ document.missing_fields.map((field) => documentFieldLabel(field, document.document_type || '')).join('ã€') }}</small></div><span class="status-pill" :class="`status-${document.processing_status.toLowerCase()}`">{{ statusLabel(document.processing_status) }}</span><select v-if="selected.includes(document.id)" v-model="roles[document.id]" aria-label="å•æ®ä¸šåŠ¡è§’è‰²"><option value="">é€‰æ‹©ä¸šåŠ¡è§’è‰²</option><option value="INVOICE">å‘ç¥¨</option><option value="GOODS_RECEIPT">å…¥åº“ / æ”¶è´§</option><option value="BANK_RECEIPT">é“¶è¡Œå›å•</option><option value="CONTRACT">åˆåŒ</option><option value="PAYMENT_PROOF">æ”¯ä»˜è¯æ˜ï¼ˆä¸ä»£è¡¨å·²æ¸…ç®—ï¼‰</option></select><button class="button button-quiet" @click="inspect(document)">{{ editing[document.id] ? 'æ”¶èµ·å­—æ®µ' : 'æŸ¥çœ‹å¹¶ç¡®è®¤å­—æ®µ' }}</button></article>
+              <div v-for="document in docs.filter((item) => editing[item.id])" :key="`edit-${document.id}`" class="field-editor">
+                <div class="field-editor-heading"><div><strong>æ ¸å¯¹è¯†åˆ«å­—æ®µ</strong><small>ç‚¹å‡»å­—æ®µæŸ¥çœ‹å®ƒåœ¨åŸä»¶ä¸­çš„ä½ç½®ï¼›æ²¡æœ‰å®šä½è¯æ®æ—¶ä¼šæ˜ç¡®æ˜¾ç¤ºã€‚</small></div><button class="text-button" @click="browseOriginal(document.id)">æµè§ˆåŸä»¶</button><select v-model="editing[document.id].type" @change="ensureReviewFields(document)"><option>UNCLASSIFIED</option><option>VAT_INVOICE</option><option>GOODS_RECEIPT</option><option>BANK_RECEIPT</option><option>CONTRACT</option><option>PAYMENT_PROOF</option><option>ACCEPTANCE_REPORT</option><option>TAXI_RECEIPT</option><option>TOLL_RECEIPT</option><option>OTHER</option></select></div>
+                <div v-if="editing[document.id].typeCandidate?.normalized_value" class="document-type-suggestion"><span>ç±»å‹å»ºè®®ï¼š{{ documentTypeLabel(editing[document.id].typeCandidate?.normalized_value || undefined) }} Â· {{ editing[document.id].typeCandidate?.evidence_text ? `è¯†åˆ«ä¾æ®ï¼š${editing[document.id].typeCandidate?.evidence_text}` : 'éœ€å¯¹ç…§åŸä»¶ç¡®è®¤' }}</span><button class="text-button" @click="applyDocumentTypeSuggestion(document)">é‡‡ç”¨å»ºè®®</button></div>
+                <div v-if="evidenceSelection?.documentId === document.id" class="source-preview-panel">
+                  <div v-if="evidencePreview?.documentId === document.id" class="source-preview-canvas">
+                    <img :src="evidencePreview.url" :alt="`å•æ®ç¬¬ ${evidencePreview.page} é¡µ`" @load="recordPreviewSize(document.id, $event)">
+                    <span v-if="evidenceBoxStyle(document.id, editing[document.id].fields[evidenceSelection.fieldKey]).width" class="source-evidence-box" :style="evidenceBoxStyle(document.id, editing[document.id].fields[evidenceSelection.fieldKey])"></span>
+                  </div>
+                  <p v-else>è¿™ä¸ªå­—æ®µæ²¡æœ‰å¯å®šä½çš„åŸä»¶é¡µé¢å’Œæ¡†é€‰ä½ç½®ã€‚</p>
+                  <small v-if="evidencePreview?.documentId === document.id">åŸä»¶ç¬¬ {{ evidencePreview.page }} é¡µï¼›æ¡†é€‰ä½ç½®æ¥è‡ªå­—æ®µè¯æ®ã€‚</small>
+                  <div v-if="evidencePreview?.documentId === document.id" class="source-preview-controls">
+                    <button class="text-button" @click="showEvidencePage(document.id, evidencePreview.page - 1)" :disabled="evidencePreview.page <= 1">ä¸Šä¸€é¡µ</button>
+                    <span>ç¬¬ {{ evidencePreview.page }} / {{ evidencePreview.pageCount }} é¡µ</span>
+                    <button class="text-button" @click="showEvidencePage(document.id, evidencePreview.page + 1)" :disabled="evidencePreview.page >= evidencePreview.pageCount">ä¸‹ä¸€é¡µ</button>
+                  </div>
+                </div>
+                <details class="ocr-text"><summary>æŸ¥çœ‹ OCR è¯†åˆ«åŸæ–‡</summary><div class="ocr-meta">{{ editing[document.id].provider }} Â· {{ editing[document.id].modelVersion }} Â· {{ statusLabel(editing[document.id].extractionStatus) }}</div><pre v-if="editing[document.id].fullText">{{ editing[document.id].fullText }}</pre><p v-else-if="editing[document.id].extractionStatus === 'FAILED'">è¯†åˆ«å¤±è´¥ï¼Œç³»ç»Ÿæ²¡æœ‰æå–åˆ°æ–‡å­—ã€‚<span v-if="editing[document.id].fields.error?.message">{{ editing[document.id].fields.error.message }}</span><span v-else>é”™è¯¯ç±»å‹ï¼š{{ editing[document.id].fields.error?.raw_value || 'æœªçŸ¥' }}</span></p><p v-else>OCR æ²¡æœ‰è¿”å›å¯å±•ç¤ºçš„æ–‡å­—ï¼Œè¯·æ£€æŸ¥åŸä»¶æ¸…æ™°åº¦æˆ–æ‰‹åŠ¨å¡«å†™å­—æ®µã€‚</p></details>
+                <details v-if="editing[document.id].history.length > 1" class="extraction-history"><summary>æŸ¥çœ‹å†å²å­—æ®µç‰ˆæœ¬ï¼ˆ{{ editing[document.id].history.length }} ä¸ªç‰ˆæœ¬ï¼‰</summary><article v-for="version in editing[document.id].history.slice(1)" :key="version.version" class="history-version"><strong>V{{ version.version }} Â· {{ documentRoleLabel(version.document_type) }}</strong><small>{{ version.created_by }} Â· {{ new Date(version.created_at).toLocaleString('zh-CN') }} Â· {{ version.reason || 'å†å²ç‰ˆæœ¬æœªè®°å½•ä¿®æ”¹åŸå› ' }}</small><div class="history-fields"><span v-for="(field, key) in version.fields" :key="key">{{ documentFieldLabel(String(key), version.document_type) }}ï¼š{{ field.normalized_value ?? 'ç©º' }}</span></div></article></details>
+                <div v-if="editing[document.id].history[0]" class="current-extraction-version"><strong>å½“å‰å·²ä¿å­˜ç‰ˆæœ¬ V{{ editing[document.id].history[0].version }}</strong><small>{{ editing[document.id].history[0].created_by }} Â· {{ new Date(editing[document.id].history[0].created_at).toLocaleString('zh-CN') }} Â· {{ editing[document.id].history[0].reason || 'æ­¤ç‰ˆæœ¬æœªè®°å½•ä¿®æ”¹åŸå› ' }}</small></div>
+                <div class="field-grid"><label v-for="(field, key) in visibleDocumentFields(document.id)" :key="key" @click="focusEvidence(document.id, String(key))">{{ documentFieldLabel(String(key), editing[document.id].type) }}<small>è¯†åˆ«ç½®ä¿¡åº¦ {{ field.confidence }} Â· {{ field.status || 'å¾…ç¡®è®¤' }} Â· {{ field.page ? `ç¬¬ ${field.page} é¡µ` : 'æœªå®šä½åˆ°é¡µé¢' }}</small><small v-if="field.evidence_text">åŸæ–‡è¯æ®ï¼š{{ field.evidence_text }}</small><small v-if="field.bbox?.length">æ¥æºä½ç½®ï¼ˆ{{ field.coordinate_space || 'åæ ‡ç³»æœªçŸ¥' }}ï¼‰ï¼š{{ field.bbox.join(', ') }}</small><input v-model="field.normalized_value" :aria-label="String(key)" @focus="focusEvidence(document.id, String(key))"></label></div>
+                <div class="field-editor-footer"><input v-model="editing[document.id].reason" aria-label="äººå·¥ç¡®è®¤åŸå› "><button class="button button-primary" @click="confirm(document)">ä¿å­˜ç¡®è®¤ç‰ˆæœ¬</button></div>
+              </div>
+            </div>
+            <div v-if="selected.length && currentRole !== 'BUSINESS_USER'" class="association-bar"><span>å·²é€‰ {{ selected.length }} ä»½ Â· å…³è”å‰è¯·ä¸ºæ¯ä»½å•æ®æŒ‡å®šè§’è‰²å¹¶ç¡®è®¤å­—æ®µ</span><select v-model="selectedEventType" aria-label="ä¸šåŠ¡ç±»å‹" @change="selectedEventType === 'RENTAL' && canManageAccountingPolicy && loadChartAccounts()"><option value="PURCHASE">é‡‡è´­</option><option value="EXPENSE">è´¹ç”¨æŠ¥é”€</option><option value="ASSET_PURCHASE">è®¾å¤‡è´­ç½®</option><option value="RENTAL">ç§Ÿèµ</option></select><label v-if="selectedEventType === 'RENTAL' && canManageAccountingPolicy && policyForms.RENTAL.version && policyForms.RENTAL.accounting_treatment === 'DIRECT_EXPENSE'" class="rental-confirmation"><input v-model="rentalDirectExpenseConfirmed" type="checkbox">æˆ‘å·²æ ¸å¯¹æœ¬ç¬”åˆåŒï¼Œç¡®è®¤é€‚ç”¨è´¦å¥—çš„â€œç§Ÿèµç›´æ¥è´¹ç”¨â€æ”¿ç­–ï¼Œä¸éœ€è¦æŒ‰ä½¿ç”¨æƒèµ„äº§å’Œç§Ÿèµè´Ÿå€ºå¤„ç†</label><span v-else-if="selectedEventType === 'RENTAL' && canManageAccountingPolicy" class="rental-confirmation-hint">è¯·å…ˆåœ¨è®¾ç½®ä¸­ç¡®è®¤ç§Ÿèµç›´æ¥è´¹ç”¨æ”¿ç­–ï¼›æœªç¡®è®¤æ”¿ç­–å‰ï¼Œç§Ÿèµä¸šåŠ¡ä¼šä¿æŒå¾…å¤æ ¸ã€‚</span><button class="button button-primary" @click="linkDocs" :disabled="busy">ç¡®è®¤å…³è”å¹¶æ ¸å¯¹</button></div><div v-if="documentPages > 1" class="pagination"><button @click="changePage('documents', Math.max(1, documentPage - 1))" :disabled="documentPage === 1">ä¸Šä¸€é¡µ</button><span>{{ documentPage }} / {{ documentPages }}</span><button @click="changePage('documents', Math.min(documentPages, documentPage + 1))" :disabled="documentPage === documentPages">ä¸‹ä¸€é¡µ</button></div>
+          </section>
+        </template>
+
+        <template v-else-if="activeView === 'business'">
+          <section class="welcome-row"><div><p class="eyebrow">ä¸šåŠ¡ä¸­å¿ƒ</p><h1>ä¸šåŠ¡å…³è”ä¸æ ¸å¯¹</h1><p class="page-subtitle">æ¯æ¡è®°å½•ä»£è¡¨ä¸€ç¬”ç”±æ“ä½œäººæ˜ç¡®å…³è”çš„ä¸šåŠ¡ã€‚</p></div><button class="button button-primary" @click="openUpload">ï¼‹ ä¸Šä¼ å¹¶å»ºç«‹ä¸šåŠ¡</button></section>
+          <section class="business-layout"><div class="content-card business-list"><div class="card-heading"><div><h2>ä¸šåŠ¡è®°å½•</h2><p>{{ eventTotal }} ç¬”ä¸šåŠ¡</p></div></div><div v-if="!events.length" class="empty-state compact"><strong>æš‚æ— ä¸šåŠ¡è®°å½•</strong><p>å…ˆç¡®è®¤å•æ®å­—æ®µï¼Œå†é€‰æ‹©å•æ®è§’è‰²å»ºç«‹å…³è”ã€‚</p><button class="button button-secondary" @click="openUpload">å‰å¾€å•æ®ä¸­å¿ƒ</button></div><button v-for="item in pagedEvents" :key="item.id" class="business-list-item" :class="{ selected: eventId === item.id }" @click="selectEvent(item.id)"><span><strong>ä¸šåŠ¡ {{ item.id.slice(0, 8) }} Â· {{ eventTypeLabel(item.event_type) }}</strong><small>{{ item.document_count }} ä»½å…³è”å•æ® Â· {{ item.amount ? `Â¥${item.amount}` : 'é‡‘é¢å¾…æ ¸å¯¹' }}</small></span><span class="status-pill">{{ businessStatusLabel(item.status) }}</span></button><div v-if="businessPages > 1" class="pagination"><button @click="changePage('business', Math.max(1, businessPage - 1))" :disabled="businessPage === 1">ä¸Šä¸€é¡µ</button><span>{{ businessPage }} / {{ businessPages }}</span><button @click="changePage('business', Math.min(businessPages, businessPage + 1))" :disabled="businessPage === businessPages">ä¸‹ä¸€é¡µ</button></div></div>
+            <section class="content-card detail-card"><template v-if="eventDetail"><div class="card-heading"><div><p class="eyebrow">ä¸šåŠ¡è¯¦æƒ…</p><h2>{{ eventTypeLabel(eventDetail.event_type) }} {{ eventDetail.id.slice(0, 8) }}</h2><p>{{ eventDetail.amount ? `ä¸šåŠ¡é‡‘é¢ Â¥${Number(eventDetail.amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}` : 'é‡‘é¢å¾…æ ¸å¯¹' }} Â· {{ businessStatusLabel(eventDetail.status) }}</p></div><span class="status-pill">{{ businessStatusLabel(eventDetail.status) }}</span></div><p v-if="eventDetail.event_type === 'RENTAL'" class="rental-confirmation-status">ç›´æ¥è´¹ç”¨ç¡®è®¤ï¼š{{ eventDetail.rental_direct_expense_confirmed ? `å·²ç”± ${eventDetail.rental_direct_expense_confirmed_by} æŒ‰ ${eventDetail.rental_direct_expense_policy_version} ç¡®è®¤` : 'å°šæœªç¡®è®¤ï¼Œä¸šåŠ¡ä¸èƒ½ç”Ÿæˆå‡­è¯' }}</p><h3>å…³è”è¯æ®</h3><div class="evidence-timeline"><div v-for="document in eventDetail.documents" :key="document.id" class="evidence-item"><span class="timeline-dot"></span><div><strong>{{ documentRoleLabel(document.role) }}</strong><small>{{ document.filename }} Â· äººå·¥ç¡®è®¤ç‰ˆæœ¬ {{ document.extraction_version }}</small></div><button class="text-button" @click="activeView = 'documents'">æŸ¥çœ‹å•æ®</button></div></div><section v-if="currentRole === 'TENANT_ADMIN'" class="assignment-panel"><div><h3>ä¸šåŠ¡è´Ÿè´£äºº</h3><p>è¢«æŒ‡æ´¾çš„ä¸šåŠ¡äººå‘˜å¯ä»¥æŸ¥çœ‹è¿™ç¬”ä¸šåŠ¡åŠå…¶å…³è”å•æ®ã€‚</p></div><div class="assignment-controls"><select v-model="selectedAssignee" aria-label="é€‰æ‹©ä¸šåŠ¡è´Ÿè´£äºº"><option value="">é€‰æ‹©ä¸šåŠ¡äººå‘˜</option><option v-for="person in businessUsers" :key="person.user_id" :value="person.user_id">{{ person.display_name }}ï¼ˆ{{ person.email }}ï¼‰</option></select><button class="button button-secondary" @click="assignBusinessUser" :disabled="!selectedAssignee">æŒ‡æ´¾</button></div><div v-if="eventAssignments.length" class="assignment-list"><div v-for="person in eventAssignments" :key="person.user_id"><span>{{ person.display_name }} Â· {{ person.email }}</span><button class="text-button" @click="unassignBusinessUser(person.user_id)">å–æ¶ˆæŒ‡æ´¾</button></div></div><p v-else class="assignment-empty">å°šæœªæŒ‡æ´¾ä¸šåŠ¡äººå‘˜</p></section><h3>æ ¸å¯¹ç»“æœ</h3><div v-if="eventDetail.findings?.length" class="finding-list"><div v-for="(finding, index) in eventDetail.findings" :key="index" class="finding-item"><span :class="['BLOCKING', 'REVIEW'].includes(String(finding.severity)) ? 'attention-mark' : 'check-mark'">{{ finding.severity === 'BLOCKING' ? '!' : finding.severity === 'REVIEW' ? '?' : 'âœ“' }}</span><span>{{ findingLabel(finding) }}<small v-if="finding.role"> Â· {{ finding.role }}</small><small v-if="finding.code === 'BANK_SETTLEMENT_NOT_CONFIRMED'">è¯·å¯¹ç…§é“¶è¡Œå›å•åŸä»¶ç¡®è®¤æ˜¯å¦å·²å®é™…æ¸…ç®—ï¼›å°šæœªåˆ°è´¦æ—¶ä¸è¦å‹¾é€‰ã€‚ä¿å­˜å­—æ®µåéœ€è¦é‡æ–°æ ¸å¯¹ã€‚</small><small v-if="finding.code === 'EXPENSE_ACCOUNT_POLICY_REVIEW_REQUIRED'">éœ€è¦è´¢åŠ¡è´Ÿè´£äººç¡®è®¤è´¹ç”¨ç§‘ç›®æ”¿ç­–ã€‚ä¿å­˜æ”¿ç­–åéœ€è¦é‡æ–°æ ¸å¯¹ã€‚</small></span><button v-if="finding.code === 'BANK_SETTLEMENT_NOT_CONFIRMED' && currentRole !== 'BUSINESS_USER'" class="text-button" @click="resolveBankSettlement">æ ¸å¯¹é“¶è¡Œå›å• â†’</button><button v-if="finding.code === 'EXPENSE_ACCOUNT_POLICY_REVIEW_REQUIRED' && canManageAccountingPolicy" class="text-button" @click="resolveExpensePolicy">è®¾ç½®è´¹ç”¨æŠ¥é”€æ”¿ç­– â†’</button><small v-if="finding.code === 'EXPENSE_ACCOUNT_POLICY_REVIEW_REQUIRED' && !canManageAccountingPolicy">è¯·è”ç³»è´¦å¥—ç®¡ç†å‘˜æˆ–ä¼šè®¡è®¾ç½®è´¹ç”¨æŠ¥é”€æ”¿ç­–ã€‚</small></div></div><div v-else class="quiet-empty"><span class="check-mark">i</span><div><strong>å°šæ— æ ¸å¯¹æ˜ç»†</strong><p>è¯·é‡è·‘æ ¸å¯¹ä»¥æŸ¥çœ‹é‡‘é¢ã€ä¸»ä½“ã€æ”¶è´§å’Œç»“ç®—è¯æ®æ£€æŸ¥ç»“æœã€‚</p></div></div><div class="detail-footer"><span>{{ currentRole === 'BUSINESS_USER' ? 'å½“å‰ä»…å±•ç¤ºå·²æŒ‡æ´¾ä¸šåŠ¡ï¼›æ ¸å¯¹å’Œåˆ¶è¯ç”±è´¢åŠ¡è§’è‰²å¤„ç†ã€‚' : 'åªæœ‰æ ¸å¯¹é€šè¿‡ä¸”è¯æ®å……åˆ†æ—¶æ‰èƒ½ç”Ÿæˆå‡­è¯ã€‚' }}</span><div v-if="currentRole !== 'BUSINESS_USER'" class="action-row"><button class="button button-quiet" @click="rerunReconciliation" :disabled="busy">é‡æ–°è¿è¡Œæ ¸å¯¹</button><button class="button button-primary" @click="makeVoucher" :disabled="busy || eventDetail.status !== 'MATCHED'">ç”Ÿæˆå‡­è¯è‰ç¨¿</button></div></div></template><div v-else class="empty-state"><strong>é€‰æ‹©ä¸€ç¬”ä¸šåŠ¡æŸ¥çœ‹è¯¦æƒ…</strong><p>è¿™é‡Œä¼šæ˜¾ç¤ºå…³è”å•æ®ã€æ ¸å¯¹ç»“æœå’Œå¯æ‰§è¡Œçš„ä¸‹ä¸€æ­¥ã€‚</p></div></section></section>
+        </template>
+
+        <template v-else-if="activeView === 'vouchers'">
+          <section class="welcome-row"><div><p class="eyebrow">å‡­è¯ä¸­å¿ƒ</p><h1>å‡­è¯è‰ç¨¿ä¸å®¡æ‰¹</h1><p class="page-subtitle">å®¡æ‰¹é”å®šå‡­è¯ç‰ˆæœ¬ï¼›å¯¼å‡ºä¸ç­‰äº ERP å…¥è´¦ã€‚</p></div><span class="connection-badge">ERP å†™å…¥æœªè¿æ¥</span></section>
+          <section class="voucher-layout"><div class="content-card voucher-list"><div class="card-heading"><div><h2>å‡­è¯åˆ—è¡¨</h2><p>{{ draftTotal }} ä»½å‡­è¯</p></div></div><div v-if="!drafts.length" class="empty-state compact"><strong>è¿˜æ²¡æœ‰å‡­è¯è‰ç¨¿</strong><p>å…ˆå®Œæˆä¸šåŠ¡å…³è”å’Œæ ¸å¯¹ï¼Œå†ç”Ÿæˆå‡­è¯å€™é€‰ã€‚</p><button class="button button-secondary" @click="activeView = 'business'">æŸ¥çœ‹ä¸šåŠ¡</button></div><button v-for="item in pagedDrafts" :key="item.id" class="voucher-list-item" :class="{ selected: draft?.id === item.id }" @click="chooseDraft(item)"><span><strong>{{ item.id.slice(0, 8) }} Â· V{{ item.version }}</strong><small>{{ item.period }} Â· å€Ÿæ–¹ Â¥{{ item.debit_total }}</small></span><span class="status-pill">{{ voucherStatusLabel(item.status) }}</span></button><div v-if="voucherPages > 1" class="pagination"><button @click="changePage('vouchers', Math.max(1, voucherPage - 1))" :disabled="voucherPage === 1">ä¸Šä¸€é¡µ</button><span>{{ voucherPage }} / {{ voucherPages }}</span><button @click="changePage('vouchers', Math.min(voucherPages, voucherPage + 1))" :disabled="voucherPage === voucherPages">ä¸‹ä¸€é¡µ</button></div></div>
+            <section class="content-card voucher-detail"><template v-if="draft"><div class="card-heading"><div><p class="eyebrow">AI ç”Ÿæˆ Â· {{ String(draft.policy?.provider || 'DeepSeek') }} / {{ String(draft.policy?.model || 'æ¨¡å‹æœªè®°å½•') }}</p><h2>å‡­è¯ {{ draft.id.slice(0, 8) }} <span class="version-tag">V{{ draft.version }}</span></h2><p>ä¼šè®¡æœŸé—´ {{ draft.period }} Â· çŠ¶æ€ {{ voucherStatusLabel(draft.status) }}</p><p class="source-note">{{ voucherPolicySummary(draft.policy) }}</p></div><span class="status-pill">{{ voucherStatusLabel(draft.status) }}</span></div><div v-if="draft.status === 'NEEDS_REVIEW'" class="export-state"><strong>å¿…å¡«è¾…åŠ©æ ¸ç®—å°šæœªè¡¥é½</strong><p>{{ draft.validations?.find((item) => item.code === 'AUXILIARY_COMPLETE')?.reason || 'è¯·è¡¥é½ç§‘ç›®è¦æ±‚çš„è¾…åŠ©æ ¸ç®—ç»´åº¦åå†æäº¤å®¡æ ¸ã€‚' }}</p></div><div class="voucher-summary"><div><small>å€Ÿæ–¹åˆè®¡</small><strong>Â¥ {{ Number(draft.debit_total).toLocaleString('zh-CN', { minimumFractionDigits: 2 }) }}</strong></div><div><small>è´·æ–¹åˆè®¡</small><strong>Â¥ {{ Number(draft.credit_total).toLocaleString('zh-CN', { minimumFractionDigits: 2 }) }}</strong></div><div><small>æ¥æºä¸šåŠ¡</small><button class="table-link" @click="selectEvent(draft!.event_id); activeView = 'business'">{{ draft.event_id.slice(0, 8) }} â†’</button></div></div><button v-if="correctedFromDraftId(draft.policy)" class="button button-quiet" @click="showOriginalAiDraft">æŸ¥çœ‹åŸ AI è‰ç¨¿ V{{ correctedFromVersion(draft.policy) }}</button><section v-if="originalAiDraft" class="voucher-evidence-panel original-ai-panel"><div class="card-heading"><div><h3>åŸ AI å‡­è¯è‰ç¨¿ V{{ originalAiDraft.version }}</h3><p>{{ String(originalAiDraft.policy?.provider || 'DeepSeek') }} / {{ String(originalAiDraft.policy?.model || 'æ¨¡å‹æœªè®°å½•') }}</p></div><button class="text-button" @click="originalAiDraft = null">å…³é—­</button></div><div v-for="line in originalAiDraft.lines" :key="`${line.account_code}-${line.description}`" class="original-ai-line"><strong>{{ line.account_code }} {{ line.account_name }}</strong><span>{{ line.description }} Â· å€Ÿ {{ line.debit }} / è´· {{ line.credit }}</span><small>AI ç†ç”±ï¼š{{ line.rationale || 'æœªè®°å½•' }}</small></div></section><div class="table-scroll"><table class="entry-table"><thead><tr><th>ç§‘ç›®ç¼–ç </th><th>ä¼šè®¡ç§‘ç›®</th><th>æ‘˜è¦</th><th>å€Ÿæ–¹</th><th>è´·æ–¹</th><th>è¾…åŠ©æ ¸ç®—</th><th>æ¥æº</th></tr></thead><tbody><tr v-for="(line, index) in (editingVoucher ? voucherLines : draft.lines)" :key="`${line.account_code}-${index}`"><td><input v-if="editingVoucher" v-model="line.account_code" aria-label="ç§‘ç›®ç¼–ç "><template v-else>{{ line.account_code }}</template></td><td>{{ line.account_name }}</td><td><input v-if="editingVoucher" v-model="line.description" aria-label="æ‘˜è¦"><template v-else>{{ line.description }}</template><small v-if="!editingVoucher && line.rationale" class="ai-rationale">AI ç†ç”±ï¼š{{ line.rationale }}</small></td><td class="amount"><input v-if="editingVoucher" v-model="line.debit" type="number" min="0" step="0.01" aria-label="å€Ÿæ–¹é‡‘é¢"><template v-else>{{ line.debit === '0.00' ? 'â€”' : `Â¥ ${line.debit}` }}</template></td><td class="amount"><input v-if="editingVoucher" v-model="line.credit" type="number" min="0" step="0.01" aria-label="è´·æ–¹é‡‘é¢"><template v-else>{{ line.credit === '0.00' ? 'â€”' : `Â¥ ${line.credit}` }}</template></td><td><textarea v-if="editingVoucher" v-model="line.auxiliary_text" :aria-label="`è¾…åŠ©æ ¸ç®— JSON ${line.account_code}`"></textarea><span v-else>{{ auxiliaryLabel(line.auxiliary) }}</span><small v-if="editingVoucher && line.required_auxiliary_fields?.length">å¿…å¡«ï¼š{{ line.required_auxiliary_fields.join('ã€') }}</small></td><td><button v-for="ref in line.evidence_refs" :key="ref" class="table-link voucher-evidence-link" @click="openVoucherEvidence(ref)">{{ eventDetail?.documents.find((document) => document.id === ref)?.filename || `æ¥æº ${ref.slice(0, 8)}` }}</button><span v-if="!line.evidence_refs.length">ç¼ºå°‘è¯æ®</span></td></tr></tbody></table></div><section v-if="voucherEvidence" class="voucher-evidence-panel"><div class="card-heading"><div><h3>æ¥æºè¯æ®ï¼š{{ voucherEvidence.filename }}</h3><p>å•æ® {{ voucherEvidence.id.slice(0, 8) }} Â· äººå·¥ç¡®è®¤ç‰ˆæœ¬ {{ voucherEvidence.version }}</p></div><button class="text-button" @click="voucherEvidence = null">å…³é—­</button></div><div class="field-grid"><div v-for="(field, key) in voucherEvidence.fields" :key="key" class="source-field"><strong>{{ documentFieldLabel(String(key), '') }}</strong><span>{{ field.normalized_value ?? field.raw_value ?? 'â€”' }}</span><small v-if="field.evidence_text">åŸæ–‡ï¼š{{ field.evidence_text }}</small><button v-if="field.page" class="text-button" @click="showEvidencePage(voucherEvidence!.id, field.page!)">æŸ¥çœ‹åŸä»¶ç¬¬ {{ field.page }} é¡µ</button></div></div><img v-if="evidencePreview?.documentId === voucherEvidence.id" class="voucher-evidence-preview" :src="evidencePreview.url" alt="æ¥æºå•æ®åŸä»¶"></section><div class="validation-panel"><h3>åç«¯æ ¡éªŒ</h3><div v-for="validation in draft.validations || []" :key="validation.code" class="validation-row"><span :class="validation.passed ? 'check-mark' : 'attention-mark'">{{ validation.passed ? 'âœ“' : '!' }}</span><span>{{ validationLabel(validation.code) }}<small v-if="validation.reason">{{ validation.reason }}</small></span><strong>{{ validation.passed ? 'é€šè¿‡' : 'å¾…å¤„ç†' }}</strong></div><div class="validation-row"><span class="attention-mark">!</span><span>ERP å†™å…¥ä¸å›è¯»</span><strong>æœªæ¥å…¥ï¼Œä¸èƒ½æ ‡è®°å·²å…¥è´¦</strong></div></div><section class="audit-timeline"><h3>å¤„ç†è®°å½•</h3><div v-if="!auditEntries.length" class="audit-empty">å½“å‰æ²¡æœ‰å¯æ˜¾ç¤ºçš„å®¡æ‰¹æˆ–å…¥è´¦è®°å½•ã€‚</div><div v-for="entry in auditEntries" :key="entry.id" class="audit-entry"><span class="audit-dot"></span><div><strong>{{ auditLabel(entry.event_type) }}</strong><small>{{ entry.actor }} Â· {{ new Date(entry.occurred_at).toLocaleString('zh-CN') }}</small></div></div></section><div v-if="editingVoucher" class="correction-editor"><label>ä¿®æ­£åŸå› <input v-model="voucherCorrectionReason" minlength="3" maxlength="500" placeholder="è¯·è¯´æ˜ä¸ºä»€ä¹ˆä¿®æ”¹è¿™ä»½å‡­è¯"></label><button class="button button-primary" @click="saveVoucherCorrection" :disabled="voucherCorrectionReason.trim().length < 3">ä¿å­˜ä¸ºæ–°ç‰ˆæœ¬å¹¶é‡æ–°æ ¡éªŒ</button><button class="button button-quiet" @click="cancelVoucherCorrection">å–æ¶ˆ</button></div><div class="approval-notice">å®¡æ‰¹éœ€ç”±ä¸åˆ¶å•äººä¸åŒçš„æœ‰æƒé™ç”¨æˆ·å®Œæˆã€‚æ¼”ç¤ºå®¡æ‰¹åªç”¨äºæœ¬åœ°éªŒæ”¶ã€‚</div><div class="action-row"><button v-if="!editingVoucher" class="button button-secondary" @click="startVoucherCorrection" :disabled="!canSubmitVoucher || !['NEEDS_REVIEW', 'VALIDATED', 'REJECTED', 'APPROVED'].includes(draft.status)">ä¿®æ­£å‡­è¯</button><button class="button button-secondary" @click="submitReview" :disabled="draft.status !== 'VALIDATED' || !canSubmitVoucher" :title="canSubmitVoucher ? 'æäº¤å®¡æ ¸' : 'å½“å‰è§’è‰²æ²¡æœ‰æäº¤å®¡æ ¸æƒé™'">æäº¤å®¡æ ¸</button><button class="button button-secondary" @click="returnDraft" :disabled="draft.status !== 'PENDING_APPROVAL' || !canApproveVoucher">é€€å›ä¿®æ”¹</button><button class="button button-secondary" @click="approveDraft" :disabled="draft.status !== 'PENDING_APPROVAL' || !canApproveVoucher" :title="canApproveVoucher ? 'æ‰¹å‡†å‡­è¯' : 'å½“å‰è§’è‰²æ²¡æœ‰å®¡æ‰¹æƒé™'">æ‰¹å‡†å‡­è¯</button><button class="button button-primary" @click="exportDraft" :disabled="draft.status !== 'APPROVED' || !canExportVoucher" :title="canExportVoucher ? 'å¯¼å‡ºå¾…äººå·¥å…¥è´¦ CSV' : 'å½“å‰è§’è‰²æ²¡æœ‰å¯¼å‡ºæƒé™'">å¯¼å‡ºå¾…äººå·¥å…¥è´¦ CSV</button></div><div v-if="draft.status === 'EXPORTED_PENDING_MANUAL_POST'" class="export-state"><strong>å·²å¯¼å‡ºå¾…äººå·¥å…¥è´¦</strong><p>æ­¤å‡­è¯æ–‡ä»¶å°šæœªå†™å…¥ ERPï¼Œä¹Ÿæ²¡æœ‰ ERP å‡­è¯å·æˆ–å›è¯»æ ¸å®ç»“æœã€‚</p></div></template><div v-else class="empty-state"><strong>é€‰æ‹©ä¸€ä»½å‡­è¯æŸ¥çœ‹è¯¦æƒ…</strong><p>å‡­è¯çŠ¶æ€ã€å€Ÿè´·åˆ†å½•å’Œæ ¡éªŒç»“æœä¼šæ˜¾ç¤ºåœ¨è¿™é‡Œã€‚</p></div></section></section>
+        </template>
+
+        <template v-else-if="activeView === 'cases'">
+          <section class="welcome-row"><div><p class="eyebrow">æ ¸å¯¹ä¸å¼‚å¸¸</p><h1>éœ€è¦å¤„ç†çš„é—®é¢˜</h1><p class="page-subtitle">æ˜¾ç¤ºå½“å‰è´¦å¥—çš„å¼‚å¸¸å’Œè¯æ®ç¼ºå£ã€‚</p></div></section>
+          <section class="content-card"><div class="card-heading"><div><h2>å¼‚å¸¸åˆ—è¡¨</h2><p>{{ openCaseTotal }} æ¡å¾…å¤„ç†</p></div></div>
+            <div v-if="caseTotal === 0" class="empty-state"><strong>æ²¡æœ‰å¼‚å¸¸è®°å½•</strong><p>å‡ºç°æ ¸å¯¹å·®å¼‚ã€é‡å¤å‘ç¥¨æˆ–ç¼ºå°‘è¯æ®æ—¶ä¼šåœ¨è¿™é‡Œåˆ›å»ºè®°å½•ã€‚</p></div>
+            <div v-else class="case-list"><article v-for="item in cases" :key="item.id" class="case-row"><span class="attention-mark">!</span><div><strong>{{ caseLabel(item.type) }}</strong><small>{{ caseSummary(item) }}</small><small>å…³è”è¯æ® {{ item.source_refs?.length || 0 }} ä»½ Â· {{ item.event_id ? `ä¸šåŠ¡ ${item.event_id.slice(0, 8)}` : 'æœªå…³è”ä¸šåŠ¡' }}</small></div><span class="status-pill">{{ statusLabel(item.status) }}</span><button class="button button-quiet" @click="inspectCase(item)">æŸ¥çœ‹è¯¦æƒ…</button></article></div>
+            <div v-if="casePages > 1" class="pagination"><button @click="changePage('cases', Math.max(1, casePage - 1))" :disabled="casePage === 1">ä¸Šä¸€é¡µ</button><span>{{ casePage }} / {{ casePages }}</span><button @click="changePage('cases', Math.min(casePages, casePage + 1))" :disabled="casePage === casePages">ä¸‹ä¸€é¡µ</button></div>
+          </section>
+          <section v-if="caseDetailLoading" class="content-card">æ­£åœ¨è¯»å–å¼‚å¸¸è¯¦æƒ…â€¦</section>
+          <section v-if="selectedCase" class="content-card case-detail"><div class="card-heading"><div><p class="eyebrow">{{ caseLabel(selectedCase.type) }}</p><h2>å¼‚å¸¸è¯¦æƒ…</h2><p>{{ selectedCase.id.slice(0, 8) }} Â· {{ statusLabel(selectedCase.status) }} Â· {{ selectedCase.severity === 'BLOCKING' ? 'é˜»æ–­çº§' : 'éœ€å¤æ ¸' }}</p></div><button class="text-button" @click="selectedCase = null">å…³é—­</button></div>
+            <h3>æ ¸å¯¹äº‹å®ä¸å·®å¼‚</h3><div v-if="selectedCase.findings.length" class="finding-list"><div v-for="(finding, index) in selectedCase.findings" :key="index" class="finding-item"><span class="attention-mark">!</span><span>{{ findingLabel(finding) }}<small v-if="finding.role"> Â· {{ finding.role }}</small></span></div></div><p v-else>{{ caseSummary(selectedCase) }}</p>
+            <h3>æ¥æºå•æ®</h3><div v-if="selectedCase.source_documents.length" class="evidence-timeline"><div v-for="document in selectedCase.source_documents" :key="document.id" class="evidence-item"><span class="timeline-dot"></span><div><strong>{{ documentRoleLabel(document.role) }} Â· {{ document.filename }}</strong><small>{{ document.mime_type }}<template v-if="document.extraction_version"> Â· äººå·¥ç¡®è®¤ç‰ˆæœ¬ {{ document.extraction_version }}</template></small></div></div></div><p v-else class="quiet-empty">å½“å‰è´¦å·æ— æ³•æŸ¥çœ‹æ¥æºå•æ®ï¼Œæˆ–è¯¥å¼‚å¸¸æ²¡æœ‰å…³è”æ¥æºã€‚</p><p v-if="selectedCase.unavailable_source_count" class="quiet-empty">å¦æœ‰ {{ selectedCase.unavailable_source_count }} ä»½æ¥æºå½“å‰æ— æƒæŸ¥çœ‹ã€‚</p>
+            <h3>è´Ÿè´£äºº</h3><p v-if="selectedCase.assignees.length">{{ selectedCase.assignees.map((person) => `${person.display_name}ï¼ˆ${person.email}ï¼‰`).join('ã€') }}</p><p v-else class="quiet-empty">ä¸šåŠ¡å°šæœªæŒ‡æ´¾è´Ÿè´£äººã€‚</p>
+            <h3>å¤„ç†è®°å½•</h3><div v-if="selectedCase.audit_trail.length" class="audit-timeline"><div v-for="(entry, index) in selectedCase.audit_trail" :key="`${entry.event_type}-${index}`" class="audit-entry"><span class="audit-dot"></span><div><strong>{{ auditLabel(entry.event_type) }}</strong><small>{{ entry.actor }} Â· {{ new Date(entry.occurred_at).toLocaleString('zh-CN') }}</small></div></div></div><p v-else class="quiet-empty">æš‚æ— å¤„ç†è®°å½•ã€‚</p>
+            <div class="action-row"><button class="button button-primary" @click="continueCaseBusiness">è¿”å›å…³è”ä¸šåŠ¡å¤„ç†</button></div>
+          </section>
+        </template>
+
+        <template v-else-if="activeView === 'insights'">
+          <section class="welcome-row"><div><p class="eyebrow">è´¢åŠ¡åˆ†æ</p><h1>ä¸šåŠ¡ä¸å‡­è¯å¤„ç†æ‘˜è¦</h1><p class="page-subtitle">åªæ±‡æ€»å½“å‰æƒé™èŒƒå›´å†…çš„ä¸šåŠ¡è®°å½•ï¼›ä¸æŠŠå€™é€‰é‡‘é¢å½“ä½œæ”¶å…¥ã€ä½™é¢æˆ–æ­£å¼å…¥è´¦ã€‚</p></div><button class="button button-secondary" @click="loadInsights" :disabled="insightsLoading">{{ insightsLoading ? 'æ­£åœ¨åˆ·æ–°â€¦' : 'åˆ·æ–°æ‘˜è¦' }}</button></section>
+          <section v-if="insightsLoading && !insightsSummary" class="content-card loading-state">æ­£åœ¨è¯»å–å½“å‰è´¦å¥—æ‘˜è¦â€¦</section>
+          <section v-else-if="insightsError" class="content-card availability-card"><div class="availability-icon">!</div><div><h2>åˆ†ææ‘˜è¦æš‚æ—¶ä¸å¯ç”¨</h2><p>{{ insightsError }}</p></div></section>
+          <template v-else-if="insightsSummary">
+            <section class="kpi-grid">
+              <article class="kpi-card"><span class="kpi-label">å¯è§ä¸šåŠ¡</span><strong>{{ insightsSummary.event_count }}</strong><small>æ¥æºï¼šå½“å‰æƒé™èŒƒå›´å†…çš„ä¸šåŠ¡è®°å½•</small></article>
+              <article class="kpi-card"><span class="kpi-label">å·²åŒ¹é…ä¸šåŠ¡</span><strong>{{ insightsSummary.matched_event_count }}</strong><small>åªç»Ÿè®¡è§„åˆ™æ ¸å¯¹é€šè¿‡çš„ä¸šåŠ¡</small></article>
+              <article class="kpi-card"><span class="kpi-label">å·²åŒ¹é…ä¸šåŠ¡å€™é€‰é‡‘é¢</span><strong>Â¥{{ Number(insightsSummary.matched_event_amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 }) }}</strong><small>ä¸æ˜¯æ”¶å…¥æˆ–é“¶è¡Œä½™é¢</small></article>
+              <article class="kpi-card kpi-card-warning"><span class="kpi-label">å¾…å¤æ ¸ / å¼€æ”¾å¼‚å¸¸</span><strong>{{ insightsSummary.needs_review_count }} / {{ insightsSummary.open_case_count }}</strong><small>éœ€è¦è¡¥è¯æ®æˆ–äººå·¥å¤„ç†</small><button @click="activeView = 'cases'">æŸ¥çœ‹å¼‚å¸¸ <span>â†’</span></button></article>
+              <article class="kpi-card"><span class="kpi-label">å¾…äººå·¥å…¥è´¦ / å·²éªŒè¯å‡­è¯</span><strong v-if="insightsSummary.voucher_metrics_visible">{{ insightsSummary.pending_manual_post_count }} / {{ insightsSummary.verified_voucher_count }}</strong><strong v-else>ä»…è´¢åŠ¡è§’è‰²å¯è§</strong><small>å¯¼å‡ºä¸ç­‰äº ERP å·²å…¥è´¦</small></article>
+            </section>
+            <section class="content-card"><div class="card-heading"><div><h2>æœ€è¿‘ä¸šåŠ¡è¯æ®</h2><p>{{ insightsSummary.scope.tenant }} Â· {{ insightsSummary.scope.account_set }} Â· {{ insightsSummary.period_scope }} Â· åˆ—è¡¨æ˜¾ç¤ºæœ€è¿‘ 5 ç¬”</p></div><div><small>æ•°æ®æˆªè‡³ {{ new Date(insightsSummary.as_of).toLocaleString('zh-CN') }}</small><button class="table-link" @click="activeView = 'business'">æŸ¥çœ‹å…¨éƒ¨ä¸šåŠ¡ â†’</button></div></div>
+              <div v-if="!insightsSummary.source_events.length" class="empty-state compact"><strong>å½“å‰èŒƒå›´è¿˜æ²¡æœ‰ä¸šåŠ¡è®°å½•</strong><p>ä¸Šä¼ å•æ®å¹¶ç¡®è®¤å…³è”åï¼Œè¿™é‡Œä¼šæ˜¾ç¤ºæœ‰æ¥æºçš„å¤„ç†æ‘˜è¦ã€‚</p><button class="button button-secondary" @click="activeView = 'documents'">å‰å¾€å•æ®ä¸­å¿ƒ</button></div>
+              <div v-else class="business-list"> <button v-for="item in insightsSummary.source_events" :key="item.id" class="business-list-item" @click="activeView = 'business'; selectEvent(item.id)"><span><strong>ä¸šåŠ¡ {{ item.id.slice(0, 8) }}</strong><small>{{ item.amount ? `å€™é€‰é‡‘é¢ Â¥${Number(item.amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}` : 'é‡‘é¢å¾…æ ¸å¯¹' }} Â· {{ new Date(item.created_at).toLocaleDateString('zh-CN') }}</small></span><span class="status-pill">{{ businessStatusLabel(item.status) }}</span></button></div>
+              <p class="source-note">{{ insightsSummary.limitations }}</p>
+            </section>
+          </template>
+        </template>
+
+        <template v-else-if="activeView === 'integrations'">
+          <section class="welcome-row"><div><p class="eyebrow">è¿æ¥ä¸è®¾ç½®</p><h1>è¿æ¥ä¸è´¦å¥—è®¾ç½®</h1><p class="page-subtitle">æŸ¥çœ‹å½“å‰è´¦å¥—ä¸å¤–éƒ¨ç³»ç»Ÿè¿æ¥èƒ½åŠ›ã€‚</p></div></section>
+          <section class="content-card availability-card"><div class="availability-icon">i</div><div><h2>å°šæœªè¿æ¥ ERP å†™å…¥æœåŠ¡</h2><p>å½“å‰å¯ä»¥æŸ¥çœ‹å’Œå¯¼å‡ºå·²å®¡æ‰¹å‡­è¯ï¼›ç³»ç»Ÿæ²¡æœ‰æˆæƒçš„ ERP å†™å…¥å’Œå›è¯»èƒ½åŠ›ï¼Œä¸èƒ½æ˜¾ç¤ºâ€œå·²å…¥è´¦â€æˆ–â€œå·²æ ¸å®â€ã€‚</p><span class="connection-badge">å†™å…¥ï¼šæœªæˆæƒ / æœªè¿æ¥ã€€Â·ã€€å›è¯»ï¼šä¸å¯ç”¨</span></div></section>
+          <section v-if="currentRole === 'TENANT_ADMIN'" class="content-card">
+            <div class="card-heading"><div><h2>è´¦å¥—ç§‘ç›®ä¸è¾…åŠ©æ ¸ç®—</h2><p>è®¾ç½®ç§‘ç›®æ˜¯å¦å¯ç”¨ã€æ˜¯å¦ä¸ºæœ«çº§ï¼Œä»¥åŠå‡­è¯å¿…å¡«çš„è¾…åŠ©æ ¸ç®—ç»´åº¦ã€‚</p></div><button class="button button-secondary" @click="loadChartAccounts" :disabled="chartAccountsLoading">{{ chartAccountsLoading ? 'è¯»å–ä¸­â€¦' : 'åˆ·æ–°' }}</button></div>
+            <div v-if="chartAccountsLoading && !chartAccounts.length" class="loading-state">æ­£åœ¨è¯»å–ç§‘ç›®é…ç½®â€¦</div>
+            <div v-else-if="!chartAccounts.length" class="empty-state compact"><strong>å½“å‰è´¦å¥—è¿˜æ²¡æœ‰ç§‘ç›®é…ç½®</strong><p>æ·»åŠ ç§‘ç›®åï¼Œå‡­è¯å°†ä½¿ç”¨è¿™äº›é…ç½®è¿›è¡Œæœ‰æ•ˆæ€§å’Œè¾…åŠ©æ ¸ç®—æ£€æŸ¥ã€‚</p></div>
+            <div v-else class="table-scroll"><table><thead><tr><th>ç¼–ç </th><th>ç§‘ç›®åç§°</th><th>æœ‰æ•ˆ</th><th>æœ«çº§ç§‘ç›®</th><th>å¿…å¡«è¾…åŠ©æ ¸ç®—ç»´åº¦ï¼ˆç”¨é¡¿å·åˆ†éš”ï¼‰</th></tr></thead><tbody><tr v-for="account in chartAccounts" :key="account.code"><td>{{ account.code }}</td><td>{{ account.name }}</td><td><input v-model="account.is_active" type="checkbox" :aria-label="`${account.code} æ˜¯å¦æœ‰æ•ˆ`"></td><td><input v-model="account.is_leaf" type="checkbox" :aria-label="`${account.code} æ˜¯å¦æœ«çº§`"></td><td><input v-model="account.auxiliary_input" :aria-label="`${account.code} è¾…åŠ©æ ¸ç®—ç»´åº¦`" placeholder="ä¾‹å¦‚ï¼šéƒ¨é—¨ã€å‘˜å·¥"></td></tr></tbody></table></div>
+            <div class="action-row"><input v-model="newChartAccount.code" aria-label="æ–°ç§‘ç›®ç¼–ç " placeholder="æ–°ç§‘ç›®ç¼–ç "><input v-model="newChartAccount.name" aria-label="æ–°ç§‘ç›®åç§°" placeholder="æ–°ç§‘ç›®åç§°"><button class="button button-secondary" @click="addChartAccount" :disabled="!newChartAccount.code.trim() || !newChartAccount.name.trim()">æ·»åŠ ç§‘ç›®</button><button class="button button-primary" @click="saveChartAccounts" :disabled="chartAccountsSaving || !chartAccounts.length">{{ chartAccountsSaving ? 'ä¿å­˜ä¸­â€¦' : 'ä¿å­˜ç§‘ç›®é…ç½®' }}</button></div>
+            <p class="source-note">æœ‰æœªå®Œæˆå‡­è¯å¼•ç”¨çš„ç§‘ç›®ä¸èƒ½åœç”¨æˆ–ä¿®æ”¹è¾…åŠ©æ ¸ç®—è¦æ±‚ã€‚ä¿å­˜æ“ä½œä¼šå†™å…¥å®¡è®¡è®°å½•ï¼›å½“å‰é…ç½®åªä½œç”¨äºæ­¤è´¦å¥—ã€‚</p>
+          </section>
+          <section v-if="canManageAccountingPolicy" class="content-card">
+            <div class="card-heading"><div><h2>ä¸šåŠ¡ä¼šè®¡æ”¿ç­–</h2><p>ç”±è´¢åŠ¡è´Ÿè´£äººç¡®è®¤å€Ÿæ–¹ç§‘ç›®ã€é“¶è¡Œç§‘ç›®å’Œè¿›é¡¹ç¨å¤„ç†ã€‚ä¿å­˜åæŒ‰ç‰ˆæœ¬ç•™ç—•ï¼›ä¸ä¼šè°ƒç”¨ AI æˆ–è‡ªåŠ¨å†™å…¥ ERPã€‚</p></div></div>
+            <article v-for="businessType in configurablePolicyTypes" :key="businessType" class="policy-editor">
+              <div class="card-heading"><div><h3>{{ businessTypeLabel(businessType) }}</h3><p>{{ policyForms[businessType].version ? `å½“å‰æ”¿ç­– V${policyForms[businessType].version}` : 'å°šæœªé…ç½®ï¼›ç›¸å…³ä¸šåŠ¡ä¼šä¿æŒå¾…å¤æ ¸' }}</p></div></div>
+              <div class="policy-fields">
+                <label>å€Ÿæ–¹ç§‘ç›®<select v-model="policyForms[businessType].debit_account_code"><option value="">è¯·é€‰æ‹©æœ‰æ•ˆæœ«çº§ç§‘ç›®</option><option v-for="account in chartAccounts.filter((item) => item.is_active && item.is_leaf)" :key="account.code" :value="account.code">{{ account.code }} Â· {{ account.name }}</option></select></label>
+                <label>ä»˜æ¬¾ç§‘ç›®<select v-model="policyForms[businessType].bank_account_code"><option value="">è¯·é€‰æ‹©æœ‰æ•ˆæœ«çº§ç§‘ç›®</option><option v-for="account in chartAccounts.filter((item) => item.is_active && item.is_leaf)" :key="account.code" :value="account.code">{{ account.code }} Â· {{ account.name }}</option></select></label>
+                <label>è¿›é¡¹ç¨å¤„ç†<select v-model="policyForms[businessType].tax_treatment"><option value="DEDUCTIBLE">è´¢åŠ¡ç¡®è®¤å¯æŠµæ‰£</option><option value="NON_DEDUCTIBLE">è´¢åŠ¡ç¡®è®¤ä¸å¯æŠµæ‰£</option></select></label>
+                <label v-if="policyForms[businessType].tax_treatment === 'DEDUCTIBLE'">è¿›é¡¹ç¨ç§‘ç›®<select v-model="policyForms[businessType].input_tax_account_code"><option value="">è¯·é€‰æ‹©æœ‰æ•ˆæœ«çº§ç§‘ç›®</option><option v-for="account in chartAccounts.filter((item) => item.is_active && item.is_leaf)" :key="account.code" :value="account.code">{{ account.code }} Â· {{ account.name }}</option></select></label>
+              </div>
+              <label class="policy-confirm"><input v-model="policyForms[businessType].confirmed" type="checkbox">æˆ‘ç¡®è®¤ä»¥ä¸Šä¿¡æ¯æ˜¯æœ¬ä¼ä¸šè´¢åŠ¡è´Ÿè´£äººæ ¸å®šçš„æ”¿ç­–ï¼Œä¸”ä¸æœ¬ä¸šåŠ¡å¤„ç†æ–¹å¼ä¸€è‡´ã€‚</label>
+              <div class="action-row"><button class="button button-primary" @click="saveAccountingPolicy(businessType)" :disabled="chartAccountsSaving || !policyForms[businessType].confirmed || !policyForms[businessType].debit_account_code || !policyForms[businessType].bank_account_code || (policyForms[businessType].tax_treatment === 'DEDUCTIBLE' && !policyForms[businessType].input_tax_account_code)">ä¿å­˜{{ businessTypeLabel(businessType) }}æ”¿ç­–</button></div>
+            </article>
+            <p class="source-note">ç§Ÿèµé…ç½®ç›®å‰åªæ”¯æŒè´¢åŠ¡æ˜ç¡®ç¡®è®¤çš„ç›´æ¥è´¹ç”¨å¤„ç†ï¼›éœ€è¦ä½¿ç”¨æƒèµ„äº§ã€ç§Ÿèµè´Ÿå€ºæˆ–å…¶ä»–å¤æ‚åˆ¤æ–­æ—¶ä»ä¼šé˜»æ–­ï¼Œéœ€åç»­æ”¯æŒã€‚é…ç½®å˜æ›´æœ‰æœªå®Œæˆå‡­è¯æ—¶ä¼šè¢«æ‹’ç»ã€‚</p>
+          </section>
+        </template>
+      </div>
+      <footer class="app-footer">ä¸šåŠ¡çŠ¶æ€ç”±æœåŠ¡ç«¯æä¾› Â· å€™é€‰å‡­è¯ä¸ç­‰äºæ­£å¼å‡­è¯ Â· ERP æ˜¯æ­£å¼è´¦åŠ¡æ¥æº</footer>
+    </div>
+  </div>
+</template>

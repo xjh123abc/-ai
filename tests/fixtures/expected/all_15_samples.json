@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "review_note": "Expected values were transcribed from the supplied synthetic sample documents and checked against their visible/OCR content. Null or omitted values mean the sample does not provide a reliably readable value; they are not treated as model successes.",
+  "samples": [
+    {"file":"01_采购入库付款/01_数电发票_45200.jpg","document_type":"VAT_INVOICE","fields":{"invoice_number":"24360125413017362003","issue_date":"2024-12-01","buyer":"南昌市杰盛科技有限公司","seller":"南昌市视维科技公司","net_amount":"40000.00","tax_rate":"13%","tax_amount":"5200.00","gross_amount":"45200.00"}},
+    {"file":"01_采购入库付款/02_入库单_45200.jpg","document_type":"GOODS_RECEIPT","fields":{"receipt_number":"NO56784001","receipt_date":"2024-12-01","item":"教学专用VR眼镜","quantity":"100","gross_amount":"45200.00"}},
+    {"file":"01_采购入库付款/03_银行回单_45200.jpg","document_type":"BANK_RECEIPT","fields":{"payer":"南昌市杰盛科技有限公司","payee":"南昌市视维科技公司","gross_amount":"45200.00","settlement_date":"2024-12-01","settled":"true"}},
+    {"file":"02_多票费用报销/01_餐饮住宿发票_4448.jpg","document_type":"VAT_INVOICE","fields":{"invoice_number":"24360123413017362987","issue_date":"2024-12-07","buyer":"南昌市杰盛科技有限公司","seller":"南昌市露森酒店","net_amount":"4196.23","tax_rate":"6%","tax_amount":"251.77","gross_amount":"4448.00"}},
+    {"file":"02_多票费用报销/02_银行回单_4448.jpg","document_type":"BANK_RECEIPT","fields":{"payer":"南昌市杰盛科技有限公司","payee":"南昌市露森酒店","gross_amount":"4448.00","settlement_date":"2024-12-07","settled":"true"}},
+    {"file":"02_多票费用报销/03_支付证明_4448.jpg","document_type":"PAYMENT_PROOF","fields":{"purpose":"报销业务招待费","gross_amount":"4448.00","payment_date":"2024-12-07"}},
+    {"file":"03_合同交付验收/01_购销合同_904000.jpg","document_type":"CONTRACT","fields":{"contract_number":"25326952","buyer":"暨中大学","seller":"南昌市杰盛科技有限公司","gross_amount":"904000.00"}},
+    {"file":"03_合同交付验收/02_验收报告_第1页.jpg","document_type":"ACCEPTANCE_REPORT","fields":{"acceptance_date":"2024-12-11"}},
+    {"file":"03_合同交付验收/03_验收报告_第2页.jpg","document_type":"ACCEPTANCE_REPORT","fields":{"acceptance_result":"通过验收"}},
+    {"file":"04_补充单据/01_电脑购置_数电发票_6780.jpg","document_type":"VAT_INVOICE","fields":{"invoice_number":"244234139350671047","issue_date":"2024-12-01","buyer":"南昌市杰盛科技有限公司","seller":"南昌市归鸿商贸有限公司","net_amount":"6000.00","tax_rate":"13%","tax_amount":"780.00","gross_amount":"6780.00"}},
+    {"file":"04_补充单据/02_电脑购置_银行回单_6780.jpg","document_type":"BANK_RECEIPT","fields":{"payer":"南昌市杰盛科技有限公司","payee":"南昌市归鸿商贸有限公司","gross_amount":"6780.00","settlement_date":"2024-12-01","settled":"true"}},
+    {"file":"04_补充单据/03_办公室租赁_数电发票_21800.jpg","document_type":"VAT_INVOICE","fields":{"invoice_number":"244278928656838066","issue_date":"2024-12-01","buyer":"南昌市杰盛科技有限公司","seller":"南昌市中智集团地产有限公司","net_amount":"20000.00","tax_rate":"9%","tax_amount":"1800.00","gross_amount":"21800.00"}},
+    {"file":"04_补充单据/04_旧版增值税发票_独立样本.jpg","document_type":"VAT_INVOICE","fields":{"invoice_number":"09750785","issue_date":"2017-04-18","buyer":"中国科学院自动化研究所","seller":"佳作天成（北京）科技有限公司","net_amount":"32705.98","tax_rate":"17%","tax_amount":"5560.02","gross_amount":"38266.00"}},
+    {"file":"04_补充单据/05_出租车发票_脱敏独立样本.jpg","document_type":"TAXI_RECEIPT","fields":{"invoice_number":"77120424"}},
+    {"file":"04_补充单据/06_通行费票据_脱敏独立样本.jpg","document_type":"TOLL_RECEIPT","fields":{"gross_amount":"20.00"}}
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "gold_sample_count": 15,
+  "field_accuracy_exact_match": {
+    "acceptance_date": {
+      "correct": 0,
+      "total": 1,
+      "accuracy": 0.0
+    },
+    "acceptance_result": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    },
+    "buyer": {
+      "correct": 5,
+      "total": 6,
+      "accuracy": 0.8333
+    },
+    "contract_number": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    },
+    "gross_amount": {
+      "correct": 12,
+      "total": 12,
+      "accuracy": 1.0
+    },
+    "invoice_number": {
+      "correct": 6,
+      "total": 6,
+      "accuracy": 1.0
+    },
+    "issue_date": {
+      "correct": 5,
+      "total": 5,
+      "accuracy": 1.0
+    },
+    "item": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    },
+    "net_amount": {
+      "correct": 5,
+      "total": 5,
+      "accuracy": 1.0
+    },
+    "payee": {
+      "correct": 3,
+      "total": 3,
+      "accuracy": 1.0
+    },
+    "payer": {
+      "correct": 3,
+      "total": 3,
+      "accuracy": 1.0
+    },
+    "payment_date": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    },
+    "purpose": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    },
+    "quantity": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    },
+    "receipt_date": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    },
+    "receipt_number": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    },
+    "seller": {
+      "correct": 5,
+      "total": 6,
+      "accuracy": 0.8333
+    },
+    "settled": {
+      "correct": 0,
+      "total": 3,
+      "accuracy": 0.0
+    },
+    "settlement_date": {
+      "correct": 3,
+      "total": 3,
+      "accuracy": 1.0
+    },
+    "tax_amount": {
+      "correct": 5,
+      "total": 5,
+      "accuracy": 1.0
+    },
+    "tax_rate": {
+      "correct": 5,
+      "total": 5,
+      "accuracy": 1.0
+    }
+  },
+  "supported_field_count": 71,
+  "unsupported_gold_field_count": 0,
+  "document_type_classification": {
+    "implemented": true,
+    "correct": 15,
+    "total": 15,
+    "accuracy": 1.0
+  },
+  "limitations": "Type classification is a rule-based candidate and remains NEEDS_REVIEW; exact match is measured on this 15-image set only. Unsupported gold fields are reported as gaps, not successes. No source text or field values are included."
+}

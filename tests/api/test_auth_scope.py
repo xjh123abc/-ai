@@ -48,8 +48,8 @@ def test_login_scopes_documents_and_revokes_session():
     auth_a = {"Authorization": f"Bearer {login_a.json()['access_token']}"}
     auth_b = {"Authorization": f"Bearer {login_b.json()['access_token']}"}
     try:
-        assert [d["id"] for d in client.get("/api/v1/documents", headers=auth_a).json()] == [document_ids[0]]
-        assert [d["id"] for d in client.get("/api/v1/documents", headers=auth_b).json()] == [document_ids[1]]
+        assert [d["id"] for d in client.get("/api/v1/documents", headers=auth_a).json()["items"]] == [document_ids[0]]
+        assert [d["id"] for d in client.get("/api/v1/documents", headers=auth_b).json()["items"]] == [document_ids[1]]
         assert client.get(f"/api/v1/documents/{document_ids[1]}", headers=auth_a).status_code == 404
         assert client.post("/api/v1/auth/memberships", headers=auth_b, json={
             "email": f"blocked-{uuid4().hex[:8]}@example.test", "display_name": "No admin",

@@ -1,0 +1,192 @@
+{
+  "sample_count": 15,
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "database": "isolated SQLite",
+    "transport": "FastAPI TestClient; no external network"
+  },
+  "provider": "RapidOCR",
+  "model_version": "PP-OCRv6-Tiny/CPU; max-edge=1800px; threads=2/1",
+  "measurements": [
+    {
+      "sample_id": 1,
+      "group": "01_采购入库付款",
+      "byte_size": 98430,
+      "elapsed_seconds": 0.503,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 257.6,
+      "candidate_field_count": 8,
+      "duplicate": false
+    },
+    {
+      "sample_id": 2,
+      "group": "01_采购入库付款",
+      "byte_size": 83822,
+      "elapsed_seconds": 0.417,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 265.8,
+      "candidate_field_count": 3,
+      "duplicate": false
+    },
+    {
+      "sample_id": 3,
+      "group": "01_采购入库付款",
+      "byte_size": 114168,
+      "elapsed_seconds": 0.336,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 260.1,
+      "candidate_field_count": 1,
+      "duplicate": false
+    },
+    {
+      "sample_id": 4,
+      "group": "02_多票费用报销",
+      "byte_size": 101150,
+      "elapsed_seconds": 0.289,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 260.1,
+      "candidate_field_count": 6,
+      "duplicate": false
+    },
+    {
+      "sample_id": 5,
+      "group": "02_多票费用报销",
+      "byte_size": 114584,
+      "elapsed_seconds": 0.313,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 260.8,
+      "candidate_field_count": 1,
+      "duplicate": false
+    },
+    {
+      "sample_id": 6,
+      "group": "02_多票费用报销",
+      "byte_size": 50804,
+      "elapsed_seconds": 0.336,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 287.2,
+      "candidate_field_count": 1,
+      "duplicate": false
+    },
+    {
+      "sample_id": 7,
+      "group": "03_合同交付验收",
+      "byte_size": 57317,
+      "elapsed_seconds": 0.503,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 288.9,
+      "candidate_field_count": 1,
+      "duplicate": false
+    },
+    {
+      "sample_id": 8,
+      "group": "03_合同交付验收",
+      "byte_size": 167692,
+      "elapsed_seconds": 0.6,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 267.1,
+      "candidate_field_count": 1,
+      "duplicate": false
+    },
+    {
+      "sample_id": 9,
+      "group": "03_合同交付验收",
+      "byte_size": 209120,
+      "elapsed_seconds": 0.757,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 264.1,
+      "candidate_field_count": 0,
+      "duplicate": false
+    },
+    {
+      "sample_id": 10,
+      "group": "04_补充单据",
+      "byte_size": 99731,
+      "elapsed_seconds": 0.266,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 264.1,
+      "candidate_field_count": 8,
+      "duplicate": false
+    },
+    {
+      "sample_id": 11,
+      "group": "04_补充单据",
+      "byte_size": 114774,
+      "elapsed_seconds": 0.39,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 238.0,
+      "candidate_field_count": 1,
+      "duplicate": false
+    },
+    {
+      "sample_id": 12,
+      "group": "04_补充单据",
+      "byte_size": 91446,
+      "elapsed_seconds": 0.298,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 293.4,
+      "candidate_field_count": 8,
+      "duplicate": false
+    },
+    {
+      "sample_id": 13,
+      "group": "04_补充单据",
+      "byte_size": 494827,
+      "elapsed_seconds": 1.289,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 274.8,
+      "candidate_field_count": 3,
+      "duplicate": false
+    },
+    {
+      "sample_id": 14,
+      "group": "04_补充单据",
+      "byte_size": 179690,
+      "elapsed_seconds": 0.39,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 238.4,
+      "candidate_field_count": 1,
+      "duplicate": false
+    },
+    {
+      "sample_id": 15,
+      "group": "04_补充单据",
+      "byte_size": 83941,
+      "elapsed_seconds": 0.213,
+      "http_status": 200,
+      "processing_status": "NEEDS_REVIEW",
+      "process_rss_mib_after_request": 285.0,
+      "candidate_field_count": 0,
+      "duplicate": false
+    }
+  ],
+  "latency_seconds_including_upload_and_ocr": {
+    "all_mean": 0.46,
+    "all_p50": 0.39,
+    "all_p95_nearest_rank": 1.289,
+    "first_request_cold": 0.503,
+    "warm_mean_excluding_first": 0.457,
+    "warm_p50_excluding_first": 0.336,
+    "warm_p95_nearest_rank_excluding_first": 1.289
+  },
+  "peak_process_rss_mib": 472.7,
+  "peak_sampled_process_rss_mib": 449.8,
+  "rss_sampling_interval_ms": 5,
+  "accuracy_note": "Candidate counts and response status are not accuracy metrics; gold labels are required.",
+  "scope_note": "Includes multipart handling, local file write, OCR, candidate extraction, and SQLite persistence; excludes PostgreSQL and real network latency."
+}

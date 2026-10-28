@@ -1,0 +1,131 @@
+{
+  "sample_count": 15,
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "logical_cpu_count": 16
+  },
+  "provider": "RapidOCR",
+  "model_version": "PP-OCRv6-Tiny/CPU; max-edge=1800px; threads=2/1",
+  "model_init_seconds": 0.012,
+  "sequential_wall_seconds": 6.538,
+  "per_image_seconds": [
+    {
+      "sample_id": 1,
+      "group": "01_采购入库付款",
+      "elapsed_seconds": 0.402,
+      "line_count": 36,
+      "candidate_field_count": 8
+    },
+    {
+      "sample_id": 2,
+      "group": "01_采购入库付款",
+      "elapsed_seconds": 0.387,
+      "line_count": 42,
+      "candidate_field_count": 3
+    },
+    {
+      "sample_id": 3,
+      "group": "01_采购入库付款",
+      "elapsed_seconds": 0.32,
+      "line_count": 38,
+      "candidate_field_count": 1
+    },
+    {
+      "sample_id": 4,
+      "group": "02_多票费用报销",
+      "elapsed_seconds": 0.276,
+      "line_count": 41,
+      "candidate_field_count": 6
+    },
+    {
+      "sample_id": 5,
+      "group": "02_多票费用报销",
+      "elapsed_seconds": 0.348,
+      "line_count": 38,
+      "candidate_field_count": 1
+    },
+    {
+      "sample_id": 6,
+      "group": "02_多票费用报销",
+      "elapsed_seconds": 0.361,
+      "line_count": 38,
+      "candidate_field_count": 1
+    },
+    {
+      "sample_id": 7,
+      "group": "03_合同交付验收",
+      "elapsed_seconds": 0.421,
+      "line_count": 30,
+      "candidate_field_count": 1
+    },
+    {
+      "sample_id": 8,
+      "group": "03_合同交付验收",
+      "elapsed_seconds": 0.554,
+      "line_count": 21,
+      "candidate_field_count": 1
+    },
+    {
+      "sample_id": 9,
+      "group": "03_合同交付验收",
+      "elapsed_seconds": 0.681,
+      "line_count": 42,
+      "candidate_field_count": 0
+    },
+    {
+      "sample_id": 10,
+      "group": "04_补充单据",
+      "elapsed_seconds": 0.246,
+      "line_count": 34,
+      "candidate_field_count": 8
+    },
+    {
+      "sample_id": 11,
+      "group": "04_补充单据",
+      "elapsed_seconds": 0.342,
+      "line_count": 39,
+      "candidate_field_count": 1
+    },
+    {
+      "sample_id": 12,
+      "group": "04_补充单据",
+      "elapsed_seconds": 0.306,
+      "line_count": 36,
+      "candidate_field_count": 8
+    },
+    {
+      "sample_id": 13,
+      "group": "04_补充单据",
+      "elapsed_seconds": 1.232,
+      "line_count": 74,
+      "candidate_field_count": 3
+    },
+    {
+      "sample_id": 14,
+      "group": "04_补充单据",
+      "elapsed_seconds": 0.445,
+      "line_count": 29,
+      "candidate_field_count": 1
+    },
+    {
+      "sample_id": 15,
+      "group": "04_补充单据",
+      "elapsed_seconds": 0.202,
+      "line_count": 30,
+      "candidate_field_count": 0
+    }
+  ],
+  "latency_seconds": {
+    "mean": 0.435,
+    "p50": 0.361,
+    "p95_nearest_rank": 1.232
+  },
+  "peak_process_rss_mib": 379.7,
+  "ocr_line_confidence_buckets": {
+    "below_0_5": 0,
+    "0_5_to_0_8": 14,
+    "at_least_0_8": 554,
+    "missing": 0
+  },
+  "accuracy_note": "Candidate counts and OCR confidence are not accuracy metrics; gold labels are required."
+}

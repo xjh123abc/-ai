@@ -13,8 +13,8 @@ from app.db.models import AccountSet, AppUser, AuthSession, Tenant, TenantMember
 from app.db.session import db_session
 
 ROLE_PERMISSIONS = {
-    "TENANT_ADMIN": {"read", "upload", "correct", "reconcile", "voucher_create", "voucher_submit", "approve", "export", "manage_members"},
-    "ACCOUNTANT": {"read", "upload", "correct", "reconcile", "voucher_create", "voucher_submit", "export"},
+    "TENANT_ADMIN": {"read", "upload", "correct", "reconcile", "voucher_create", "voucher_submit", "approve", "export", "manage_members", "manage_accounting_policy"},
+    "ACCOUNTANT": {"read", "upload", "correct", "reconcile", "voucher_create", "voucher_submit", "export", "manage_accounting_policy"},
     "APPROVER": {"read", "reconcile", "approve", "export"},
     "BUSINESS_USER": {"read_assigned", "upload", "correct"},
     "AUDITOR": {"read", "export"},

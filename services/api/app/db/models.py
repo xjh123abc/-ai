@@ -78,6 +78,14 @@ class AuthSession(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
+class LoginThrottleBucket(Base):
+    __tablename__ = "login_throttle_buckets"
+
+    bucket_key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    window_started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
 class ChartAccount(Base):
     __tablename__ = "chart_accounts"
     __table_args__ = (
@@ -92,8 +100,25 @@ class ChartAccount(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     is_leaf: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     requires_auxiliary: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    required_auxiliary_fields: Mapped[list] = mapped_column(JSON_DOCUMENT, nullable=False, default=list)
 
     account_set: Mapped[AccountSet] = relationship(back_populates="chart_accounts")
+
+
+class AccountingPolicy(Base):
+    __tablename__ = "accounting_policies"
+    __table_args__ = (
+        UniqueConstraint("account_set_id", "business_type", "version"),
+        Index("ix_accounting_policies_scope", "account_set_id", "business_type", "version"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    account_set_id: Mapped[str] = mapped_column(ForeignKey("account_sets.id", ondelete="CASCADE"), nullable=False)
+    business_type: Mapped[str] = mapped_column(String(40), nullable=False)
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    configuration: Mapped[dict] = mapped_column(JSON_DOCUMENT, nullable=False)
+    confirmed_by: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
 class AccountingPeriod(Base):
@@ -148,6 +173,7 @@ class DocumentExtraction(Base):
     confidence: Mapped[Decimal | None] = mapped_column(Numeric(6, 5))
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="NEEDS_REVIEW")
     created_by: Mapped[str] = mapped_column(String(200), nullable=False)
+    correction_reason: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     document: Mapped[DocumentAsset] = relationship(back_populates="extractions")
@@ -155,12 +181,19 @@ class DocumentExtraction(Base):
 
 class BusinessEvent(Base):
     __tablename__ = "business_events"
-    __table_args__ = (Index("ix_business_events_scope_status", "tenant_id", "account_set_id", "status"),)
+    __table_args__ = (
+        Index("ix_business_events_scope_status", "tenant_id", "account_set_id", "status"),
+        UniqueConstraint("account_set_id", "created_by", "request_hash", name="uq_business_events_request_hash"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
     tenant_id: Mapped[str] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     account_set_id: Mapped[str] = mapped_column(ForeignKey("account_sets.id", ondelete="RESTRICT"), nullable=False)
     event_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    request_hash: Mapped[str | None] = mapped_column(String(64))
+    rental_direct_expense_confirmed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    rental_direct_expense_confirmed_by: Mapped[str | None] = mapped_column(String(200))
+    rental_direct_expense_policy_version: Mapped[str | None] = mapped_column(String(100))
     party_ref: Mapped[str | None] = mapped_column(String(200))
     amount: Mapped[Decimal | None] = mapped_column(Numeric(18, 2))
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="CNY")
@@ -196,6 +229,22 @@ class BusinessEventDocument(Base):
     confirmed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     event: Mapped[BusinessEvent] = relationship(back_populates="documents")
+
+
+class BusinessEventAssignment(Base):
+    __tablename__ = "business_event_assignments"
+    __table_args__ = (
+        UniqueConstraint("event_id", "user_id"),
+        Index("ix_business_event_assignments_user_scope", "tenant_id", "account_set_id", "user_id"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    event_id: Mapped[str] = mapped_column(ForeignKey("business_events.id", ondelete="CASCADE"), nullable=False)
+    tenant_id: Mapped[str] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    account_set_id: Mapped[str] = mapped_column(ForeignKey("account_sets.id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[str] = mapped_column(ForeignKey("app_users.id", ondelete="CASCADE"), nullable=False)
+    assigned_by: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
 class ExceptionCase(Base):
@@ -260,6 +309,7 @@ class VoucherDraftLine(Base):
     debit: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False, default=Decimal("0.00"))
     credit: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False, default=Decimal("0.00"))
     description: Mapped[str] = mapped_column(String(500), nullable=False)
+    rationale: Mapped[str] = mapped_column(Text, nullable=False, default="")
     auxiliary: Mapped[dict] = mapped_column(JSON_DOCUMENT, nullable=False, default=dict)
     evidence_refs: Mapped[list] = mapped_column(JSON_DOCUMENT, nullable=False, default=list)
 
@@ -277,6 +327,31 @@ class VoucherApproval(Base):
     decision: Mapped[str] = mapped_column(String(30), nullable=False)
     reason: Mapped[str | None] = mapped_column(Text)
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class PostingAttempt(Base):
+    __tablename__ = "posting_attempts"
+    __table_args__ = (
+        UniqueConstraint("idempotency_key"),
+        UniqueConstraint("voucher_draft_id", "voucher_version"),
+        Index("ix_posting_attempts_scope_status", "tenant_id", "account_set_id", "status"),
+        CheckConstraint("status IN ('SUBMITTING', 'UNKNOWN', 'FAILED', 'VERIFIED')", name="posting_status"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    tenant_id: Mapped[str] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    account_set_id: Mapped[str] = mapped_column(ForeignKey("account_sets.id", ondelete="RESTRICT"), nullable=False)
+    voucher_draft_id: Mapped[str] = mapped_column(ForeignKey("voucher_drafts.id", ondelete="RESTRICT"), nullable=False)
+    voucher_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(200), nullable=False)
+    request_digest: Mapped[str] = mapped_column(String(64), nullable=False)
+    request_payload: Mapped[dict] = mapped_column(JSON_DOCUMENT, nullable=False)
+    status: Mapped[str] = mapped_column(String(30), nullable=False, default="SUBMITTING")
+    external_reference: Mapped[str | None] = mapped_column(String(200))
+    message: Mapped[str | None] = mapped_column(Text)
+    created_by: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
 
 class AuditEvent(Base):

@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     storage_dir: Path = BASE_DIR / "storage"
     ocr_model_root: Path = Path.home() / ".cache" / "zhangqing-ai" / "ocr-models"
     max_upload_bytes: int = 12 * 1024 * 1024
+    deepseek_api_key: str = ""
+    deepseek_base_url: str = ""
+    deepseek_model: str = "deepseek-flash"
+    deepseek_timeout_seconds: float = 30
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
