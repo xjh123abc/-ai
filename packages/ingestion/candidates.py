@@ -34,6 +34,7 @@ def document_type_candidate(full_text: str, lines: list[dict] | None = None) -> 
     """Return a conservative rule-based type suggestion with its OCR evidence."""
     compact_text = re.sub(r"\s+", "", full_text)
     rules = (
+        ("REIMBURSEMENT_FORM", ("费用报销单", "差旅费报销单", "报销审批单")),
         ("TAXI_RECEIPT", ("出租汽车", "出租汽军", "出租车客运")),
         ("TOLL_RECEIPT", ("通行费票据", "车辆通行费")),
         ("BANK_RECEIPT", ("网上银行电子回单", "银行电子回单", "电子回单号码")),

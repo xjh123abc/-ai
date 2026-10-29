@@ -8,7 +8,8 @@ type EventRow = { id: string; event_type: string; party_name: string | null; sta
 type Draft = { id: string; event_id: string; version: number; status: string; period: string; debit_total: string; credit_total: string; policy?: Record<string, unknown>; validations?: { code: string; passed: boolean; required_fields?: Record<string, string[]>; reason?: string }[]; lines: { account_code: string; account_name: string; debit: string; credit: string; description?: string; rationale?: string; auxiliary: Record<string, string>; auxiliary_text?: string; required_auxiliary_fields?: string[]; evidence_refs: string[] }[] }
 type CaseRow = { id: string; event_id: string | null; type: string; status: string; severity: string; details: Record<string, unknown>; source_refs: string[] }
 type CaseDetail = CaseRow & { event_status: string; findings: Record<string, unknown>[]; source_documents: { id: string; filename: string; role: string; extraction_version: number | null; mime_type: string }[]; unavailable_source_count: number; assignees: BusinessUserOption[]; audit_trail: { actor: string; event_type: string; occurred_at: string }[] }
-type EventDetail = { id: string; event_type: string; status: string; amount: string | null; findings: Record<string, unknown>[]; rental_direct_expense_confirmed?: boolean; rental_direct_expense_confirmed_by?: string | null; rental_direct_expense_policy_version?: string | null; documents: { id: string; filename: string; role: string; extraction_version: number }[] }
+type EventDetail = { id: string; version: number; event_type: string; status: string; amount: string | null; findings: Record<string, unknown>[]; rental_direct_expense_confirmed?: boolean; rental_direct_expense_confirmed_by?: string | null; rental_direct_expense_policy_version?: string | null; documents: { id: string; filename: string; role: string; extraction_version: number }[] }
+type DocumentSuggestion = { document_id: string; filename: string; role: string; document_type: string; score: number; reasons: string[] }
 type ArchiveDocument = { id: string; filename: string; role: string; extraction_version: number; mimeType: string; url: string; extraction: { document_type: string; fields: Record<string, ExtractedField>; full_text: string; provider: string; model_version: string } | null }
 type ScopeOption = { membership_id: string; tenant_id: string; account_set_id: string; tenant_name: string; account_set_name: string; role: string }
 type BusinessUserOption = { user_id: string; email: string; display_name: string }
@@ -78,6 +79,11 @@ const message = ref('')
 const activeView = ref('workspace')
 const eventId = ref('')
 const eventDetail = ref<EventDetail | null>(null)
+const appendDocumentId = ref('')
+const appendCandidates = ref<Doc[]>([])
+const appendCandidatesPage = ref(1)
+const appendCandidatesTotal = ref(0)
+const documentSuggestions = ref<DocumentSuggestion[]>([])
 const draft = ref<Draft | null>(null)
 const editingVoucher = ref(false)
 const voucherLines = ref<Draft['lines']>([])
@@ -225,12 +231,13 @@ async function showOriginalAiDraft() {
 }
 const documentRoleLabel = (role: string) => ({
   INVOICE: '发票', GOODS_RECEIPT: '入库 / 收货凭证', BANK_RECEIPT: '银行回单',
-  CONTRACT: '合同', PAYMENT_PROOF: '支付证明',
+  CONTRACT: '合同', PAYMENT_PROOF: '支付证明', ACCEPTANCE_REPORT: '验收报告',
+  REIMBURSEMENT_FORM: '费用报销单', TAXI_RECEIPT: '出租车票据', TOLL_RECEIPT: '通行费票据',
 } as Record<string, string>)[role] || role
 const documentTypeLabel = (type: string | undefined) => ({
   VAT_INVOICE: '增值税发票', GOODS_RECEIPT: '入库 / 收货单', BANK_RECEIPT: '银行回单',
   CONTRACT: '合同', PAYMENT_PROOF: '支付证明', ACCEPTANCE_REPORT: '验收报告',
-  TAXI_RECEIPT: '出租车票据', TOLL_RECEIPT: '通行费票据',
+  TAXI_RECEIPT: '出租车票据', TOLL_RECEIPT: '通行费票据', REIMBURSEMENT_FORM: '费用报销单',
   UNCLASSIFIED: '未分类', OTHER: '其他文件',
 } as Record<string, string>)[type || 'UNCLASSIFIED'] || type || '未分类'
 const documentFieldKeys: Record<string, string[]> = {
@@ -242,7 +249,26 @@ const documentFieldKeys: Record<string, string[]> = {
   ACCEPTANCE_REPORT: ['acceptance_date', 'acceptance_result'],
   TAXI_RECEIPT: ['invoice_number', 'issue_date', 'gross_amount'],
   TOLL_RECEIPT: ['receipt_number', 'issue_date', 'gross_amount'],
+  REIMBURSEMENT_FORM: ['form_number', 'applicant', 'department', 'purpose', 'application_date', 'gross_amount'],
 }
+const documentRolesByType: Record<string, string> = {
+  VAT_INVOICE: 'INVOICE', GOODS_RECEIPT: 'GOODS_RECEIPT', BANK_RECEIPT: 'BANK_RECEIPT',
+  CONTRACT: 'CONTRACT', PAYMENT_PROOF: 'PAYMENT_PROOF', ACCEPTANCE_REPORT: 'ACCEPTANCE_REPORT',
+  REIMBURSEMENT_FORM: 'REIMBURSEMENT_FORM', TAXI_RECEIPT: 'TAXI_RECEIPT', TOLL_RECEIPT: 'TOLL_RECEIPT',
+}
+const eventRoles: Record<string, string[]> = {
+  PURCHASE: ['INVOICE', 'GOODS_RECEIPT', 'BANK_RECEIPT', 'PAYMENT_PROOF', 'CONTRACT', 'ACCEPTANCE_REPORT'],
+  EXPENSE: ['INVOICE', 'BANK_RECEIPT', 'PAYMENT_PROOF', 'REIMBURSEMENT_FORM', 'TAXI_RECEIPT', 'TOLL_RECEIPT', 'CONTRACT'],
+  ASSET_PURCHASE: ['INVOICE', 'BANK_RECEIPT', 'CONTRACT', 'ACCEPTANCE_REPORT'],
+  RENTAL: ['INVOICE', 'BANK_RECEIPT', 'CONTRACT', 'ACCEPTANCE_REPORT'],
+}
+const appendableDocuments = computed(() => appendCandidates.value.filter((doc) => {
+  const role = documentRolesByType[doc.document_type || '']
+  return eventDetail.value && doc.processing_status === 'CONFIRMED'
+    && role && eventRoles[eventDetail.value.event_type]?.includes(role)
+    && !doc.business_events?.length
+    && !eventDetail.value.documents.some((linked) => linked.id === doc.id)
+}))
 const bankAuxiliaryFieldKeys = ['payer_account_number', 'payee_account_number', 'bank_account_number', 'bank_name', 'electronic_receipt_number', 'transaction_id']
 const documentAuxiliaryFieldKeys: Record<string, string[]> = {
   PAYMENT_PROOF: ['proof_number', ...bankAuxiliaryFieldKeys],
@@ -285,6 +311,7 @@ const fieldLabel = (key: string) => ({
   bank_name: '开户银行',
   electronic_receipt_number: '电子回单号', transaction_id: '交易流水号',
   acceptance_date: '验收日期', acceptance_result: '验收结论',
+  form_number: '报销单号', applicant: '报销人', department: '部门', application_date: '申请日期',
 }[key] || key)
 function documentFieldLabel(key: string, documentType: string) {
   if (key === 'receipt_number' && documentType === 'TOLL_RECEIPT') return '票据号码'
@@ -710,7 +737,7 @@ async function retryUpload(item: UploadItem) {
 function toggle(id: string) {
   if (selected.value.includes(id)) { selected.value = selected.value.filter((value) => value !== id); return }
   const type = docs.value.find((document) => document.id === id)?.document_type
-  const role = ({ VAT_INVOICE: 'INVOICE', GOODS_RECEIPT: 'GOODS_RECEIPT', BANK_RECEIPT: 'BANK_RECEIPT', CONTRACT: 'CONTRACT', PAYMENT_PROOF: 'PAYMENT_PROOF' } as Record<string, string>)[type || '']
+  const role = documentRolesByType[type || '']
   if (!role) { message.value = '请先确认这张单据的类型，再关联业务。'; return }
   roles.value[id] = role
   selected.value = [...selected.value, id]
@@ -797,7 +824,7 @@ function ensureReviewFields(document: Doc) {
   if (form.type === 'BANK_RECEIPT' && form.fields.settled) {
     form.fields.settled.normalized_value = canonicalSettlementValue(form.fields.settled.normalized_value)
   }
-  const dateKey = ({ VAT_INVOICE: 'issue_date', GOODS_RECEIPT: 'receipt_date', BANK_RECEIPT: 'settlement_date', PAYMENT_PROOF: 'payment_date', CONTRACT: 'contract_date', ACCEPTANCE_REPORT: 'acceptance_date' } as Record<string, string>)[form.type]
+  const dateKey = ({ VAT_INVOICE: 'issue_date', GOODS_RECEIPT: 'receipt_date', BANK_RECEIPT: 'settlement_date', PAYMENT_PROOF: 'payment_date', CONTRACT: 'contract_date', ACCEPTANCE_REPORT: 'acceptance_date', REIMBURSEMENT_FORM: 'application_date' } as Record<string, string>)[form.type]
   const genericDate = form.fields.issue_date
   if (dateKey && dateKey !== 'issue_date' && !['PAYMENT_PROOF', 'BANK_RECEIPT', 'GOODS_RECEIPT', 'ACCEPTANCE_REPORT'].includes(form.type) && !form.fields[dateKey]?.normalized_value && genericDate?.normalized_value) {
     form.fields[dateKey] = { ...genericDate }
@@ -822,10 +849,11 @@ async function confirm(document: Doc) {
 }
 
 async function linkDocs() {
-  if (selected.value.length < 2 || selected.value.some((id) => !roles.value[id])) { message.value = '请至少选择两份已确认类型的单据。'; return }
+  if (!selected.value.length || selected.value.some((id) => !roles.value[id])) { message.value = '请至少选择一份已确认类型的单据。'; return }
+  if (selected.value.some((id) => !eventRoles[selectedEventType.value].includes(roles.value[id]))) { message.value = '所选资料不适用于当前业务类型，请重新选择。'; return }
   busy.value = true
   try {
-    const response = await api('/api/v1/business-events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_type: selectedEventType.value, document_ids: selected.value, roles: selected.value.map((id) => roles.value[id]), reason: '由操作人明确选择关联；需逐份确认单据字段', rental_direct_expense_confirmed: selectedEventType.value === 'RENTAL' && rentalDirectExpenseConfirmed.value }) })
+    const response = await api('/api/v1/business-events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_type: selectedEventType.value, document_ids: selected.value, roles: selected.value.map((id) => roles.value[id]), reason: '由操作人明确选择关联；需逐份确认单据字段', allow_incomplete: true, rental_direct_expense_confirmed: selectedEventType.value === 'RENTAL' && rentalDirectExpenseConfirmed.value }) })
     const body = await response.json()
     if (!response.ok) throw new Error(body.detail)
     eventId.value = body.id
@@ -844,11 +872,61 @@ async function linkDocs() {
   finally { busy.value = false }
 }
 
+async function appendDocumentToEvent(candidateId?: string) {
+  const documentId = candidateId || appendDocumentId.value
+  if (!eventDetail.value || !documentId) return
+  const item = appendableDocuments.value.find((doc) => doc.id === documentId)
+  const suggestion = documentSuggestions.value.find((candidate) => candidate.document_id === documentId)
+  const role = item ? documentRolesByType[item.document_type || ''] : suggestion?.role
+  if (!role) { message.value = '请选择当前账套中一份已确认且未关联的单据。'; return }
+  busy.value = true
+  try {
+    const id = eventDetail.value.id
+    const response = await api(`/api/v1/business-events/${id}/documents`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ document_id: documentId, role,
+        expected_version: eventDetail.value.version, reason: '财务人员确认后续到达单据属于该业务' }),
+    })
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.detail || '追加单据失败')
+    const check = await api(`/api/v1/business-events/${id}/reconcile`, { method: 'POST' })
+    const result = await check.json()
+    appendDocumentId.value = ''
+    await load()
+    await selectEvent(id)
+    message.value = check.ok
+      ? `已追加 ${item?.filename || suggestion?.filename}；业务已重新核对：${businessStatusLabel(result.status)}。`
+      : `单据已追加，但自动核对未完成：${result.detail || '请手动重试核对'}`
+  } catch (error) { message.value = error instanceof Error ? error.message : String(error) }
+  finally { busy.value = false }
+}
+
+async function loadAppendCandidates(page = 1) {
+  const response = await api(`/api/v1/documents?work_queue=true&page=${page}&page_size=100`)
+  if (!response.ok) return
+  const result = await response.json() as PageResult<Doc>
+  appendCandidates.value = result.items
+  appendCandidatesPage.value = page
+  appendCandidatesTotal.value = result.total
+  appendDocumentId.value = ''
+}
+
+async function loadDocumentSuggestions(id: string) {
+  const response = await api(`/api/v1/business-events/${id}/document-suggestions`)
+  documentSuggestions.value = response.ok ? (await response.json()).items as DocumentSuggestion[] : []
+}
+
 async function selectEvent(id: string) {
   eventId.value = id
   const response = await api(`/api/v1/business-events/${id}`)
   if (!response.ok) { message.value = '读取业务详情失败，请检查权限或网络后重试。'; return }
   eventDetail.value = await response.json()
+  if (currentRole.value !== 'BUSINESS_USER') {
+    await Promise.all([loadAppendCandidates(), loadDocumentSuggestions(id)])
+  } else {
+    appendCandidates.value = []
+    documentSuggestions.value = []
+  }
   eventAssignments.value = []
   if (currentRole.value === 'TENANT_ADMIN') {
     const assignmentResponse = await api(`/api/v1/business-events/${id}/assignments`)
@@ -1118,7 +1196,7 @@ onBeforeUnmount(() => {
             <div v-if="!docs.length" class="empty-state"><div class="empty-icon">▤</div><strong>当前没有待处理单据</strong><p>已处理单据可在业务档案查看；新单据上传后会出现在这里。</p></div>
             <div v-else class="document-list"><article v-for="document in docs" :key="document.id" class="document-row"><input type="checkbox" :checked="selected.includes(document.id)" @change="toggle(document.id)"><div class="document-thumb"><img v-if="document.mime_type.startsWith('image/') && previews[document.id]" :src="previews[document.id]" alt="单据原件预览"><a v-else-if="previews[document.id]" :href="previews[document.id]" target="_blank" rel="noreferrer">{{ document.mime_type === 'application/pdf' ? 'PDF' : document.mime_type === 'text/csv' ? 'CSV' : 'XLSX' }}</a><span v-else>文件</span></div><div class="document-main"><strong>{{ document.filename }}</strong><small>{{ documentTypeLabel(document.document_type) }} · {{ document.uploaded_at ? new Date(document.uploaded_at).toLocaleString('zh-CN') : '上传时间未提供' }} · 来源 {{ document.uploaded_by || '未知' }}</small><small>关键金额：{{ document.key_amount ? `¥ ${Number(document.key_amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}` : '未识别' }} · {{ document.id.slice(0, 8) }}</small><div class="document-business-links"><span v-if="!document.business_events?.length">未关联业务</span><button v-for="business in document.business_events" :key="business.id" class="table-link" @click.stop="activeView = 'business'; selectEvent(business.id)">业务 {{ business.id.slice(0, 8) }} · {{ documentRoleLabel(business.role) }} · {{ businessStatusLabel(business.status) }}</button></div><small v-if="document.missing_fields?.length">缺少字段：{{ document.missing_fields.map((field) => documentFieldLabel(field, document.document_type || '')).join('、') }}</small></div><span class="status-pill" :class="`status-${document.processing_status.toLowerCase()}`">{{ statusLabel(document.processing_status) }}</span><button class="button button-quiet" @click="inspect(document)">{{ editing[document.id] ? '收起字段' : '查看并确认字段' }}</button></article>
               <div v-for="document in docs.filter((item) => editing[item.id])" :key="`edit-${document.id}`" class="field-editor">
-                <div class="field-editor-heading"><div><strong>核对识别字段</strong><small>点击字段查看它在原件中的位置；没有定位证据时会明确显示。</small></div><button class="text-button" @click="browseOriginal(document.id)">浏览原件</button><select v-model="editing[document.id].type" class="document-type-select" aria-label="单据类型" @change="ensureReviewFields(document)"><option v-for="type in ['UNCLASSIFIED', 'VAT_INVOICE', 'GOODS_RECEIPT', 'BANK_RECEIPT', 'CONTRACT', 'PAYMENT_PROOF', 'ACCEPTANCE_REPORT', 'TAXI_RECEIPT', 'TOLL_RECEIPT', 'OTHER']" :key="type" :value="type">{{ documentTypeLabel(type) }}</option></select></div>
+                <div class="field-editor-heading"><div><strong>核对识别字段</strong><small>点击字段查看它在原件中的位置；没有定位证据时会明确显示。</small></div><button class="text-button" @click="browseOriginal(document.id)">浏览原件</button><select v-model="editing[document.id].type" class="document-type-select" aria-label="单据类型" @change="ensureReviewFields(document)"><option v-for="type in ['UNCLASSIFIED', 'VAT_INVOICE', 'GOODS_RECEIPT', 'BANK_RECEIPT', 'CONTRACT', 'PAYMENT_PROOF', 'ACCEPTANCE_REPORT', 'REIMBURSEMENT_FORM', 'TAXI_RECEIPT', 'TOLL_RECEIPT', 'OTHER']" :key="type" :value="type">{{ documentTypeLabel(type) }}</option></select></div>
                 <div v-if="editing[document.id].typeCandidate?.normalized_value" class="document-type-suggestion"><span>类型建议：{{ documentTypeLabel(editing[document.id].typeCandidate?.normalized_value || undefined) }} · {{ editing[document.id].typeCandidate?.evidence_text ? `识别依据：${editing[document.id].typeCandidate?.evidence_text}` : '需对照原件确认' }}</span><button class="text-button" @click="applyDocumentTypeSuggestion(document)">采用建议</button></div>
                 <div v-if="evidenceSelection?.documentId === document.id" class="source-preview-panel">
                   <div v-if="evidencePreview?.documentId === document.id" class="source-preview-canvas">
@@ -1159,6 +1237,22 @@ onBeforeUnmount(() => {
 
         <template v-else-if="activeView === 'business'">
           <section class="welcome-row"><div><p class="eyebrow">业务中心</p><h1>业务关联与核对</h1><p class="page-subtitle">每条记录代表一笔由操作人明确关联的业务。</p></div><button class="button button-primary" @click="openUpload">＋ 上传并建立业务</button></section>
+          <section v-if="eventDetail && currentRole !== 'BUSINESS_USER'" class="content-card late-document-panel">
+            <div class="card-heading"><div><h2>后到单据 · 智能归集建议</h2><p>业务 {{ eventDetail.id.slice(0, 8) }} · {{ eventTypeLabel(eventDetail.event_type) }}。单据可乱序到达；系统只推荐候选，关联由财务人员确认。</p></div></div>
+            <div v-if="documentSuggestions.length" class="document-suggestion-list">
+              <article v-for="suggestion in documentSuggestions" :key="suggestion.document_id" class="document-suggestion-row">
+                <div><strong>{{ documentTypeLabel(suggestion.document_type) }} · {{ suggestion.filename }}</strong><small>匹配线索：{{ suggestion.reasons.join('、') }} · 规则排序分 {{ suggestion.score }}（非概率）</small></div>
+                <button class="button button-secondary" :disabled="busy" @click="appendDocumentToEvent(suggestion.document_id)">人工确认关联</button>
+              </article>
+            </div>
+            <p v-else class="late-document-note">暂无线索足够的候选。也可手动选择已确认单据；仅凭金额相同不会给出推荐。</p>
+            <div class="assignment-controls late-document-controls">
+              <select v-model="appendDocumentId" aria-label="手动选择后到单据"><option value="">手动选择已确认、未关联的单据</option><option v-for="document in appendableDocuments" :key="document.id" :value="document.id">{{ documentTypeLabel(document.document_type) }} · {{ document.filename }}</option></select>
+              <button class="button button-primary" :disabled="busy || !appendDocumentId" @click="appendDocumentToEvent()">追加并重新核对</button>
+            </div>
+            <div v-if="appendCandidatesTotal > 100" class="pagination"><button :disabled="appendCandidatesPage === 1" @click="loadAppendCandidates(appendCandidatesPage - 1)">上一页</button><span>可选单据第 {{ appendCandidatesPage }} / {{ Math.ceil(appendCandidatesTotal / 100) }} 页</span><button :disabled="appendCandidatesPage * 100 >= appendCandidatesTotal" @click="loadAppendCandidates(appendCandidatesPage + 1)">下一页</button></div>
+            <p class="late-document-note">当前为人工确认归集。已经生成凭证的业务不直接改变历史证据；请先复核凭证版本。</p>
+          </section>
           <section class="business-layout"><div class="content-card business-list"><div class="card-heading"><div><h2>待处理业务</h2><p>{{ eventTotal }} 笔业务</p></div><div v-if="canSubmitVoucher" class="business-bulk-actions"><button class="text-button" @click="selectBusinessPage" :disabled="!events.length">{{ pagedEvents.every((item) => selectedBusinessIds.includes(item.id)) ? '取消本页全选' : '全选本页' }}</button><button class="button button-quiet" @click="deleteSelectedBusinesses" :disabled="!selectedBusinessIds.length">删除选中（{{ selectedBusinessIds.length }}）</button></div></div><div v-if="!events.length" class="empty-state compact"><strong>暂无业务记录</strong><p>先确认单据类型和字段，再建立关联。</p><button class="button button-secondary" @click="openUpload">前往单据中心</button></div><div v-for="item in pagedEvents" :key="item.id" class="business-list-row"><input v-if="canSubmitVoucher" v-model="selectedBusinessIds" type="checkbox" :value="item.id" :aria-label="`选择业务 ${item.id.slice(0, 8)}`"><button class="business-list-item" :class="{ selected: eventId === item.id }" @click="selectEvent(item.id)"><span><strong>业务 {{ item.id.slice(0, 8) }} · {{ eventTypeLabel(item.event_type) }}</strong><small>{{ item.document_count }} 份关联单据 · {{ item.amount ? `¥${item.amount}` : '金额待核对' }}</small></span><span class="status-pill">{{ businessStatusLabel(item.status) }}</span></button></div><div v-if="businessPages > 1" class="pagination"><button @click="changePage('business', Math.max(1, businessPage - 1))" :disabled="businessPage === 1">上一页</button><span>{{ businessPage }} / {{ businessPages }}</span><button @click="changePage('business', Math.min(businessPages, businessPage + 1))" :disabled="businessPage === businessPages">下一页</button></div></div>
             <section class="content-card detail-card"><template v-if="eventDetail"><div class="card-heading"><div><p class="eyebrow">业务详情</p><h2>{{ eventTypeLabel(eventDetail.event_type) }} {{ eventDetail.id.slice(0, 8) }}</h2><p>{{ eventDetail.amount ? `业务金额 ¥${Number(eventDetail.amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}` : '金额待核对' }} · {{ businessStatusLabel(eventDetail.status) }}</p></div><span class="status-pill">{{ businessStatusLabel(eventDetail.status) }}</span></div><p v-if="eventDetail.event_type === 'RENTAL'" class="rental-confirmation-status">直接费用确认：{{ eventDetail.rental_direct_expense_confirmed ? `已由 ${eventDetail.rental_direct_expense_confirmed_by} 按 ${eventDetail.rental_direct_expense_policy_version} 确认` : '尚未确认，业务不能生成凭证' }}</p><h3>关联证据</h3><div class="evidence-timeline"><div v-for="document in eventDetail.documents" :key="document.id" class="evidence-item"><span class="timeline-dot"></span><div><strong>{{ documentRoleLabel(document.role) }}</strong><small>{{ document.filename }} · 人工确认版本 {{ document.extraction_version }}</small></div><button class="text-button" @click="activeView = 'documents'">查看单据</button></div></div><section v-if="currentRole === 'TENANT_ADMIN'" class="assignment-panel"><div><h3>业务负责人</h3><p>被指派的业务人员可以查看这笔业务及其关联单据。</p></div><div class="assignment-controls"><select v-model="selectedAssignee" aria-label="选择业务负责人"><option value="">选择业务人员</option><option v-for="person in businessUsers" :key="person.user_id" :value="person.user_id">{{ person.display_name }}（{{ person.email }}）</option></select><button class="button button-secondary" @click="assignBusinessUser" :disabled="!selectedAssignee">指派</button></div><div v-if="eventAssignments.length" class="assignment-list"><div v-for="person in eventAssignments" :key="person.user_id"><span>{{ person.display_name }} · {{ person.email }}</span><button class="text-button" @click="unassignBusinessUser(person.user_id)">取消指派</button></div></div><p v-else class="assignment-empty">尚未指派业务人员</p></section><h3>核对结果</h3><div v-if="eventDetail.findings?.length" class="finding-list"><div v-for="(finding, index) in eventDetail.findings" :key="index" class="finding-item"><span :class="['BLOCKING', 'REVIEW'].includes(String(finding.severity)) ? 'attention-mark' : 'check-mark'">{{ finding.severity === 'BLOCKING' ? '!' : finding.severity === 'REVIEW' ? '?' : '✓' }}</span><span>{{ findingLabel(finding) }}<small v-if="finding.role"> · {{ finding.role }}</small><small v-if="finding.code === 'BANK_SETTLEMENT_NOT_CONFIRMED'">银行回单标记为未清算，须到账后按原件复核；保存后重新核对。</small><small v-if="finding.code === 'BANK_SETTLEMENT_STATUS_UNKNOWN'">请对照银行回单确认状态；无法确认时业务保持待复核。</small><small v-if="finding.code === 'EXPENSE_ACCOUNT_POLICY_REVIEW_REQUIRED'">需要财务负责人确认费用科目政策。保存政策后需要重新核对。</small></span><button v-if="['BANK_SETTLEMENT_NOT_CONFIRMED', 'BANK_SETTLEMENT_STATUS_UNKNOWN'].includes(String(finding.code)) && currentRole !== 'BUSINESS_USER'" class="text-button" @click="resolveBankSettlement">核对银行回单 →</button><button v-if="finding.code === 'EXPENSE_ACCOUNT_POLICY_REVIEW_REQUIRED' && canManageAccountingPolicy" class="text-button" @click="resolveExpensePolicy">设置费用报销政策 →</button><small v-if="finding.code === 'EXPENSE_ACCOUNT_POLICY_REVIEW_REQUIRED' && !canManageAccountingPolicy">请联系账套管理员或会计设置费用报销政策。</small></div></div><div v-else class="quiet-empty"><span class="check-mark">i</span><div><strong>尚无核对明细</strong><p>请重跑核对以查看金额、主体、收货和结算证据检查结果。</p></div></div><div class="detail-footer"><span>{{ currentRole === 'BUSINESS_USER' ? '当前仅展示已指派业务；核对和制证由财务角色处理。' : '只有核对通过且证据充分时才能生成凭证。' }}</span><div v-if="currentRole !== 'BUSINESS_USER'" class="action-row"><button class="button button-quiet" @click="rerunReconciliation" :disabled="busy">重新运行核对</button><button class="button button-primary" @click="makeVoucher" :disabled="busy || eventDetail.status !== 'MATCHED'">生成凭证草稿</button></div></div></template><div v-else class="empty-state"><strong>选择一笔业务查看详情</strong><p>这里会显示关联单据、核对结果和可执行的下一步。</p></div></section></section>
         </template>

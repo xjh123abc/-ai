@@ -23,6 +23,8 @@ from ai.suggestions import (AccountingSuggestionProvider, DeepSeekAccountingSugg
     SOURCE_FACT_FIELDS, SuggestedAccount, SuggestionProviderError, VoucherSuggestionContext)
 from app.security import Principal, current_principal, require
 from domain.settlement import normalize_bank_settlement_state
+from domain.document_registry import EVENT_DOCUMENT_ROLES, ROLE_DOCUMENT_TYPES, role_allowed
+from domain.document_matching import match_document_candidate
 from app.structured_files import extract_csv, extract_xlsx
 from ingestion.candidates import field_candidates, normalize_date_value
 from connectors.csv_export import GenericCsvVoucherExporter, VoucherExportData, VoucherExportLine
@@ -155,6 +157,7 @@ DOCUMENT_TYPE_FIELDS = {
     "ACCEPTANCE_REPORT": {"acceptance_date", "acceptance_result"},
     "TAXI_RECEIPT": {"invoice_number", "issue_date", "gross_amount"},
     "TOLL_RECEIPT": {"receipt_number", "issue_date", "gross_amount"},
+    "REIMBURSEMENT_FORM": {"form_number", "applicant", "department", "purpose", "application_date", "gross_amount"},
 }
 AUXILIARY_FIELD_KEYS = {"payer_account_number", "payee_account_number", "bank_account_number",
                         "bank_name", "electronic_receipt_number", "transaction_id"}
@@ -275,6 +278,7 @@ def list_documents(page: int = Query(default=1, ge=1), page_size: int = Query(de
         "ACCEPTANCE_REPORT": ("acceptance_date", "acceptance_result"),
         "TAXI_RECEIPT": ("invoice_number", "issue_date", "gross_amount"),
         "TOLL_RECEIPT": ("receipt_number", "gross_amount"),
+        "REIMBURSEMENT_FORM": ("form_number", "applicant", "purpose", "gross_amount"),
     }
     def candidate_value(fields: dict, key: str):
         value = fields.get(key)
@@ -481,7 +485,7 @@ def confirm_fields(document_id: str, body: ConfirmFields, db: Session = Depends(
             normalized_value = normalize_bank_settlement_state(value)
             if normalized_value is None:
                 raise HTTPException(422, "银行清算状态只能是已清算、未清算或无法确认")
-        if key in {"issue_date", "receipt_date", "settlement_date", "payment_date", "acceptance_date"}:
+        if key in {"issue_date", "receipt_date", "settlement_date", "payment_date", "acceptance_date", "application_date"}:
             normalized_value, _ = normalize_date_value(str(value))
             normalized_value = normalized_value or value
         fields[key] = {"raw_value": value, "normalized_value": normalized_value, "confidence": 1.0,
@@ -492,7 +496,7 @@ def confirm_fields(document_id: str, body: ConfirmFields, db: Session = Depends(
                        "previous_value": fields.get(key, {}).get("normalized_value"), "reason": body.reason}
     canonical_date_key = {"VAT_INVOICE": "issue_date", "GOODS_RECEIPT": "receipt_date",
                           "BANK_RECEIPT": "settlement_date", "PAYMENT_PROOF": "payment_date",
-                          "ACCEPTANCE_REPORT": "acceptance_date"}.get(body.document_type)
+                          "ACCEPTANCE_REPORT": "acceptance_date", "REIMBURSEMENT_FORM": "application_date"}.get(body.document_type)
     if canonical_date_key and not fields.get(canonical_date_key, {}).get("normalized_value"):
         candidate = fields.get("issue_date", {})
         candidate_value = candidate.get("normalized_value")
@@ -511,11 +515,12 @@ def confirm_fields(document_id: str, body: ConfirmFields, db: Session = Depends(
             "fields": public_extraction_fields(new.fields)[0]}
 
 class EventCreate(BaseModel):
-    document_ids: list[str] = Field(min_length=2, max_length=20)
-    roles: list[str] = Field(min_length=2, max_length=20)
+    document_ids: list[str] = Field(min_length=1, max_length=20)
+    roles: list[str] = Field(min_length=1, max_length=20)
     event_type: str = "PURCHASE"
     reason: str = Field(min_length=5, max_length=500)
     rental_direct_expense_confirmed: bool = False
+    allow_incomplete: bool = False
 
 class EventAssignmentBody(BaseModel):
     email: str = Field(min_length=3, max_length=320, pattern=r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
@@ -540,8 +545,12 @@ def list_business_event_assignments(event_id: str, db: Session = Depends(db_sess
 def create_event(body: EventCreate, db: Session = Depends(db_session), who: str = Depends(actor), principal: Principal = Depends(current_principal)):
     require(principal, "reconcile")
     tenant, account = active_scope(db, principal)
-    if body.event_type not in {"PURCHASE", "EXPENSE", "ASSET_PURCHASE", "RENTAL"}:
+    if body.event_type not in EVENT_DOCUMENT_ROLES:
         raise HTTPException(422, "暂不支持此业务类型")
+    if len(body.document_ids) < 2 and not body.allow_incomplete:
+        raise HTTPException(422, "常规关联至少需要两份单据；单据陆续到达时请明确允许建立待补充业务")
+    if any(not role_allowed(body.event_type, role) for role in body.roles):
+        raise HTTPException(422, "当前业务类型不支持所选单据角色")
     if body.event_type == "RENTAL" and body.rental_direct_expense_confirmed:
         require(principal, "manage_accounting_policy")
     request_hash = hashlib.sha256(json.dumps(body.model_dump(mode="json"), sort_keys=True,
@@ -553,13 +562,11 @@ def create_event(body: EventCreate, db: Session = Depends(db_session), who: str 
     if previous_request is not None:
         return {"id": previous_request.id, "status": previous_request.status,
                 "documents": [link.document_id for link in previous_request.documents], "idempotent_replay": True}
-    if body.event_type == "EXPENSE" and ("PAYMENT_PROOF" not in body.roles or "GOODS_RECEIPT" in body.roles):
+    if body.event_type == "EXPENSE" and not body.allow_incomplete and "PAYMENT_PROOF" not in body.roles:
         raise HTTPException(422, "费用报销需要支付证明，且不能关联入库单")
-    if body.event_type == "ASSET_PURCHASE" and ("INVOICE" not in body.roles or "BANK_RECEIPT" not in body.roles
-            or "GOODS_RECEIPT" in body.roles or "PAYMENT_PROOF" in body.roles):
+    if body.event_type == "ASSET_PURCHASE" and not body.allow_incomplete and ("INVOICE" not in body.roles or "BANK_RECEIPT" not in body.roles):
         raise HTTPException(422, "设备购置需关联发票和银行回单，不能混入入库单或支付证明")
-    if body.event_type == "RENTAL" and ("INVOICE" not in body.roles or "BANK_RECEIPT" not in body.roles
-            or "GOODS_RECEIPT" in body.roles or "PAYMENT_PROOF" in body.roles):
+    if body.event_type == "RENTAL" and not body.allow_incomplete and ("INVOICE" not in body.roles or "BANK_RECEIPT" not in body.roles):
         raise HTTPException(422, "租赁业务需关联发票和银行回单，不能混入入库单或支付证明")
     if len(body.document_ids) != len(body.roles) or len(set(body.document_ids)) != len(body.document_ids): raise HTTPException(422, "单据与角色必须一一对应且不可重复")
     docs = db.scalars(select(DocumentAsset).where(DocumentAsset.id.in_(body.document_ids), DocumentAsset.tenant_id == tenant.id, DocumentAsset.account_set_id == account.id)).all()
@@ -659,8 +666,120 @@ def unassign_business_user(event_id: str, user_id: str, db: Session = Depends(db
     return {"event_id":event.id,"user_id":user_id,"status":"UNASSIGNED"}
 
 def role_type(role: str) -> str | None:
-    return {"INVOICE":"VAT_INVOICE", "GOODS_RECEIPT":"GOODS_RECEIPT", "BANK_RECEIPT":"BANK_RECEIPT",
-            "PAYMENT_PROOF":"PAYMENT_PROOF", "CONTRACT":"CONTRACT"}.get(role)
+    return ROLE_DOCUMENT_TYPES.get(role)
+
+
+class EventDocumentAppend(BaseModel):
+    document_id: str
+    role: str
+    expected_version: int = Field(ge=1)
+    reason: str = Field(min_length=5, max_length=500)
+
+
+@router.get("/business-events/{event_id}/document-suggestions")
+def suggest_event_documents(event_id: str, limit: int = Query(default=8, ge=1, le=30),
+                            db: Session = Depends(db_session), principal: Principal = Depends(current_principal)):
+    """Offer evidence-backed hints, never write or silently associate source documents."""
+    require(principal, "reconcile")
+    tenant, account = active_scope(db, principal)
+    event = db.scalar(select(BusinessEvent).where(
+        BusinessEvent.id == event_id, BusinessEvent.tenant_id == tenant.id,
+        BusinessEvent.account_set_id == account.id))
+    if event is None:
+        raise HTTPException(404, "业务不存在")
+    linked = db.execute(select(BusinessEventDocument, DocumentExtraction).join(
+        DocumentExtraction, (DocumentExtraction.document_id == BusinessEventDocument.document_id) &
+        (DocumentExtraction.version == BusinessEventDocument.extraction_version)).where(
+        BusinessEventDocument.event_id == event.id, DocumentExtraction.status == "CONFIRMED")).all()
+    existing = [(link.role, extraction.fields) for link, extraction in linked]
+    if not existing:
+        return {"items": [], "scanned_count": 0, "scan_limit": 200}
+
+    linked_in_account = (select(BusinessEventDocument.document_id)
+        .join(BusinessEvent, BusinessEvent.id == BusinessEventDocument.event_id)
+        .where(BusinessEvent.tenant_id == tenant.id, BusinessEvent.account_set_id == account.id))
+    latest = (select(DocumentExtraction.document_id,
+        func.max(DocumentExtraction.version).label("latest_version"))
+        .group_by(DocumentExtraction.document_id).subquery())
+    rows = db.execute(select(DocumentAsset, DocumentExtraction)
+        .join(latest, latest.c.document_id == DocumentAsset.id)
+        .join(DocumentExtraction, (DocumentExtraction.document_id == latest.c.document_id) &
+              (DocumentExtraction.version == latest.c.latest_version))
+        .where(DocumentAsset.tenant_id == tenant.id, DocumentAsset.account_set_id == account.id,
+               DocumentAsset.processing_status == "CONFIRMED",
+               DocumentAsset.id.not_in(linked_in_account), DocumentExtraction.status == "CONFIRMED")
+        .order_by(DocumentAsset.uploaded_at.desc(), DocumentAsset.id).limit(200)).all()
+    suggestions = []
+    for document, extraction in rows:
+        role = next((role for role, document_type in ROLE_DOCUMENT_TYPES.items()
+            if document_type == extraction.document_type and role_allowed(event.event_type, role)), None)
+        if role is None:
+            continue
+        ranking = match_document_candidate(existing, extraction.fields)
+        if ranking is None:
+            continue
+        suggestions.append({"document_id": document.id, "filename": document.original_filename,
+            "role": role, "document_type": extraction.document_type, **ranking})
+    suggestions.sort(key=lambda item: (-item["score"], item["filename"], item["document_id"]))
+    return {"items": suggestions[:limit], "scanned_count": len(rows), "scan_limit": 200}
+
+
+@router.post("/business-events/{event_id}/documents")
+def append_event_document(event_id: str, body: EventDocumentAppend,
+                          db: Session = Depends(db_session), who: str = Depends(actor),
+                          principal: Principal = Depends(current_principal)):
+    """Append a late confirmed document without rewriting previous evidence or vouchers."""
+    require(principal, "reconcile")
+    tenant, account = active_scope(db, principal)
+    event = db.scalar(select(BusinessEvent).where(
+        BusinessEvent.id == event_id, BusinessEvent.tenant_id == tenant.id,
+        BusinessEvent.account_set_id == account.id).with_for_update())
+    if event is None:
+        raise HTTPException(404, "业务不存在")
+    existing = next((link for link in event.documents if link.document_id == body.document_id), None)
+    if existing is not None:
+        if existing.role != body.role:
+            raise HTTPException(409, "该单据已经以其他角色关联本业务")
+        return {"id": event.id, "version": event.version, "status": event.status,
+                "document_id": existing.document_id, "idempotent_replay": True}
+    if event.version != body.expected_version:
+        raise HTTPException(409, "业务版本已变化，请刷新后重试")
+    if not role_allowed(event.event_type, body.role):
+        raise HTTPException(422, "当前业务类型不支持所选单据角色")
+    if len(event.documents) >= 20:
+        raise HTTPException(422, "本业务关联单据已达到上限")
+    document = db.scalar(select(DocumentAsset).where(
+        DocumentAsset.id == body.document_id, DocumentAsset.tenant_id == tenant.id,
+        DocumentAsset.account_set_id == account.id))
+    if document is None:
+        raise HTTPException(404, "单据不存在")
+    extraction = db.scalar(select(DocumentExtraction).where(
+        DocumentExtraction.document_id == document.id).order_by(DocumentExtraction.version.desc()).limit(1))
+    if extraction is None or extraction.status != "CONFIRMED":
+        raise HTTPException(409, "新单据尚未人工确认字段")
+    if extraction.document_type != role_type(body.role):
+        raise HTTPException(422, "新单据的已确认类型与关联角色不一致")
+    active_draft = db.scalar(select(VoucherDraft.id).where(
+        VoucherDraft.event_id == event.id, VoucherDraft.status != "REJECTED").limit(1))
+    if active_draft is not None:
+        raise HTTPException(409, "本业务已有凭证版本；新单据已保存在单据中心，请先人工复核历史凭证")
+    previous = {"version": event.version, "status": event.status,
+                "document_ids": [link.document_id for link in event.documents]}
+    db.add(BusinessEventDocument(event_id=event.id, document_id=document.id,
+        extraction_version=extraction.version, role=body.role, relation_type="USER_CONFIRMED",
+        reason=body.reason, confirmed_by=who))
+    event.version += 1
+    event.status = "NEEDS_REVIEW"
+    event.amount = None
+    event.findings = []
+    audit(db, tenant.id, who, "BUSINESS_EVENT_DOCUMENT_APPENDED", event.id,
+          [document.id], before=previous,
+          after={"version": event.version, "status": event.status,
+                 "document_id": document.id, "extraction_version": extraction.version,
+                 "role": body.role, "reason": body.reason})
+    db.commit()
+    return {"id": event.id, "version": event.version, "status": event.status,
+            "document_id": document.id, "idempotent_replay": False}
 
 @router.post("/business-events/{event_id}/reconcile")
 def reconcile(event_id: str, db: Session = Depends(db_session), who: str = Depends(actor), principal: Principal = Depends(current_principal)):
@@ -716,8 +835,7 @@ def reconcile(event_id: str, db: Session = Depends(db_session), who: str = Depen
         findings.append({"code":"REQUIRED_DOCUMENT_ROLES_MISSING_OR_DUPLICATED",
                          "missing_roles":missing_roles,"duplicated_roles":duplicated_roles,
                          "severity":"BLOCKING"})
-    expected_types={"INVOICE":"VAT_INVOICE","GOODS_RECEIPT":"GOODS_RECEIPT","BANK_RECEIPT":"BANK_RECEIPT",
-                    "PAYMENT_PROOF":"PAYMENT_PROOF","CONTRACT":"CONTRACT"}
+    expected_types=ROLE_DOCUMENT_TYPES
     if any(role not in expected_types or extraction.document_type != expected_types[role]
            for role, extraction in facts):
         findings.append({"code":"DOCUMENT_TYPE_ROLE_CONFLICT","severity":"BLOCKING"})
@@ -1520,7 +1638,7 @@ def get_event(event_id:str,db:Session=Depends(db_session),principal:Principal=De
     event=db.scalar(event_query)
     if not event:raise HTTPException(404,"业务组不存在")
     docs=db.execute(select(BusinessEventDocument,DocumentAsset).join(DocumentAsset,DocumentAsset.id==BusinessEventDocument.document_id).where(BusinessEventDocument.event_id==event.id)).all()
-    return {"id":event.id,"event_type":event.event_type,"status":event.status,"amount":str(event.amount) if event.amount is not None else None,"findings":event.findings,
+    return {"id":event.id,"version":event.version,"event_type":event.event_type,"status":event.status,"amount":str(event.amount) if event.amount is not None else None,"findings":event.findings,
             "rental_direct_expense_confirmed":event.rental_direct_expense_confirmed,
             "rental_direct_expense_confirmed_by":event.rental_direct_expense_confirmed_by,
             "rental_direct_expense_policy_version":event.rental_direct_expense_policy_version,

@@ -15,6 +15,7 @@ from app.db.models import (
     AccountingPeriod,
     AppUser,
     BusinessEvent,
+    AuditEvent,
     ChartAccount,
     DocumentAsset,
     DocumentExtraction,
@@ -206,6 +207,137 @@ def _matched_purchase_event(client, document_ids, invoice_count):
     assert reconciled.status_code == 200
     assert reconciled.json()["status"] == "MATCHED"
     return event_id
+
+
+def _seed_late_document(document_type, fields, *, confirmed=True):
+    """Add an independently arriving document inside the test tenant/account."""
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        account = db.scalar(select(AccountSet))
+        tenant = db.scalar(select(Tenant))
+        document = DocumentAsset(
+            tenant_id=tenant.id, account_set_id=account.id,
+            sha256=uuid4().hex.ljust(64, "0"), original_filename=f"late-{document_type.lower()}.jpg",
+            mime_type="image/jpeg", byte_size=10, storage_key="/tmp/late-fixture.jpg",
+            uploaded_by="workflow-test", processing_status="CONFIRMED" if confirmed else "NEEDS_REVIEW",
+        )
+        db.add(document)
+        db.flush()
+        db.add(DocumentExtraction(
+            document_id=document.id, version=1, document_type=document_type,
+            full_text="fixture", lines=[], fields={key: {"normalized_value": value} for key, value in fields.items()},
+            provider="fixture", model_version="fixture-v1", status="CONFIRMED" if confirmed else "NEEDS_REVIEW",
+            created_by="workflow-test",
+        ))
+        db.commit()
+        return document.id
+    finally:
+        dependency.close()
+
+
+def test_incremental_purchase_handles_out_of_order_append_and_preserves_voucher(workflow_client):
+    client, document_ids, invoice_count, _ = workflow_client
+    initial = {"event_type": "PURCHASE", "document_ids": document_ids[:1],
+               "roles": ["INVOICE"], "reason": "先收到发票，等待后续收货与结算单据"}
+    assert client.post("/api/v1/business-events", json=initial).status_code == 422
+    created = client.post("/api/v1/business-events", json={**initial, "allow_incomplete": True})
+    assert created.status_code == 200, created.text
+    event_id = created.json()["id"]
+    assert client.post(f"/api/v1/business-events/{event_id}/reconcile").json()["status"] == "NEEDS_REVIEW"
+    assert client.get(f"/api/v1/business-events/{event_id}").json()["version"] == 1
+
+    suggestions = client.get(f"/api/v1/business-events/{event_id}/document-suggestions")
+    assert suggestions.status_code == 200, suggestions.text
+    bank_suggestion = next(item for item in suggestions.json()["items"] if item["document_id"] == document_ids[-1])
+    assert bank_suggestion["role"] == "BANK_RECEIPT"
+    assert len(bank_suggestion["reasons"]) >= 2
+    # Read-only suggestions must not silently associate the bank receipt.
+    assert len(client.get(f"/api/v1/business-events/{event_id}").json()["documents"]) == 1
+
+    append_url = f"/api/v1/business-events/{event_id}/documents"
+    appended = client.post(append_url, json={"document_id": document_ids[-1],
+        "role": "BANK_RECEIPT", "expected_version": 1, "reason": "人工查看银行回单原件并确认属于本次采购"})
+    assert appended.status_code == 200, appended.text
+    assert appended.json()["version"] == 2
+    replay = client.post(append_url, json={"document_id": document_ids[-1],
+        "role": "BANK_RECEIPT", "expected_version": 1, "reason": "重试同一次明确关联操作"})
+    assert replay.status_code == 200
+    assert replay.json()["idempotent_replay"] is True
+    stale = client.post(append_url, json={"document_id": document_ids[-2],
+        "role": "GOODS_RECEIPT", "expected_version": 1, "reason": "模拟旧版本并发请求"})
+    assert stale.status_code == 409
+    wrong_role = client.post(append_url, json={"document_id": document_ids[-2],
+        "role": "INVOICE", "expected_version": 2, "reason": "模拟不匹配的单据类型"})
+    assert wrong_role.status_code == 422
+
+    # Receive the goods receipt next and, in a multiple-invoice case, the second invoice last.
+    late_roles = [(document_ids[-2], "GOODS_RECEIPT")]
+    late_roles += [(document_id, "INVOICE") for document_id in document_ids[1:invoice_count]]
+    version = 2
+    for document_id, role in late_roles:
+        response = client.post(append_url, json={"document_id": document_id, "role": role,
+            "expected_version": version, "reason": "财务人工确认后到单据属于该采购业务"})
+        assert response.status_code == 200, response.text
+        version += 1
+    detail = client.get(f"/api/v1/business-events/{event_id}").json()
+    assert detail["version"] == version
+    assert {item["id"] for item in detail["documents"]} == set(document_ids)
+    result = client.post(f"/api/v1/business-events/{event_id}/reconcile")
+    assert result.status_code == 200
+    assert result.json()["status"] == "MATCHED"
+
+    voucher = client.post(f"/api/v1/business-events/{event_id}/voucher-drafts")
+    assert voucher.status_code == 200, voucher.text
+    later_acceptance = _seed_late_document("ACCEPTANCE_REPORT", {"acceptance_date": "2024-12-02"})
+    blocked = client.post(append_url, json={"document_id": later_acceptance,
+        "role": "ACCEPTANCE_REPORT", "expected_version": version, "reason": "该凭证生成之后补到验收报告"})
+    assert blocked.status_code == 409
+    assert len(client.get(f"/api/v1/business-events/{event_id}").json()["documents"]) == len(document_ids)
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        audit_kinds = db.scalars(select(AuditEvent.event_type).where(AuditEvent.entity_ref == event_id)).all()
+        assert audit_kinds.count("BUSINESS_EVENT_DOCUMENT_APPENDED") == len(late_roles) + 1
+    finally:
+        dependency.close()
+
+
+def test_expense_reimbursement_form_can_start_incomplete_case(workflow_client):
+    client, _, _, _ = workflow_client
+    form = _seed_late_document("REIMBURSEMENT_FORM", {
+        "form_number": "BX-1", "applicant": "张三", "application_date": "2024-12-07",
+        "purpose": "出差费用报销", "gross_amount": "4448.00",
+    })
+    proof = _seed_late_document("PAYMENT_PROOF", {
+        "proof_number": "P-1", "payment_date": "2024-12-08", "gross_amount": "4448.00",
+        "purpose": "出差费用报销", "approved": True,
+    })
+    created = client.post("/api/v1/business-events", json={
+        "event_type": "EXPENSE", "document_ids": [form], "roles": ["REIMBURSEMENT_FORM"],
+        "allow_incomplete": True, "reason": "报销申请先到，支付证明后补"})
+    assert created.status_code == 200, created.text
+    event_id = created.json()["id"]
+    suggestions = client.get(f"/api/v1/business-events/{event_id}/document-suggestions")
+    assert suggestions.status_code == 200
+    assert any(item["document_id"] == proof for item in suggestions.json()["items"])
+    bad_role = client.post(f"/api/v1/business-events/{event_id}/documents", json={
+        "document_id": proof, "role": "GOODS_RECEIPT", "expected_version": 1,
+        "reason": "验证费用业务不能混入采购入库角色"})
+    assert bad_role.status_code == 422
+    confirmed = client.post(f"/api/v1/business-events/{event_id}/documents", json={
+        "document_id": proof, "role": "PAYMENT_PROOF", "expected_version": 1,
+        "reason": "已核对支付证明属于该费用报销申请"})
+    assert confirmed.status_code == 200, confirmed.text
+    reconciliation = client.post(f"/api/v1/business-events/{event_id}/reconcile")
+    assert reconciliation.status_code == 200
+    assert reconciliation.json()["status"] == "NEEDS_REVIEW"  # Missing formal settlement evidence.
+    assert client.post(f"/api/v1/business-events/{event_id}/voucher-drafts").status_code == 422
+    unconfirmed = _seed_late_document("TAXI_RECEIPT", {"gross_amount": "66.00"}, confirmed=False)
+    denied = client.post(f"/api/v1/business-events/{event_id}/documents", json={
+        "document_id": unconfirmed, "role": "TAXI_RECEIPT", "expected_version": 2,
+        "reason": "验证未经人工确认的票据不能关联"})
+    assert denied.status_code == 409
 
 
 def test_document_list_shows_only_latest_visible_business_event(workflow_client):
