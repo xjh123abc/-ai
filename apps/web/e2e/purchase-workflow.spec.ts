@@ -31,6 +31,10 @@ const privatePaymentProof = resolve(
   process.cwd(),
   '../../发票账单数据/zhangqing_raw_docs_20261025/02_多票费用报销/03_支付证明_4448.jpg',
 )
+const privateVatSpecialInvoice = resolve(
+  process.cwd(),
+  '../../发票账单数据/zhangqing_raw_docs_20261025/04_补充单据/04_旧版增值税发票_独立样本.jpg',
+)
 const privateExpenseInvoice = resolve(
   process.cwd(),
   '../../发票账单数据/zhangqing_raw_docs_20261025/02_多票费用报销/01_餐饮住宿发票_4448.jpg',
@@ -136,6 +140,10 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
     issue_date: '2024-12-01',
     buyer: '南昌市杰盛科技有限公司',
     seller: '南昌市视维科技公司',
+    item: '教学专用VR眼镜',
+    unit: '副',
+    quantity: '100',
+    unit_price: '400.00',
     net_amount: '40000.00',
     tax_rate: '13%',
     tax_amount: '5200.00',
@@ -161,8 +169,12 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
   await uploadAndConfirm(page, receiptFilename, receiptImage, 'GOODS_RECEIPT', {
     receipt_number: 'NO56784001',
     receipt_date: '2024-12-01',
+    department: '行政部门',
+    source_reference_number: '25165954',
     item: '教学专用VR眼镜',
+    unit: '副',
     quantity: '100',
+    unit_price: '452.00',
     gross_amount: '45200.00',
     received: 'true',
   })
@@ -257,6 +269,10 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
   await expect(page.locator('.entry-table')).toContainText('222101')
   if (!useRealDeepSeek || !acceptOriginalAiDraft) {
     await page.getByRole('button', { name: '修正凭证' }).click()
+    await page.getByRole('combobox', { name: '选择账套科目 3' }).selectOption('1001')
+    await expect(page.getByRole('textbox', { name: '科目编码 3' })).toHaveValue('1001')
+    await expect(page.getByRole('textbox', { name: '会计科目名称 1001' })).toHaveValue('库存现金')
+    await page.getByRole('textbox', { name: '会计科目名称 1001' }).fill('库存现金（人工修正）')
     await page.getByRole('textbox', { name: '摘要' }).first().fill('采购入库设备（浏览器验收修正版）')
     await page.getByPlaceholder('请说明为什么修改这份凭证').fill('浏览器验收：补充清楚的分录摘要')
     await page.getByRole('textbox', { name: '辅助核算 JSON 1405' }).fill('{')
@@ -267,6 +283,8 @@ test('采购单据从上传、人工确认流转到审批和待人工入账导�
     await expect(page.locator('.alert')).toContainText('修正已保存为凭证新版本 V2')
     await expect(page.locator('.voucher-detail .version-tag')).toHaveText('V2')
     await expect(page.locator('.entry-table')).toContainText('采购入库设备（浏览器验收修正版）')
+    await expect(page.locator('.entry-table')).toContainText('1001')
+    await expect(page.locator('.entry-table')).toContainText('库存现金（人工修正）')
     await expect(page.locator('.entry-table')).toContainText('辅助核算')
   } else {
     await expect(page.locator('.voucher-detail .version-tag')).toHaveText('V1')
@@ -344,10 +362,20 @@ test('本地金标发票字段可打开带 bbox 的原件位置', async ({ page 
   await expect(row).toBeVisible({ timeout: 60_000 })
   await row.getByRole('button', { name: '查看并确认字段' }).click()
   const editor = page.locator('.field-editor').last()
-  await expect(editor.locator('.document-type-suggestion')).toContainText('增值税发票')
-  await expect(editor.locator('.document-type-suggestion')).toContainText('发票号码')
+  await expect(editor.locator('.document-type-suggestion')).toContainText('普通发票')
+  await expect(editor.locator('.document-type-suggestion')).toContainText('识别依据：普通发票')
+  const typeSelect = editor.getByRole('combobox', { name: '单据类型' })
+  await expect(typeSelect.locator('option[value="VAT_INVOICE"]')).toHaveText('普通发票')
+  await expect(typeSelect.locator('option[value="VAT_SPECIAL_INVOICE"]')).toHaveText('增值税专用发票')
   await editor.getByRole('button', { name: '采用建议' }).click()
   await expect(editor.locator('.field-editor-heading select')).toHaveValue('VAT_INVOICE')
+  await expect(editor.getByLabel('item')).toHaveValue('*其他机械设备*教学专用 VR眼镜')
+  await expect(editor.getByLabel('unit', { exact: true })).toHaveValue('副')
+  await expect(editor.getByLabel('quantity')).toHaveValue('100')
+  await expect(editor.getByLabel('unit_price')).toHaveValue('400.00')
+  await expect(editor.getByLabel('net_amount')).toHaveValue('40000.00')
+  await expect(editor.getByLabel('tax_rate')).toHaveValue('13%')
+  await expect(editor.getByLabel('tax_amount')).toHaveValue('5200.00')
   await expect(editor.getByLabel('gross_amount')).toHaveValue('45200.00')
   await editor.locator('.ocr-text summary').click()
   const ocrMeta = await editor.locator('.ocr-meta').innerText()
@@ -358,10 +386,73 @@ test('本地金标发票字段可打开带 bbox 的原件位置', async ({ page 
     body: JSON.stringify({ model: ocrMeta, expectedField: 'gross_amount', expectedValue: '45200.00' }, null, 2),
     contentType: 'application/json',
   })
+  await editor.getByLabel('tax_rate').click()
+  await expect(editor.locator('.source-evidence-box')).toBeVisible()
   await editor.getByLabel('gross_amount').click()
   await expect(editor.locator('.source-preview-panel')).toContainText('原件第 1 页')
   await expect(editor.locator('.source-evidence-box')).toBeVisible()
   await expectMobileLayout(page)
+})
+
+test('本地专用发票优先按票面类型建议并显示专用字段', async ({ page }) => {
+  test.skip(!existsSync(privateVatSpecialInvoice), '本地增值税专用发票样例未提供；该样例不会被提交到 Git。')
+  await signIn(page, 'accountant@playwright.example.test')
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '单据中心' }).click()
+  await page.locator('input[type="file"]').setInputFiles(privateVatSpecialInvoice)
+  const row = page.locator('article.document-row').filter({ hasText: basename(privateVatSpecialInvoice) })
+  await expect(row).toBeVisible({ timeout: 60_000 })
+  await row.getByRole('button', { name: '查看并确认字段' }).click()
+  const editor = page.locator('.field-editor').last()
+  await expect(editor.locator('.document-type-suggestion')).toContainText('增值税专用发票')
+  await editor.getByLabel('单据类型').selectOption('VAT_INVOICE')
+  const firstSave = page.waitForResponse((response) =>
+    response.url().includes('/api/v1/documents/') && response.url().endsWith('/extraction')
+      && response.request().method() === 'PATCH',
+  )
+  await editor.getByRole('button', { name: '保存确认版本' }).click()
+  expect((await firstSave).status()).toBe(200)
+  await row.getByRole('button', { name: '查看并确认字段' }).click()
+  const savedEditor = page.locator('.field-editor').last()
+  await expect(savedEditor.locator('.document-type-suggestion')).toContainText('增值税专用发票')
+  await expect(savedEditor.getByLabel('单据类型')).toHaveValue('VAT_SPECIAL_INVOICE')
+  await savedEditor.getByRole('button', { name: '采用建议' }).click()
+  await expect(savedEditor.getByLabel('invoice_code')).toHaveValue('1100162130')
+  await expect(savedEditor.getByLabel('invoice_number')).toHaveValue('09750785')
+  await expect(savedEditor.getByLabel('item')).toHaveValue('佳能相机')
+  await expect(savedEditor.getByLabel('gross_amount')).toHaveValue('38266.00')
+  await expect(savedEditor.locator('.field-grid label').filter({ hasText: '购买方纳税人识别号' })).toBeVisible()
+  await expect(savedEditor.locator('.field-grid label').filter({ hasText: '销售方纳税人识别号' })).toBeVisible()
+})
+
+test('本地入库单按列映射名称单位数量单价与总额，并保存原件证据', async ({ page }) => {
+  test.skip(!existsSync(privateGoodsReceipt), '本地入库单金标图未提供；该样例不会被提交到 Git。')
+  await signIn(page, 'accountant@playwright.example.test')
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '单据中心' }).click()
+  await page.locator('input[type="file"]').setInputFiles(privateGoodsReceipt)
+  const row = page.locator('article.document-row').filter({ hasText: basename(privateGoodsReceipt) })
+  await expect(row).toBeVisible({ timeout: 60_000 })
+  await row.getByRole('button', { name: '查看并确认字段' }).click()
+  const editor = page.locator('.field-editor').last()
+  await expect(editor.getByLabel('单据类型')).toHaveValue('GOODS_RECEIPT')
+  await expect(editor.getByLabel('item')).toHaveValue('教学专用VR眼镜')
+  await expect(editor.getByLabel('unit', { exact: true })).toHaveValue('副')
+  await expect(editor.getByLabel('quantity')).toHaveValue('100')
+  await expect(editor.getByLabel('unit_price')).toHaveValue('452.00')
+  await expect(editor.getByLabel('gross_amount')).toHaveValue('45200.00')
+  await editor.getByLabel('unit_price').click()
+  await expect(editor.locator('.source-preview-panel')).toContainText('原件第 1 页')
+  await expect(editor.locator('.source-evidence-box')).toBeVisible()
+  const saveResponse = page.waitForResponse((response) =>
+    response.url().includes('/api/v1/documents/') && response.url().endsWith('/extraction')
+      && response.request().method() === 'PATCH',
+  )
+  await editor.getByRole('button', { name: '保存确认版本' }).click()
+  expect((await saveResponse).status()).toBe(200)
+  await row.getByRole('button', { name: '查看并确认字段' }).click()
+  const savedEditor = page.locator('.field-editor').last()
+  await expect(savedEditor.getByLabel('unit_price')).toHaveValue('452.00')
+  await savedEditor.getByLabel('unit_price').click()
+  await expect(savedEditor.locator('.source-evidence-box')).toBeVisible()
 })
 
 test('通行费类型建议使用票据号码字段标签而非入库单号', async ({ page }) => {
@@ -403,6 +494,8 @@ test('银行回单候选显示付款方、收款方、金额及其原件证据',
   await expect(editor.getByLabel('payee')).toHaveValue('南昌市视维科技公司')
   await expect(editor.getByLabel('gross_amount')).toHaveValue('45200.00')
   await expect(editor.getByLabel('settlement_date')).toHaveValue('2024-12-01')
+  await expect(editor.getByLabel('transaction_summary')).toHaveValue('采购软件配套商品')
+  await expect(editor.getByLabel('transaction_type')).toHaveValue('转账')
   await expect(editor.getByLabel('settled')).toHaveValue('UNKNOWN')
   await expect(editor.getByLabel('settled').locator('option')).toHaveText(['已清算', '未清算', '无法确认'])
   await expect(editor.locator('.field-grid label').filter({ hasText: '结算日期' })).toBeVisible()
@@ -417,7 +510,11 @@ test('银行回单候选显示付款方、收款方、金额及其原件证据',
   await editor.getByRole('button', { name: '保存确认版本' }).click()
   expect((await saveResponse).status()).toBe(200)
   await row.getByRole('button', { name: '查看并确认字段' }).click()
-  await expect(page.locator('.field-editor').last().getByLabel('settled')).toHaveValue('NOT_SETTLED')
+  const savedEditor = page.locator('.field-editor').last()
+  await expect(savedEditor.getByLabel('settled')).toHaveValue('NOT_SETTLED')
+  await expect(savedEditor.getByLabel('transaction_summary')).toHaveValue('采购软件配套商品')
+  await savedEditor.getByLabel('transaction_summary').click()
+  await expect(savedEditor.locator('.source-evidence-box')).toBeVisible()
 })
 
 test('银行回单审核页分层展示辅助字段并默认脱敏账号', async ({ page }) => {
@@ -441,19 +538,24 @@ test('银行回单审核页分层展示辅助字段并默认脱敏账号', async
       bank_name: { normalized_value: '招商银行南昌分行', confidence: 0.45, status: 'NEEDS_REVIEW', evidence_text: '开户银行 招商银行南昌分行' },
       electronic_receipt_number: { normalized_value: 'DZHD20241201001', confidence: 0.45, status: 'NEEDS_REVIEW', evidence_text: '电子回单号 DZHD20241201001' },
       transaction_id: { normalized_value: 'JYLS20241201002', confidence: 0.45, status: 'NEEDS_REVIEW', evidence_text: '交易流水号 JYLS20241201002' },
+      transaction_summary: { normalized_value: '采购软件配套商品', confidence: 0.45, status: 'NEEDS_REVIEW', evidence_text: '摘要 采购软件配套商品' },
+      transaction_type: { normalized_value: '转账', confidence: 0.45, status: 'NEEDS_REVIEW', evidence_text: '业务种类 转账' },
     }
-    body.extraction.full_text = '网上银行电子回单\n付款人账号 6222001234567890\n开户银行 招商银行南昌分行\n电子回单号 DZHD20241201001\n交易流水号 JYLS20241201002'
+    body.extraction.full_text = '网上银行电子回单\n付款人账号 6222001234567890\n开户银行 招商银行南昌分行\n电子回单号 DZHD20241201001\n交易流水号 JYLS20241201002\n摘要 采购软件配套商品\n业务种类 转账'
     await route.fulfill({ response, json: body })
   })
   await row.getByRole('button', { name: '查看并确认字段' }).click()
   const editor = page.locator('.field-editor').last()
   await expect(editor.locator('.field-tier')).toContainText('第一层 · 记账关键字段')
+  await expect(editor.locator('.field-tier')).toContainText('电子回单号')
+  await expect(editor.locator('.field-tier')).toContainText('采购软件配套商品')
   const auxiliary = editor.locator('.auxiliary-fields')
   await expect(auxiliary.locator('summary')).toContainText('第二层 · 业务辅助字段')
   await expect(auxiliary).not.toHaveAttribute('open', '')
   await auxiliary.locator('summary').click()
   await expect(auxiliary).toContainText('****7890')
   await expect(auxiliary).not.toContainText('6222001234567890')
+  await expect(auxiliary).not.toContainText('DZHD20241201001')
   const rawText = editor.locator('.ocr-text')
   await expect(rawText.locator('summary')).toContainText('第三层 · 查看 OCR 识别原文')
   await expect(rawText).not.toHaveAttribute('open', '')
@@ -501,6 +603,7 @@ test('支付证明候选保留报销事由、证明日期和证明金额语义�
   const editor = page.locator('.field-editor').last()
   await expect(editor.locator('.document-type-suggestion')).toContainText('支付证明')
   await expect(editor.getByLabel('单据类型')).toHaveValue('PAYMENT_PROOF')
+  await expect(editor.getByLabel('expense_subject')).toHaveValue('管理费用')
   await expect(editor.getByLabel('purpose')).toHaveValue('报销业务招待费')
   await expect(editor.getByLabel('payment_date')).toHaveValue('2024-12-07')
   await expect(editor.getByLabel('gross_amount')).toHaveValue('4448.00')
@@ -512,7 +615,12 @@ test('支付证明候选保留报销事由、证明日期和证明金额语义�
   )
   await editor.getByRole('button', { name: '保存确认版本' }).click()
   expect((await saveResponse).status()).toBe(200)
-  await expect(row.locator('.status-pill')).toHaveText('已确认')
+  await expect(row.locator('[data-testid="document-recognition-status"]')).toHaveText('识别状态：已确认')
+  await row.getByRole('button', { name: '查看并确认字段' }).click()
+  const savedEditor = page.locator('.field-editor').last()
+  await expect(savedEditor.getByLabel('expense_subject')).toHaveValue('管理费用')
+  await savedEditor.getByLabel('expense_subject').click()
+  await expect(savedEditor.locator('.source-evidence-box')).toBeVisible()
 })
 
 test('4,448元费用报销将发票、银行回单和支付证明分角色关联并等待费用政策', async ({ page }) => {
@@ -533,7 +641,8 @@ test('4,448元费用报销将发票、银行回单和支付证明分角色关联
     settlement_date: '2024-12-07', gross_amount: '4448.00',
   })
   await uploadAndConfirm(page, proofName, await readFile(privatePaymentProof), 'PAYMENT_PROOF', {
-    payment_date: '2024-12-07', purpose: '报销业务招待费', gross_amount: '4448.00',
+    payment_date: '2024-12-07', expense_subject: '管理费用',
+    purpose: '报销业务招待费', gross_amount: '4448.00',
   })
 
   const expenseRoles: Record<string, string> = {
@@ -580,7 +689,8 @@ test('4,448元费用报销补齐管理费用科目和政策后可生成凭证', 
     payer: 'Buyer Ltd', payee: 'Seller Ltd', settlement_date: '2024-12-08', gross_amount: '4448.00', settled: 'SETTLED',
   })
   await uploadAndConfirm(page, 'policy-expense-proof.png', proof, 'PAYMENT_PROOF', {
-    payment_date: '2024-12-08', payer: 'Buyer Ltd', payee: 'Seller Ltd', purpose: '业务招待费',
+    payment_date: '2024-12-08', payer: 'Buyer Ltd', payee: 'Seller Ltd',
+    expense_subject: '管理费用—业务招待费', purpose: '业务招待费',
     gross_amount: '4448.00', approved: 'true',
   })
   for (const filename of Object.keys({
@@ -665,9 +775,10 @@ test('6,780元设备购置核对发票和回单并等待资本化政策', async 
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '单据中心' }).click()
   const invoiceName = basename(privateAssetInvoice)
   const bankName = basename(privateAssetBankReceipt)
-  await uploadAndConfirm(page, invoiceName, await readFile(privateAssetInvoice), 'VAT_INVOICE', {
+  await uploadAndConfirm(page, invoiceName, await readFile(privateAssetInvoice), 'VAT_SPECIAL_INVOICE', {
     invoice_number: '244234139350671047', issue_date: '2024-12-01', buyer: '南昌市杰盛科技有限公司',
-    seller: '南昌市归鸿商贸有限公司', net_amount: '6000.00', tax_rate: '13%', tax_amount: '780.00', gross_amount: '6780.00',
+    seller: '南昌市归鸿商贸有限公司', seller_tax_id: '913601006354021539',
+    net_amount: '6000.00', tax_rate: '13%', tax_amount: '780.00', gross_amount: '6780.00',
   })
   await uploadAndConfirm(page, bankName, await readFile(privateAssetBankReceipt), 'BANK_RECEIPT', {
     payer: '南昌市杰盛科技有限公司', payee: '南昌市归鸿商贸有限公司', gross_amount: '6780.00', settlement_date: '2024-12-01',
@@ -705,9 +816,10 @@ test('21,800元办公室租赁核对发票和回单并等待租赁政策及合�
 
   const invoiceName = basename(privateRentalInvoice)
   const bankName = '办公室租赁银行回单_合成测试.png'
-  await uploadAndConfirm(page, invoiceName, await readFile(privateRentalInvoice), 'VAT_INVOICE', {
+  await uploadAndConfirm(page, invoiceName, await readFile(privateRentalInvoice), 'VAT_SPECIAL_INVOICE', {
     invoice_number: '244278928656838066', issue_date: '2024-12-01',
     buyer: '南昌市杰盛科技有限公司', seller: '南昌市中智集团地产有限公司',
+    seller_tax_id: '913601003024789021',
     net_amount: '20000.00', tax_rate: '9%', tax_amount: '1800.00', gross_amount: '21800.00',
   })
   await uploadAndConfirm(page, bankName, await syntheticDocument(page, 'BANK RECEIPT 21800.00'), 'BANK_RECEIPT', {

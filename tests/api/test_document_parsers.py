@@ -9,6 +9,7 @@ import pytest
 
 from app.ocr import extract_image, extract_pdf, prepare_image_for_ocr, scale_bbox_to_original
 from app.structured_files import extract_csv, extract_xlsx
+from ingestion.candidates import field_candidates
 
 
 def local_purchase_invoice(repo: Path) -> Path:
@@ -34,6 +35,47 @@ def test_csv_and_xlsx_are_preserved_as_row_evidence():
     xlsx_result=extract_xlsx(buffer.getvalue())
     assert xlsx_result["fields"]["row_count"]["normalized_value"]==1
     assert xlsx_result["lines"][0]["sheet"]=="流水"
+
+
+def test_bank_credit_notice_extracts_type_and_confirmable_fields():
+    def line(text, x, y, width=80):
+        return {"text": text, "page": 1, "bbox": [x, y, x + width, y + 24]}
+
+    lines = [
+        line("中国工商银行进账单（收账通知）", 397, 0, 530),
+        line("2019年6月2日", 563, 43, 196),
+        line("第06326号", 1145, 43, 137),
+        line("全称", 118, 91, 127),
+        line("ABC 公司", 396, 98, 114),
+        line("全称", 713, 92, 129),
+        line("华兴有限责任公司", 961, 99, 217),
+        line("出", 58, 111, 32), line("票", 57, 149, 34), line("人", 57, 191, 33),
+        line("收", 652, 110, 36), line("款", 653, 149, 34), line("人", 654, 188, 36),
+        line("账", 123, 150, 40), line("号", 196, 149, 45), line("12 - 654789231", 367, 153, 171),
+        line("账", 717, 149, 43), line("号", 794, 149, 43), line("56 - 78963214782", 968, 154, 202),
+        line("开户银行", 125, 203, 114), line("农业银行营业部", 358, 208, 190),
+        line("开户银行", 721, 205, 114), line("工商银行如意支行", 963, 208, 214),
+        line("人民币", 114, 266, 86), line("陆拾万元整", 222, 273, 218),
+        line("仟佰拾万仟佰拾元角分", 940, 259, 339),
+        line("票据种类", 98, 367, 115), line("转账支票", 395, 369, 113),
+        line("票据张数", 98, 421, 115), line("壹", 431, 421, 43),
+    ]
+    full_text = " ".join(item["text"] for item in lines)
+
+    fields = field_candidates(full_text, lines)
+
+    assert fields["document_type_candidate"]["normalized_value"] == "BANK_CREDIT_NOTICE"
+    assert fields["receipt_number"]["normalized_value"] == "06326"
+    assert fields["settlement_date"]["normalized_value"] == "2019-06-02"
+    assert fields["payer"]["normalized_value"] == "ABC 公司"
+    assert fields["payee"]["normalized_value"] == "华兴有限责任公司"
+    assert fields["payer_account_number"]["normalized_value"] == "12-654789231"
+    assert fields["payee_account_number"]["normalized_value"] == "56-78963214782"
+    assert fields["payer_bank_name"]["normalized_value"] == "农业银行营业部"
+    assert fields["payee_bank_name"]["normalized_value"] == "工商银行如意支行"
+    assert fields["gross_amount"]["normalized_value"] == "600000.00"
+    assert fields["instrument_type"]["normalized_value"] == "转账支票"
+    assert fields["instrument_count"]["normalized_value"] == "1"
 
 
 def test_pdf_text_layer_is_extracted_with_page_evidence(tmp_path):
@@ -243,6 +285,303 @@ def test_payment_proof_extracts_labeled_purpose_and_total_with_evidence():
     assert fields["purpose"]["bbox"] == [10, 130, 100, 150]
     assert fields["gross_amount"]["normalized_value"] == "4448.00"
     assert fields["gross_amount"]["bbox"] == [200, 220, 260, 240]
+
+
+def test_payment_proof_extracts_its_account_subject_number_and_signature_status():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "支付证明单", "bbox": [220, 5, 450, 30], "page": 1},
+        {"text": "总号第 PAY-2024-12-007 号", "bbox": [480, 45, 650, 70], "page": 1},
+        {"text": "科目：管理费用", "bbox": [10, 65, 180, 85], "page": 1},
+        {"text": "主管人 李小静 会计 重玉 出纳 王维 记账 邱宇 证明人 丁森 经手人 马涛", "bbox": [15, 285, 650, 310], "page": 1},
+    ]
+
+    fields = field_candidates("支付证明单\n总号第 PAY-2024-12-007 号\n科目：管理费用\n主管人 李小静 会计 重玉 出纳 王维 记账 邱宇 证明人 丁森 经手人 马涛", lines)
+
+    assert fields["expense_subject"]["normalized_value"] == "管理费用"
+    assert fields["expense_subject"]["evidence_text"] == "科目：管理费用"
+    assert fields["proof_number"]["normalized_value"] == "PAY-2024-12-007"
+    assert fields["approved"]["normalized_value"] == "true"
+    assert fields["approved"]["evidence_text"].startswith("主管人")
+
+
+def test_payment_proof_extracts_quantity_from_its_own_table():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "支付证明单", "bbox": [220, 5, 450, 30], "page": 1},
+        {"text": "数量", "bbox": [450, 100, 500, 120], "page": 1},
+        {"text": "2", "bbox": [455, 125, 490, 145], "page": 1},
+    ]
+
+    fields = field_candidates("支付证明单 数量 2", lines)
+
+    assert fields["quantity"]["normalized_value"] == "2"
+    assert fields["quantity"]["evidence_text"] == "2"
+
+
+def test_payment_proof_extracts_quantity_when_label_and_value_share_one_ocr_line():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "支付证明单", "bbox": [220, 5, 450, 30], "page": 1},
+        {"text": "数量：2", "bbox": [450, 100, 520, 120], "page": 1},
+    ]
+
+    fields = field_candidates("支付证明单 数量：2", lines)
+
+    assert fields["quantity"]["normalized_value"] == "2"
+    assert fields["quantity"]["evidence_text"] == "数量：2"
+
+
+def test_invoice_extracts_its_item_unit_quantity_and_unit_price():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "电子发票普通发票", "bbox": [300, 5, 520, 30], "page": 1},
+        {"text": "项目名称", "bbox": [60, 100, 180, 120], "page": 1},
+        {"text": "单位", "bbox": [360, 100, 410, 120], "page": 1},
+        {"text": "数量", "bbox": [450, 100, 500, 120], "page": 1},
+        {"text": "单价", "bbox": [550, 100, 600, 120], "page": 1},
+        {"text": "*其他机械设备*教学专用", "bbox": [60, 125, 250, 145], "page": 1},
+        {"text": "VR眼镜", "bbox": [60, 146, 140, 166], "page": 1},
+        {"text": "副", "bbox": [370, 125, 400, 145], "page": 1},
+        {"text": "100", "bbox": [455, 125, 490, 145], "page": 1},
+        {"text": "400.00", "bbox": [550, 125, 610, 145], "page": 1},
+    ]
+
+    fields = field_candidates("电子发票普通发票 项目名称 单位 数量 单价", lines)
+
+    assert fields["item"]["normalized_value"] == "*其他机械设备*教学专用 VR眼镜"
+    assert fields["item"]["evidence_text"] == "*其他机械设备*教学专用 VR眼镜"
+    assert fields["item"]["bbox"] == [60, 125, 250, 166]
+    assert fields["item"]["confidence"] == 0.25
+    assert fields["unit"]["normalized_value"] == "副"
+    assert fields["quantity"]["normalized_value"] == "100"
+    assert fields["unit_price"]["normalized_value"] == "400.00"
+
+
+def test_invoice_maps_distinct_item_rows_when_each_row_has_its_own_cells():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "增值税普通发票", "bbox": [300, 5, 500, 30], "page": 1},
+        {"text": "项目名称", "bbox": [60, 100, 180, 120], "page": 1},
+        {"text": "数量", "bbox": [450, 100, 500, 120], "page": 1},
+        {"text": "单价", "bbox": [550, 100, 600, 120], "page": 1},
+        {"text": "第一行商品", "bbox": [60, 125, 200, 145], "page": 1},
+        {"text": "第二行商品", "bbox": [60, 155, 200, 175], "page": 1},
+        {"text": "1", "bbox": [455, 125, 490, 145], "page": 1},
+        {"text": "2", "bbox": [455, 155, 490, 175], "page": 1},
+        {"text": "10.00", "bbox": [550, 125, 600, 145], "page": 1},
+        {"text": "20.00", "bbox": [550, 155, 600, 175], "page": 1},
+    ]
+
+    fields = field_candidates("增值税普通发票 项目名称 数量 单价", lines)
+
+    assert fields["item"]["normalized_value"] == "第一行商品；第二行商品"
+    assert fields["item"]["evidence_text"] == "第一行商品；第二行商品"
+    assert fields["item"]["bbox"] == [60, 125, 200, 175]
+
+
+def test_expense_invoice_keeps_lodging_and_catering_items_for_voucher_context():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "电子发票普通发票", "page": 1, "bbox": [300, 5, 520, 30]},
+        {"text": "项目名称", "page": 1, "bbox": [60, 100, 260, 120]},
+        {"text": "单位", "page": 1, "bbox": [700, 100, 750, 120]},
+        {"text": "数量", "page": 1, "bbox": [850, 100, 900, 120]},
+        {"text": "单价", "page": 1, "bbox": [990, 100, 1040, 120]},
+        {"text": "金额", "page": 1, "bbox": [1100, 100, 1150, 120]},
+        {"text": "税率/征收率", "page": 1, "bbox": [1200, 100, 1290, 120]},
+        {"text": "税额", "page": 1, "bbox": [1320, 100, 1370, 120]},
+        {"text": "*住宿服务*住宿费", "page": 1, "bbox": [60, 130, 260, 150]},
+        {"text": "1", "page": 1, "bbox": [860, 130, 890, 150]},
+        {"text": "800.00", "page": 1, "bbox": [990, 130, 1040, 150]},
+        {"text": "800.00", "page": 1, "bbox": [1100, 130, 1150, 150]},
+        {"text": "6%", "page": 1, "bbox": [1220, 130, 1260, 150]},
+        {"text": "48.00", "page": 1, "bbox": [1320, 130, 1370, 150]},
+        {"text": "*餐饮服务*餐饮费", "page": 1, "bbox": [60, 160, 260, 180]},
+        {"text": "1", "page": 1, "bbox": [860, 160, 890, 180]},
+        {"text": "3396.23", "page": 1, "bbox": [990, 160, 1040, 180]},
+        {"text": "3396.23", "page": 1, "bbox": [1100, 160, 1150, 180]},
+        {"text": "6%", "page": 1, "bbox": [1220, 160, 1260, 180]},
+        {"text": "203.77", "page": 1, "bbox": [1320, 160, 1370, 180]},
+    ]
+
+    fields = field_candidates(
+        "电子发票普通发票 项目名称 单位 数量 单价 金额 税率/征收率 税额 "
+        "*住宿服务*住宿费 1 800.00 800.00 6% 48.00 "
+        "*餐饮服务*餐饮费 1 3396.23 3396.23 6% 203.77",
+        lines,
+    )
+
+    assert fields["item"]["normalized_value"] == "*住宿服务*住宿费；*餐饮服务*餐饮费"
+    assert fields["item"]["evidence_text"] == "*住宿服务*住宿费；*餐饮服务*餐饮费"
+    assert fields["item"]["bbox"] == [60, 130, 260, 180]
+
+
+def test_invoice_does_not_merge_next_item_row_when_its_quantity_was_missed():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "增值税普通发票", "bbox": [300, 5, 500, 30], "page": 1},
+        {"text": "项目名称", "bbox": [60, 100, 180, 120], "page": 1},
+        {"text": "数量", "bbox": [450, 100, 500, 120], "page": 1},
+        {"text": "单价", "bbox": [550, 100, 600, 120], "page": 1},
+        {"text": "第一行商品", "bbox": [60, 125, 200, 145], "page": 1},
+        {"text": "第二行商品", "bbox": [60, 155, 200, 175], "page": 1},
+        {"text": "1", "bbox": [455, 125, 490, 145], "page": 1},
+        {"text": "10.00", "bbox": [550, 125, 600, 145], "page": 1},
+        {"text": "20.00", "bbox": [550, 155, 600, 175], "page": 1},
+    ]
+
+    fields = field_candidates("增值税普通发票 项目名称 数量 单价", lines)
+
+    assert fields["quantity"]["normalized_value"] == "1"
+    assert fields["item"]["normalized_value"] is None
+
+
+def test_invoice_does_not_merge_item_rows_when_all_second_row_cells_were_missed():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "增值税普通发票", "bbox": [300, 5, 500, 30], "page": 1},
+        {"text": "项目名称", "bbox": [60, 100, 180, 120], "page": 1},
+        {"text": "数量", "bbox": [450, 100, 500, 120], "page": 1},
+        {"text": "第一行商品", "bbox": [60, 125, 200, 145], "page": 1},
+        {"text": "第二行商品", "bbox": [60, 155, 200, 175], "page": 1},
+        {"text": "1", "bbox": [455, 125, 490, 145], "page": 1},
+    ]
+
+    fields = field_candidates("增值税普通发票 项目名称 数量", lines)
+
+    assert fields["quantity"]["normalized_value"] == "1"
+    assert fields["item"]["normalized_value"] is None
+
+
+def test_invoice_does_not_merge_two_categorized_item_rows_when_second_row_cells_were_missed():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "增值税普通发票", "bbox": [300, 5, 500, 30], "page": 1},
+        {"text": "项目名称", "bbox": [60, 100, 180, 120], "page": 1},
+        {"text": "数量", "bbox": [450, 100, 500, 120], "page": 1},
+        {"text": "*办公用品*电脑", "bbox": [60, 125, 200, 145], "page": 1},
+        {"text": "*办公用品*鼠标", "bbox": [60, 155, 200, 175], "page": 1},
+        {"text": "1", "bbox": [455, 125, 490, 145], "page": 1},
+    ]
+
+    fields = field_candidates("增值税普通发票 项目名称 数量", lines)
+
+    assert fields["item"]["normalized_value"] is None
+
+
+def test_invoice_does_not_merge_when_second_item_category_mark_was_missed_by_ocr():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "增值税普通发票", "bbox": [300, 5, 500, 30], "page": 1},
+        {"text": "项目名称", "bbox": [60, 100, 180, 120], "page": 1},
+        {"text": "数量", "bbox": [450, 100, 500, 120], "page": 1},
+        {"text": "*办公用品*电脑", "bbox": [60, 125, 200, 145], "page": 1},
+        {"text": "鼠标", "bbox": [60, 155, 120, 175], "page": 1},
+        {"text": "1", "bbox": [455, 125, 490, 145], "page": 1},
+    ]
+
+    fields = field_candidates("增值税普通发票 项目名称 数量", lines)
+
+    assert fields["item"]["normalized_value"] is None
+
+
+def test_manual_document_type_reuses_ocr_lines_to_match_its_own_fields():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "科目", "bbox": [60, 100, 110, 120], "page": 1},
+        {"text": "管理费用", "bbox": [140, 100, 220, 120], "page": 1},
+    ]
+
+    fields = field_candidates("科目 管理费用", lines, document_type="PAYMENT_PROOF")
+
+    assert fields["document_type_candidate"]["normalized_value"] is None
+    assert fields["expense_subject"]["normalized_value"] == "管理费用"
+    assert fields["expense_subject"]["evidence_text"] == "科目 管理费用"
+
+
+def test_goods_receipt_extracts_department_source_number_and_row_unit_price():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "入库单", "bbox": [370, 0, 500, 32], "page": 1},
+        {"text": "入库数量：100", "bbox": [20, 50, 120, 70], "page": 1},
+        {"text": "入库单位及部门", "bbox": [60, 80, 175, 105], "page": 1},
+        {"text": "行政部门", "bbox": [180, 80, 250, 105], "page": 1},
+        {"text": "发票号码或生产单号", "bbox": [260, 80, 410, 105], "page": 1},
+        {"text": "25165954", "bbox": [420, 80, 490, 105], "page": 1},
+        {"text": "名称及规格", "bbox": [165, 111, 238, 131], "page": 1},
+        {"text": "单位", "bbox": [280, 111, 325, 131], "page": 1},
+        {"text": "单价", "bbox": [500, 111, 555, 131], "page": 1},
+        {"text": "教学专用VR眼镜", "bbox": [151, 136, 253, 156], "page": 1},
+        {"text": "副", "bbox": [285, 136, 315, 156], "page": 1},
+        {"text": "452.00", "bbox": [500, 136, 555, 156], "page": 1},
+    ]
+
+    fields = field_candidates("入库单 行政部门 25165954 名称及规格 单位 单价", lines)
+
+    assert fields["department"]["normalized_value"] == "行政部门"
+    assert fields["source_reference_number"]["normalized_value"] == "25165954"
+    assert fields["unit"]["normalized_value"] == "副"
+    assert fields["unit_price"]["normalized_value"] == "452.00"
+    assert fields["received"]["normalized_value"] is None
+
+
+def test_goods_receipt_only_marks_received_when_the_document_says_so():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "入库单", "bbox": [370, 0, 500, 32], "page": 1},
+        {"text": "已收货", "bbox": [60, 80, 120, 105], "page": 1},
+    ]
+
+    fields = field_candidates("入库单 已收货", lines)
+
+    assert fields["received"]["normalized_value"] == "true"
+    assert fields["received"]["evidence_text"] == "已收货"
+
+
+def test_goods_receipt_leaves_conflicting_status_text_for_review():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "入库单", "bbox": [370, 0, 500, 32], "page": 1},
+        {"text": "待收货", "bbox": [60, 80, 120, 105], "page": 1},
+        {"text": "已收货", "bbox": [130, 80, 190, 105], "page": 1},
+    ]
+
+    fields = field_candidates("入库单 待收货 已收货", lines)
+
+    assert fields["received"]["normalized_value"] is None
+
+
+def test_bank_receipt_extracts_its_transaction_summary_and_type():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "网上银行电子回单", "bbox": [100, 10, 300, 30], "page": 1},
+        {"text": "用途", "bbox": [55, 140, 110, 160], "page": 1},
+        {"text": "采购软件配套商品", "bbox": [145, 140, 300, 160], "page": 1},
+        {"text": "摘要", "bbox": [350, 140, 390, 160], "page": 1},
+        {"text": "业务种类", "bbox": [350, 140, 430, 160], "page": 1},
+        {"text": "转账", "bbox": [440, 140, 500, 160], "page": 1},
+    ]
+
+    fields = field_candidates("网上银行电子回单 用途 采购软件配套商品 摘要 业务种类 转账", lines)
+
+    assert fields["transaction_summary"]["normalized_value"] == "采购软件配套商品"
+    assert fields["transaction_type"]["normalized_value"] == "转账"
 
 
 def test_payment_proof_conflicting_totals_remain_empty():
@@ -675,6 +1014,199 @@ def test_document_type_classifier_returns_an_evidence_backed_unconfirmed_candida
     assert candidate["confidence"] == 0.5
     assert candidate["evidence_confidence"] == 0.91
     assert candidate["bbox"] == [10, 20, 300, 55]
+
+
+def test_invoice_classifier_separates_ordinary_and_vat_special_invoices():
+    from ingestion.candidates import field_candidates
+
+    ordinary = field_candidates("电子发票普通发票")
+    special_with_misread_title = field_candidates("票(增慎税专用发票)发票号码：244234139350671047")
+    special = field_candidates("增值税专用发票")
+
+    assert ordinary["document_type_candidate"]["normalized_value"] == "VAT_INVOICE"
+    assert special_with_misread_title["document_type_candidate"]["normalized_value"] == "VAT_SPECIAL_INVOICE"
+    assert special["document_type_candidate"]["normalized_value"] == "VAT_SPECIAL_INVOICE"
+
+
+def test_invoice_type_uses_the_top_heading_before_a_lower_caption():
+    from ingestion.candidates import field_candidates
+
+    title = {"text": "普通发票", "page": 1, "bbox": [300, 40, 500, 65]}
+    caption = {"text": "图2-2 增值税专用发票（第一联）", "page": 1, "bbox": [300, 850, 650, 875]}
+    fields = field_candidates("图2-2 增值税专用发票（第一联） 普通发票", [caption, title])
+
+    assert fields["document_type_candidate"]["normalized_value"] == "VAT_INVOICE"
+    assert fields["document_type_candidate"]["bbox"] == title["bbox"]
+
+
+def test_vat_special_invoice_heading_overrides_a_lower_ordinary_invoice_mention():
+    from ingestion.candidates import field_candidates
+
+    title = {"text": "增值税专用发票", "page": 1, "bbox": [300, 40, 520, 65]}
+    lower_text = {"text": "图2-2 普通发票（第一联）", "page": 1, "bbox": [300, 850, 650, 875]}
+    fields = field_candidates("增值税专用发票 图2-2 普通发票（第一联）", [lower_text, title])
+
+    assert fields["document_type_candidate"]["normalized_value"] == "VAT_SPECIAL_INVOICE"
+    assert fields["document_type_candidate"]["bbox"] == title["bbox"]
+    assert fields["document_type_candidate"]["evidence_text"] == "增值税专用发票"
+
+
+def test_vat_special_invoice_maps_name_unit_quantity_and_spaced_unit_price():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "增值税专用发票", "page": 1, "bbox": [300, 5, 520, 30]},
+        {"text": "货物及应税劳务名称", "page": 1, "bbox": [60, 100, 270, 120]},
+        {"text": "单位", "page": 1, "bbox": [760, 100, 810, 120]},
+        {"text": "数量", "page": 1, "bbox": [860, 100, 910, 120]},
+        {"text": "单价", "page": 1, "bbox": [980, 100, 1030, 120]},
+        {"text": "*FUD", "page": 1, "bbox": [90, 130, 160, 150]},
+        {"text": "件", "page": 1, "bbox": [770, 130, 800, 150]},
+        {"text": "100", "page": 1, "bbox": [870, 130, 900, 150]},
+        {"text": "3 200.00", "page": 1, "bbox": [980, 130, 1050, 150]},
+    ]
+
+    fields = field_candidates("增值税专用发票 货物及应税劳务名称 单位 数量 单价", lines)
+
+    assert fields["item"]["normalized_value"] == "*FUD"
+    assert fields["unit"]["normalized_value"] == "件"
+    assert fields["quantity"]["normalized_value"] == "100"
+    assert fields["unit_price"]["normalized_value"] == "3200.00"
+
+
+def test_textbook_vat_special_invoice_maps_each_table_column_and_prefers_its_title():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "增值税专用发票", "page": 1, "bbox": [300, 5, 520, 30]},
+        {"text": "23404011158", "page": 1, "bbox": [30, 40, 150, 60]},
+        {"text": "No.06214751", "page": 1, "bbox": [500, 40, 620, 60]},
+        {"text": "货物及应税劳务名称", "page": 1, "bbox": [60, 300, 270, 320]},
+        {"text": "单位", "page": 1, "bbox": [760, 300, 810, 320]},
+        {"text": "数量", "page": 1, "bbox": [860, 300, 910, 320]},
+        {"text": "单价", "page": 1, "bbox": [980, 300, 1030, 320]},
+        {"text": "金额", "page": 1, "bbox": [1080, 300, 1160, 320]},
+        {"text": "税率", "page": 1, "bbox": [1180, 300, 1240, 320]},
+        {"text": "税额", "page": 1, "bbox": [1270, 300, 1350, 320]},
+        {"text": "*FUD", "page": 1, "bbox": [90, 330, 160, 350]},
+        {"text": "件", "page": 1, "bbox": [770, 330, 800, 350]},
+        {"text": "100", "page": 1, "bbox": [870, 330, 900, 350]},
+        {"text": "3 200.00", "page": 1, "bbox": [980, 330, 1050, 350]},
+        {"text": "320000.00", "page": 1, "bbox": [1080, 330, 1160, 350]},
+        {"text": "16%", "page": 1, "bbox": [1190, 330, 1230, 350]},
+        {"text": "51200.00", "page": 1, "bbox": [1270, 330, 1350, 350]},
+        {"text": "价税合计(小写) ￥371200.00", "page": 1, "bbox": [668, 454, 802, 475]},
+        {"text": "图2-2 增值税专用发票（第一联）", "page": 1, "bbox": [300, 850, 650, 875]},
+    ]
+
+    fields = field_candidates(
+        "增值税专用发票 23404011158 No.06214751 货物及应税劳务名称 单位 数量 单价 金额 税率 税额 "
+        "*FUD 件 100 3 200.00 320000.00 16% 51200.00 价税合计(小写) ￥371200.00 "
+        "图2-2 增值税专用发票（第一联）",
+        lines,
+    )
+
+    assert fields["document_type_candidate"]["normalized_value"] == "VAT_SPECIAL_INVOICE"
+    assert fields["document_type_candidate"]["evidence_text"] == "增值税专用发票"
+    assert fields["invoice_code"]["normalized_value"] == "23404011158"
+    assert fields["invoice_number"]["normalized_value"] == "06214751"
+    assert fields["item"]["normalized_value"] == "*FUD"
+    assert fields["unit"]["normalized_value"] == "件"
+    assert fields["quantity"]["normalized_value"] == "100"
+    assert fields["unit_price"]["normalized_value"] == "3200.00"
+    assert fields["net_amount"]["normalized_value"] == "320000.00"
+    assert fields["tax_rate"]["normalized_value"] == "16%"
+    assert fields["tax_amount"]["normalized_value"] == "51200.00"
+    assert fields["gross_amount"]["normalized_value"] == "371200.00"
+
+
+def test_textbook_vat_special_invoice_maps_buyer_and_split_small_total():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "增值税专用发票", "page": 1, "bbox": [300, 5, 520, 30]},
+        {"text": "购货单位", "page": 1, "bbox": [40, 130, 90, 240]},
+        {"text": "名称：青岛长城公司", "page": 1, "bbox": [100, 135, 290, 155]},
+        {"text": "纳税人识别号：382415675361234", "page": 1, "bbox": [100, 160, 360, 180]},
+        {"text": "销货单位", "page": 1, "bbox": [40, 390, 90, 500]},
+        {"text": "名称：华兴有限责任公司", "page": 1, "bbox": [100, 400, 310, 420]},
+        {"text": "纳税人识别号：91150102MA0NB78Q9M", "page": 1, "bbox": [100, 425, 390, 445]},
+        {"text": "价税合计（大写）", "page": 1, "bbox": [60, 455, 220, 475]},
+        {"text": "叁拾柒万壹仟贰佰元整", "page": 1, "bbox": [225, 455, 420, 475]},
+        {"text": "（小写）", "page": 1, "bbox": [1025, 455, 1090, 475]},
+        {"text": "371 200.00", "page": 1, "bbox": [1100, 455, 1190, 475]},
+    ]
+
+    fields = field_candidates(
+        "增值税专用发票 购货单位 名称：青岛长城公司 纳税人识别号：382415675361234 "
+        "销货单位 名称：华兴有限责任公司 纳税人识别号：91150102MA0NB78Q9M "
+        "价税合计（大写）叁拾柒万壹仟贰佰元整（小写）371 200.00",
+        lines,
+    )
+
+    assert fields["buyer"]["normalized_value"] == "青岛长城公司"
+    assert fields["buyer"]["evidence_text"] == "名称：青岛长城公司"
+    assert fields["seller"]["normalized_value"] == "华兴有限责任公司"
+    assert fields["gross_amount"]["normalized_value"] == "371200.00"
+    assert fields["gross_amount"]["evidence_text"] == "371 200.00"
+
+
+def test_vat_special_invoice_matches_its_additional_keywords():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "用发票", "page": 1, "bbox": [300, 5, 420, 30]},
+        {"text": "1100162130", "page": 1, "bbox": [30, 40, 150, 60]},
+        {"text": "No. 06214751", "page": 1, "bbox": [500, 40, 620, 60]},
+        {"text": "开票日期：2019年06月04日", "page": 1, "bbox": [500, 70, 700, 90]},
+        {"text": "称：", "page": 1, "bbox": [100, 100, 140, 120]},
+        {"text": "青岛长城公司", "page": 1, "bbox": [170, 100, 280, 120]},
+        {"text": "纳税人识别号：", "page": 1, "bbox": [100, 130, 220, 150]},
+        {"text": "382415675361234", "page": 1, "bbox": [230, 130, 360, 150]},
+        {"text": "称：", "page": 1, "bbox": [100, 220, 140, 240]},
+        {"text": "华兴有限责任公司", "page": 1, "bbox": [170, 220, 310, 240]},
+        {"text": "纳税人识别号：", "page": 1, "bbox": [100, 250, 220, 270]},
+        {"text": "91150102MA0NB78Q9M", "page": 1, "bbox": [230, 250, 390, 270]},
+        {"text": "货物或应税劳务、服务名称", "page": 1, "bbox": [100, 300, 420, 320]},
+        {"text": "佳能相机", "page": 1, "bbox": [80, 330, 190, 350]},
+    ]
+    fields = field_candidates("用发票 1100162130 No. 06214751 开票日期：2019年06月04日 购买方 销售方 纳税人识别号 货物或应税劳务、服务名称", lines)
+
+    assert fields["document_type_candidate"]["normalized_value"] == "VAT_SPECIAL_INVOICE"
+    assert fields["invoice_code"]["normalized_value"] == "1100162130"
+    assert fields["invoice_number"]["normalized_value"] == "06214751"
+    assert fields["buyer"]["normalized_value"] == "青岛长城公司"
+    assert fields["buyer_tax_id"]["normalized_value"] == "382415675361234"
+    assert fields["seller"]["normalized_value"] == "华兴有限责任公司"
+    assert fields["seller_tax_id"]["normalized_value"] == "91150102MA0NB78Q9M"
+    assert fields["item"]["normalized_value"] == "佳能相机"
+
+
+def test_vat_special_invoice_matches_side_by_side_parties_when_title_is_unreadable():
+    from ingestion.candidates import field_candidates
+
+    lines = [
+        {"text": "1100162130", "page": 1, "bbox": [30, 40, 150, 60]},
+        {"text": "发票号码", "page": 1, "bbox": [500, 40, 580, 60]},
+        {"text": "06214751", "page": 1, "bbox": [590, 40, 680, 60]},
+        {"text": "名称：", "page": 1, "bbox": [500, 100, 550, 120]},
+        {"text": "销售公司", "page": 1, "bbox": [560, 100, 650, 120]},
+        {"text": "名称：", "page": 1, "bbox": [100, 100, 150, 120]},
+        {"text": "购买公司", "page": 1, "bbox": [160, 100, 250, 120]},
+        {"text": "纳税人识别号：", "page": 1, "bbox": [500, 130, 620, 150]},
+        {"text": "91150102MA0NB78Q9M", "page": 1, "bbox": [630, 130, 790, 150]},
+        {"text": "纳税人识别号：", "page": 1, "bbox": [100, 130, 220, 150]},
+        {"text": "382415675361234", "page": 1, "bbox": [230, 130, 360, 150]},
+    ]
+
+    fields = field_candidates("1100162130 发票号码：06214751 名称 纳税人识别号", lines)
+
+    assert fields["document_type_candidate"]["normalized_value"] == "VAT_SPECIAL_INVOICE"
+    assert fields["invoice_number"]["normalized_value"] == "06214751"
+    assert fields["buyer"]["normalized_value"] == "购买公司"
+    assert fields["seller"]["normalized_value"] == "销售公司"
+    assert fields["buyer_tax_id"]["normalized_value"] == "382415675361234"
+    assert fields["seller_tax_id"]["normalized_value"] == "91150102MA0NB78Q9M"
 
 
 def test_document_type_classifier_leaves_conflicting_signals_unclassified():

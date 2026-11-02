@@ -4,43 +4,45 @@
 
 当前仍不是完整生产 MVP：网页直接进入测试账套，不要求账号或密码；API 与前端必须仅绑定本机 `127.0.0.1`，不得暴露到公网或作为生产系统使用。通用异常规则、OFD、真实 AI 建议和 ERP 写回仍未完成。PDF/CSV/XLSX 已有解析能力，但格式与场景验收尚未全量完成。PyMuPDF 采用 AGPL 或商业双许可，生产分发/部署前必须由项目负责人确认许可证适用性。规则候选不称为 AI；导出不表示 ERP 已入账。
 
-## 启动
+## 一键启动
 
-1. 启动仓库的 PostgreSQL 服务并创建仅本地使用的 `services/api/.env`（参照 `.env.example`），不要提交真实密码。
-2. 在项目根目录安装 API 依赖：
+首次启动前准备本地配置和依赖：
 
-   ```bash
-   services/api/.venv/bin/pip install -e . -r services/api/requirements-lock.txt
-   ```
+- 将 `services/api/.env.example` 复制为 `services/api/.env`，填写本机 PostgreSQL 连接。默认 Compose 数据库地址为 `127.0.0.1:5433`，数据库和用户均为 `zhangqing`。密码必须与现有 PostgreSQL 数据卷初始化时使用的密码一致；不要提交 `.env`。
 
-   `requirements-lock.txt` 由 `requirements-dev.txt` 编译，包含运行和测试依赖的完整精确版本。更新直接依赖后，可从项目根目录运行以下命令更新锁文件：
+  ```bash
+  cp services/api/.env.example services/api/.env
+  ```
+- 安装 API 和前端依赖：
 
-   ```bash
-   python3 -m venv /tmp/zq-lock-tools
-   /tmp/zq-lock-tools/bin/pip install -r services/api/requirements-lock-tools.txt
-   cd services/api
-   /tmp/zq-lock-tools/bin/pip-compile --resolver=backtracking --generate-hashes --output-file=requirements-lock.txt requirements-dev.txt
-   ```
+  ```bash
+  python3 -m venv services/api/.venv
+  services/api/.venv/bin/pip install -e . -r services/api/requirements-lock.txt
+  cd apps/web && npm install
+  ```
 
-3. 将 PP-OCRv6 Tiny 检测和识别模型放在 `OCR_MODEL_ROOT` 指向的目录。模型首次初始化也可由 RapidOCR 下载；运行机器需有网络，或提前放好模型文件。
-4. 迁移并初始化**测试**账套：
+- 将 PP-OCRv6 Tiny 模型放到 `OCR_MODEL_ROOT` 指向的目录。首次初始化也可由 RapidOCR 下载。
 
-   ```bash
-   cd services/api
-   .venv/bin/alembic upgrade head
-   .venv/bin/python -m app.seed_demo
-   .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8001
-   ```
+以后从项目根目录运行这一条命令：
 
-5. 另一个终端启动前端：
+```bash
+services/api/.venv/bin/python scripts/dev.py
+```
 
-   ```bash
-   cd apps/web
-   npm install
-   npm run dev -- --host 127.0.0.1
-   ```
+启动器会检查 Docker，启动 PostgreSQL，验证数据库端口和密码，运行迁移及测试账套初始化，启动 FastAPI 和 Vue，并通过前端代理再次读取当前账套。全部通过后会打印服务状态和访问地址。按 `Ctrl+C` 会停止这条命令启动的 FastAPI 和 Vue；PostgreSQL 容器会继续运行。已运行且检查通过的 API 或前端会被复用。
 
-浏览器打开 `http://127.0.0.1:5174` 即可进入本地测试账套，无需登录。上传三份样例后，逐份打开“查看并确认字段”，对照原件填写发票净额、税额、购买/销售方，入库确认状态和回单付款/收款方、已清算状态。然后分别指定发票、入库单、银行回单角色并创建核对组。审批只用于本地验收。
+成功后浏览器打开 `http://127.0.0.1:5174`。若数据库认证失败，启动器会在打开前端前停止，并提示检查本地 `DATABASE_URL` 是否与现有 PostgreSQL 数据卷一致。
+
+`requirements-lock.txt` 由 `requirements-dev.txt` 编译，包含运行和测试依赖的完整精确版本。更新直接依赖后，可从项目根目录运行以下命令更新锁文件：
+
+```bash
+python3 -m venv /tmp/zq-lock-tools
+/tmp/zq-lock-tools/bin/pip install -r services/api/requirements-lock-tools.txt
+cd services/api
+/tmp/zq-lock-tools/bin/pip-compile --resolver=backtracking --generate-hashes --output-file=requirements-lock.txt requirements-dev.txt
+```
+
+本地上传、确认、关联、核对与审批仅用于测试账套验收。
 
 ## 数据备份
 

@@ -144,28 +144,74 @@ def public_extraction_fields(fields: dict) -> tuple[dict, dict | None]:
     type_candidate = visible.pop("document_type_candidate", None)
     return visible, type_candidate
 
+BUSINESS_RECEIPT_TYPE_CODES = {"BUSINESS_RECEIPT", "BUSINESS_RECEIPT_COLLECTION", "BUSINESS_RECEIPT_PAYMENT"}
+
 DOCUMENT_TYPE_FIELDS = {
-    "VAT_INVOICE": {"invoice_number", "issue_date", "buyer", "seller", "net_amount", "tax_rate", "tax_amount", "gross_amount"},
-    "GOODS_RECEIPT": {"receipt_number", "receipt_date", "item", "quantity", "gross_amount", "received"},
+    "EXPENSE_REIMBURSEMENT": {"reimbursement_date", "department", "payee", "purpose", "gross_amount"},
+    "VAT_INVOICE": {"invoice_number", "issue_date", "buyer", "seller", "item", "unit", "quantity", "unit_price", "net_amount", "tax_rate", "tax_amount", "gross_amount"},
+    "VAT_SPECIAL_INVOICE": {"invoice_code", "invoice_number", "issue_date", "buyer", "seller", "buyer_tax_id", "seller_tax_id", "item", "unit", "quantity", "unit_price", "net_amount", "tax_rate", "tax_amount", "gross_amount"},
+    "GOODS_RECEIPT": {"receipt_number", "receipt_date", "department", "source_reference_number", "item", "unit", "quantity", "unit_price", "gross_amount", "received"},
     "BANK_RECEIPT": {"payer", "payee", "settlement_date", "gross_amount", "settled",
-                     "payer_account_number", "payee_account_number", "bank_account_number", "bank_name",
-                     "electronic_receipt_number", "transaction_id"},
-    "PAYMENT_PROOF": {"proof_number", "payment_date", "payer", "payee", "purpose", "gross_amount", "approved"},
+                     "electronic_receipt_number", "transaction_id", "transaction_summary", "transaction_type",
+                     "payer_account_number", "payee_account_number", "bank_account_number", "bank_name"},
+    "BANK_CREDIT_NOTICE": {"receipt_number", "settlement_date", "payer", "payee", "gross_amount",
+                           "instrument_type", "instrument_count", "payer_account_number", "payee_account_number",
+                           "payer_bank_name", "payee_bank_name", "bank_name"},
+    "BUSINESS_RECEIPT": {"settlement_date", "receipt_number", "payer", "payer_account_number", "payer_bank_name",
+                         "payee", "payee_account_number", "payee_bank_name", "gross_amount", "transaction_type",
+                         "instrument_type", "instrument_number", "transaction_summary", "currency"},
+    "PAYMENT_PROOF": {"proof_number", "payment_date", "expense_subject", "payer", "payee", "purpose", "unit", "quantity", "unit_price", "gross_amount", "approved"},
     "CONTRACT": {"contract_number", "contract_date", "buyer", "seller", "item", "ordered_quantity", "gross_amount"},
     "ACCEPTANCE_REPORT": {"acceptance_date", "acceptance_result"},
     "TAXI_RECEIPT": {"invoice_number", "issue_date", "gross_amount"},
     "TOLL_RECEIPT": {"receipt_number", "issue_date", "gross_amount"},
+    "PAYMENT_APPLICATION": {"application_date", "payment_number", "payee", "payee_account_number", "bank_name",
+                            "payee_bank_name", "gross_amount", "purpose", "remittance_method", "remarks",
+                            "attachment_count", "approval_status"},
+    "ASSET_REGISTRATION": {"asset_category", "asset_name", "unit", "acquisition_date", "in_service_date",
+                           "depreciation_years", "asset_location", "supplier", "department", "expense_subject"},
+    "OPENING_INVENTORY_INFO": {"item", "warehouse", "opening_quantity", "unit_price", "gross_amount"},
+    "OPENING_PAYABLE": {"supplier", "purchaser", "department", "business_date", "due_date", "item",
+                        "unit_price", "quantity", "tax_rate", "remarks"},
+    "TRAVELER_INFO": {"employee_name", "department", "job_title", "id_number", "phone"},
+    "TRAVEL_POLICY": {"travel_type", "job_grade", "reimbursement_standard", "city_level", "amount_limit"},
+    "EMPLOYEE_DEDUCTION_SUMMARY": {"employee_name", "basic_salary", "child_education", "continuing_education",
+                                   "housing_loan_interest", "housing_rent", "support_elderly", "infant_care",
+                                   "serious_illness_medical"},
 }
-AUXILIARY_FIELD_KEYS = {"payer_account_number", "payee_account_number", "bank_account_number",
-                        "bank_name", "electronic_receipt_number", "transaction_id"}
+for business_receipt_type in BUSINESS_RECEIPT_TYPE_CODES - {"BUSINESS_RECEIPT"}:
+    DOCUMENT_TYPE_FIELDS[business_receipt_type] = DOCUMENT_TYPE_FIELDS["BUSINESS_RECEIPT"]
+AUXILIARY_FIELD_KEYS = {"payer_account_number", "payee_account_number", "payer_bank_name", "payee_bank_name",
+                        "bank_account_number", "bank_name", "electronic_receipt_number", "transaction_id"}
+
+def merge_ocr_candidates(fields: dict, candidates: dict, allowed_fields: set[str] | None = None) -> dict:
+    result = dict(fields)
+    for key, candidate in candidates.items():
+        if key == "document_type_candidate" or (allowed_fields is not None and key not in allowed_fields):
+            continue
+        candidate_value = candidate.get("normalized_value")
+        if candidate_value in (None, ""):
+            continue
+        current = result.get(key)
+        if not isinstance(current, dict) or current.get("normalized_value") in (None, ""):
+            result[key] = candidate
+            continue
+        if (not current.get("bbox") and candidate.get("bbox")
+                and current.get("status") != "USER_CONFIRMED"):
+            result[key] = candidate
+            continue
+        if current.get("normalized_value") != candidate_value:
+            continue
+        missing_evidence = {evidence_key: candidate[evidence_key]
+            for evidence_key in ("raw_value", "page", "bbox", "coordinate_space", "page_size_points", "evidence_text")
+            if not current.get(evidence_key) and candidate.get(evidence_key)}
+        if missing_evidence:
+            result[key] = {**current, **missing_evidence}
+    return result
 
 def fill_ocr_auxiliary_fields(fields: dict, full_text: str, lines: list[dict]) -> dict:
-    result = dict(fields)
     candidates = field_candidates(full_text, lines)
-    for key in AUXILIARY_FIELD_KEYS:
-        if not result.get(key, {}).get("normalized_value") and candidates[key].get("normalized_value"):
-            result[key] = candidates[key]
-    return result
+    return merge_ocr_candidates(fields, candidates, AUXILIARY_FIELD_KEYS)
 
 @router.post("/documents")
 async def upload_document(file: UploadFile = File(...), db: Session = Depends(db_session), who: str = Depends(actor), principal: Principal = Depends(current_principal)):
@@ -230,18 +276,28 @@ async def upload_document(file: UploadFile = File(...), db: Session = Depends(db
 
 @router.get("/documents")
 def list_documents(page: int = Query(default=1, ge=1), page_size: int = Query(default=20, ge=1, le=100),
-                   work_queue: bool = False,
+                   work_queue: bool = False, unlinked_only: bool = False,
                    db: Session = Depends(db_session), principal: Principal = Depends(current_principal)):
     require_document_read(principal)
     tenant, account = active_scope(db, principal)
     query=apply_document_read_scope(select(DocumentAsset).where(
         DocumentAsset.tenant_id == tenant.id, DocumentAsset.account_set_id == account.id),principal)
+    linked_ids = select(BusinessEventDocument.document_id).join(BusinessEvent,
+        BusinessEvent.id == BusinessEventDocument.event_id).where(
+            BusinessEvent.tenant_id == tenant.id, BusinessEvent.account_set_id == account.id)
+    unlinked_query = apply_document_read_scope(select(DocumentAsset.id).where(
+        DocumentAsset.tenant_id == tenant.id, DocumentAsset.account_set_id == account.id,
+        DocumentAsset.id.not_in(linked_ids)), principal)
     if work_queue:
         archived_document_ids = (select(BusinessEventDocument.document_id)
             .join(BusinessEvent, BusinessEvent.id == BusinessEventDocument.event_id)
             .join(VoucherDraft, VoucherDraft.event_id == BusinessEvent.id)
-            .where(BusinessEvent.account_set_id == account.id, VoucherDraft.status != "REJECTED"))
+            .where(BusinessEvent.tenant_id == tenant.id, BusinessEvent.account_set_id == account.id,
+                   VoucherDraft.tenant_id == tenant.id, VoucherDraft.account_set_id == account.id))
         query = query.where(DocumentAsset.id.not_in(archived_document_ids))
+    status_query = query
+    if unlinked_only:
+        query = query.where(DocumentAsset.id.in_(unlinked_query))
     total = db.scalar(select(func.count()).select_from(query.subquery())) or 0
     rows = db.scalars(query.order_by(DocumentAsset.uploaded_at.desc())
         .offset((page - 1) * page_size).limit(page_size)).all()
@@ -267,52 +323,157 @@ def list_documents(page: int = Query(default=1, ge=1), page_size: int = Query(de
             "id": event.id, "status": event.status, "role": link.role,
         }]
     required_fields = {
-        "VAT_INVOICE": ("invoice_number", "issue_date", "buyer", "seller", "net_amount", "tax_amount", "gross_amount"),
-        "GOODS_RECEIPT": ("receipt_number", "receipt_date", "item", "quantity", "gross_amount", "received"),
-        "BANK_RECEIPT": ("payer", "payee", "settlement_date", "gross_amount", "settled"),
+        "EXPENSE_REIMBURSEMENT": ("reimbursement_date", "department", "payee", "purpose", "gross_amount"),
+        "VAT_INVOICE": ("invoice_number", "issue_date", "buyer", "seller", "item", "unit", "quantity", "unit_price", "net_amount", "tax_rate", "tax_amount", "gross_amount"),
+        "VAT_SPECIAL_INVOICE": ("invoice_code", "invoice_number", "issue_date", "buyer", "seller", "buyer_tax_id", "seller_tax_id", "item", "unit", "quantity", "unit_price", "net_amount", "tax_rate", "tax_amount", "gross_amount"),
+        "GOODS_RECEIPT": ("receipt_number", "receipt_date", "department", "source_reference_number", "item", "unit", "quantity", "unit_price", "gross_amount", "received"),
+        "BANK_RECEIPT": ("payer", "payee", "settlement_date", "gross_amount", "settled", "electronic_receipt_number", "transaction_id", "transaction_summary", "transaction_type"),
+        "BANK_CREDIT_NOTICE": ("receipt_number", "settlement_date", "payer", "payee", "gross_amount", "instrument_type", "instrument_count"),
+        "BUSINESS_RECEIPT": ("settlement_date", "receipt_number", "payer", "payer_account_number", "payer_bank_name",
+                             "payee", "payee_account_number", "payee_bank_name", "gross_amount", "transaction_type",
+                             "instrument_type", "instrument_number", "transaction_summary", "currency"),
         "CONTRACT": ("contract_number", "contract_date", "ordered_quantity"),
-        "PAYMENT_PROOF": ("proof_number", "payment_date", "payer", "payee", "purpose", "gross_amount", "approved"),
+        "PAYMENT_PROOF": ("proof_number", "payment_date", "expense_subject", "payer", "payee", "purpose", "unit", "quantity", "unit_price", "gross_amount", "approved"),
         "ACCEPTANCE_REPORT": ("acceptance_date", "acceptance_result"),
         "TAXI_RECEIPT": ("invoice_number", "issue_date", "gross_amount"),
         "TOLL_RECEIPT": ("receipt_number", "gross_amount"),
+        "PAYMENT_APPLICATION": ("application_date", "payment_number", "payee", "gross_amount"),
+        "ASSET_REGISTRATION": ("asset_category", "asset_name", "acquisition_date"),
+        "OPENING_INVENTORY_INFO": ("item", "warehouse", "opening_quantity"),
+        "OPENING_PAYABLE": ("supplier", "business_date", "item", "quantity", "unit_price"),
+        "TRAVELER_INFO": ("employee_name", "department", "id_number"),
+        "TRAVEL_POLICY": ("travel_type", "job_grade", "reimbursement_standard", "city_level", "amount_limit"),
+        "EMPLOYEE_DEDUCTION_SUMMARY": ("employee_name", "basic_salary"),
     }
+    for business_receipt_type in BUSINESS_RECEIPT_TYPE_CODES - {"BUSINESS_RECEIPT"}:
+        required_fields[business_receipt_type] = required_fields["BUSINESS_RECEIPT"]
     def candidate_value(fields: dict, key: str):
         value = fields.get(key)
         return value.get("normalized_value") if isinstance(value, dict) else value
     def document_summary(document: DocumentAsset):
         extraction = extraction_by_document.get(document.id)
         fields = dict(extraction.fields) if extraction else {}
-        if extraction and extraction.status == "NEEDS_REVIEW" and extraction.full_text:
-            fresh_amount = field_candidates(extraction.full_text, extraction.lines).get("gross_amount")
-            saved_amount = fields.get("gross_amount")
-            if (fresh_amount and fresh_amount.get("normalized_value")
-                    and isinstance(saved_amount, dict) and not saved_amount.get("bbox")
-                    and fresh_amount.get("bbox")):
-                fields["gross_amount"] = fresh_amount
+        recovered = {}
+        type_candidate = None
         document_type = extraction.document_type if extraction else "UNCLASSIFIED"
+        if extraction and extraction.full_text:
+            extraction_type = document_type if document_type in DOCUMENT_TYPE_FIELDS else None
+            recovered = field_candidates(extraction.full_text, extraction.lines, document_type=extraction_type)
+            type_candidate = recovered.get("document_type_candidate")
+            fields = merge_ocr_candidates(fields, recovered)
+        if document_type == "UNCLASSIFIED" and type_candidate and type_candidate.get("normalized_value"):
+            document_type = type_candidate["normalized_value"]
         required = required_fields.get(document_type, ())
         missing_fields = [key for key in required if candidate_value(fields, key) in (None, "")]
-        if not extraction or document_type == "UNCLASSIFIED":
+        if not extraction or extraction.document_type == "UNCLASSIFIED":
             missing_fields.insert(0, "document_type")
         return {"id": document.id, "filename": document.original_filename, "mime_type": document.mime_type,
             "sha256": document.sha256, "processing_status": document.processing_status,
+            "recognition_status": extraction.status if extraction else "NOT_STARTED",
             "uploaded_at": document.uploaded_at, "uploaded_by": document.uploaded_by,
             "document_type": document_type, "key_amount": candidate_value(fields, "gross_amount"),
             "business_events": events_by_document.get(document.id, []), "missing_fields": missing_fields}
-    linked_ids = select(BusinessEventDocument.document_id).join(BusinessEvent,
-        BusinessEvent.id == BusinessEventDocument.event_id).where(
-            BusinessEvent.tenant_id == tenant.id, BusinessEvent.account_set_id == account.id)
-    unlinked_query = apply_document_read_scope(select(DocumentAsset.id).where(
-        DocumentAsset.tenant_id == tenant.id, DocumentAsset.account_set_id == account.id,
-        DocumentAsset.id.not_in(linked_ids)), principal)
     unlinked_total = db.scalar(select(func.count()).select_from(unlinked_query.subquery())) or 0
-    visible_document_ids = query.with_only_columns(DocumentAsset.id).order_by(None)
+    visible_document_ids = status_query.with_only_columns(DocumentAsset.id).order_by(None)
     status_counts = dict(db.execute(select(DocumentAsset.processing_status, func.count())
         .where(DocumentAsset.id.in_(visible_document_ids))
         .group_by(DocumentAsset.processing_status)).all())
     return {"items": [document_summary(document) for document in rows],
             "page": page, "page_size": page_size, "total": total,
             "unlinked_total": unlinked_total, "status_counts": status_counts}
+
+
+class BulkDeleteDocumentsBody(BaseModel):
+    ids: list[str] = Field(min_length=1, max_length=100)
+
+
+def delete_document_assets(ids: list[str], db: Session, who: str, principal: Principal) -> dict:
+    require(principal, "correct")
+    tenant, account = active_scope(db, principal)
+    document_ids = list(dict.fromkeys(ids))
+    documents = db.scalars(apply_document_read_scope(select(DocumentAsset).where(
+        DocumentAsset.id.in_(document_ids), DocumentAsset.tenant_id == tenant.id,
+        DocumentAsset.account_set_id == account.id), principal).with_for_update()).all()
+    if len(documents) != len(document_ids):
+        raise HTTPException(404, "部分单据不存在或当前账号无权删除")
+
+    links = db.execute(select(BusinessEventDocument, BusinessEvent)
+        .join(BusinessEvent, BusinessEvent.id == BusinessEventDocument.event_id)
+        .where(BusinessEventDocument.document_id.in_(document_ids),
+            BusinessEvent.tenant_id == tenant.id, BusinessEvent.account_set_id == account.id)
+        .with_for_update()).all()
+    affected_events = {event.id: event for _, event in links}
+    if affected_events:
+        visible_event_ids = set(db.scalars(apply_event_read_scope(select(BusinessEvent.id).where(
+            BusinessEvent.id.in_(affected_events), BusinessEvent.tenant_id == tenant.id,
+            BusinessEvent.account_set_id == account.id), principal)).all())
+        if visible_event_ids != set(affected_events):
+            raise HTTPException(404, "部分单据关联的业务不存在或当前账号无权修改")
+    protected_event_ids = set(db.scalars(select(VoucherDraft.event_id).where(
+        VoucherDraft.event_id.in_(affected_events))).all()) if affected_events else set()
+    if protected_event_ids:
+        raise HTTPException(409, "这些单据已用于凭证，不能删除；请先处理或删除对应凭证版本。")
+
+    for link, _ in links:
+        db.delete(link)
+    db.flush()
+    for event in affected_events.values():
+        removed_from_event = sorted(link.document_id for link, linked_event in links
+                                    if linked_event.id == event.id)
+        before = {"status": event.status, "amount": event.amount, "event_date": event.event_date,
+                  "party_ref": event.party_ref, "version": event.version}
+        event.version += 1
+        event.status = "NEEDS_REVIEW"
+        event.amount = None
+        event.event_date = None
+        event.party_ref = None
+        event.findings = []
+        audit(db, tenant.id, who, "BUSINESS_DOCUMENTS_REMOVED", event.id, removed_from_event,
+              before=before, after={"status": event.status, "version": event.version})
+
+    deleted_id_set = set(document_ids)
+    cases = db.scalars(select(ExceptionCase).where(ExceptionCase.tenant_id == tenant.id)).all()
+    for case in cases:
+        remaining_refs = [ref for ref in (case.source_refs or []) if ref not in deleted_id_set]
+        if remaining_refs != case.source_refs:
+            case.source_refs = remaining_refs
+        if case.event_id in affected_events and case.status == "OPEN":
+            case.status = "RESOLVED"
+            case.resolved_at = datetime.now(timezone.utc)
+
+    storage_paths = []
+    for document in documents:
+        storage_paths.append(Path(document.storage_key))
+        audit(db, tenant.id, who, "DOCUMENT_DELETED", document.id, [document.id],
+              before={"filename": document.original_filename, "sha256": document.sha256,
+                      "linked_event_ids": sorted(link.event_id for link, _ in links
+                                                  if link.document_id == document.id)},
+              after={"deleted": True})
+        db.delete(document)
+    db.commit()
+
+    for path in storage_paths:
+        still_referenced = db.scalar(select(DocumentAsset.id).where(DocumentAsset.storage_key == str(path)).limit(1))
+        if not still_referenced:
+            try:
+                path.unlink(missing_ok=True)
+            except OSError:
+                pass
+    return {"deleted_count": len(document_ids), "deleted_ids": document_ids,
+            "reset_business_count": len(affected_events),
+            "reset_business_ids": sorted(affected_events)}
+
+
+@router.delete("/documents/{document_id}")
+def delete_document(document_id: str, db: Session = Depends(db_session), who: str = Depends(actor),
+                    principal: Principal = Depends(current_principal)):
+    return delete_document_assets([document_id], db, who, principal)
+
+
+@router.post("/documents/bulk-delete")
+def bulk_delete_documents(body: BulkDeleteDocumentsBody, db: Session = Depends(db_session),
+                          who: str = Depends(actor), principal: Principal = Depends(current_principal)):
+    return delete_document_assets(body.ids, db, who, principal)
 
 @router.get("/documents/correction-stats")
 def document_correction_stats(db: Session = Depends(db_session), principal: Principal = Depends(current_principal)):
@@ -359,6 +520,7 @@ def document_correction_stats(db: Session = Depends(db_session), principal: Prin
 
 @router.get("/documents/{document_id}")
 def document_detail(document_id: str, version: int | None = Query(default=None, ge=1),
+                    candidate_type: str | None = Query(default=None),
                     db: Session = Depends(db_session), principal: Principal = Depends(current_principal)):
     require_document_read(principal)
     tenant, account = active_scope(db, principal)
@@ -367,6 +529,8 @@ def document_detail(document_id: str, version: int | None = Query(default=None, 
         DocumentAsset.account_set_id == account.id),principal)
     d = db.scalar(query)
     if not d: raise HTTPException(404, "单据不存在")
+    if candidate_type and candidate_type not in DOCUMENT_TYPE_FIELDS:
+        raise HTTPException(422, "不支持为该单据类型重新匹配字段")
     extractions = db.scalars(select(DocumentExtraction).where(
         DocumentExtraction.document_id == d.id).order_by(DocumentExtraction.version.desc())).all()
     if version is not None:
@@ -376,24 +540,22 @@ def document_detail(document_id: str, version: int | None = Query(default=None, 
     else:
         e = extractions[0] if extractions else None
     current_fields, current_type_candidate = public_extraction_fields(e.fields) if e else ({}, None)
+    review_candidates = None
     if e and version is None:
         current_fields = fill_ocr_auxiliary_fields(current_fields, e.full_text, e.lines)
-        if e.status == "NEEDS_REVIEW" and e.full_text:
-            recovered = field_candidates(e.full_text, e.lines)
-            for key, candidate in recovered.items():
-                if key == "document_type_candidate":
-                    if not current_type_candidate or not current_type_candidate.get("normalized_value"):
-                        current_type_candidate = candidate
-                    continue
-                current = current_fields.get(key)
-                if (candidate.get("normalized_value") not in (None, "")
-                        and (not isinstance(current, dict) or current.get("normalized_value") in (None, "")
-                             or (key == "gross_amount" and not current.get("bbox") and candidate.get("bbox")))):
-                    current_fields[key] = candidate
+        if e.full_text:
+            extraction_type = candidate_type or (e.document_type if e.document_type in DOCUMENT_TYPE_FIELDS else None)
+            recovered = field_candidates(e.full_text, e.lines, document_type=extraction_type)
+            review_candidates = {key: value for key, value in recovered.items()
+                                 if key != "document_type_candidate"}
+            if recovered.get("document_type_candidate", {}).get("normalized_value"):
+                current_type_candidate = recovered["document_type_candidate"]
+            current_fields = merge_ocr_candidates(current_fields, recovered)
     return {"id": d.id, "filename": d.original_filename, "status": d.processing_status,
             "extraction": None if not e else {"version": e.version, "document_type": e.document_type,
                 "fields": current_fields, "document_type_candidate": current_type_candidate,
-                "full_text": e.full_text, "lines": e.lines, "provider": e.provider, "model_version": e.model_version},
+                "full_text": e.full_text, "lines": e.lines, "provider": e.provider, "model_version": e.model_version,
+                "review_candidates": review_candidates},
             "extraction_history": [{"version": item.version, "document_type": item.document_type,
                 "status": item.status, "created_by": item.created_by, "created_at": item.created_at,
                 "reason": item.correction_reason,
@@ -471,7 +633,8 @@ def confirm_fields(document_id: str, body: ConfirmFields, db: Session = Depends(
         unexpected_fields = set(body.fields) - allowed_fields
         if unexpected_fields:
             raise HTTPException(422, "字段与所选单据类型不匹配，请检查字段类型")
-    fields = fill_ocr_auxiliary_fields(prev.fields, prev.full_text, prev.lines)
+    candidates = field_candidates(prev.full_text, prev.lines, document_type=body.document_type)
+    fields = merge_ocr_candidates(prev.fields, candidates)
     fields.pop("document_type_candidate", None)
     if allowed_fields is not None:
         fields = {key: value for key, value in fields.items() if key in allowed_fields}
@@ -481,17 +644,20 @@ def confirm_fields(document_id: str, body: ConfirmFields, db: Session = Depends(
             normalized_value = normalize_bank_settlement_state(value)
             if normalized_value is None:
                 raise HTTPException(422, "银行清算状态只能是已清算、未清算或无法确认")
-        if key in {"issue_date", "receipt_date", "settlement_date", "payment_date", "acceptance_date"}:
+        if key in {"issue_date", "receipt_date", "settlement_date", "payment_date", "acceptance_date", "reimbursement_date",
+                   "application_date", "acquisition_date", "in_service_date", "business_date", "due_date"}:
             normalized_value, _ = normalize_date_value(str(value))
             normalized_value = normalized_value or value
-        fields[key] = {"raw_value": value, "normalized_value": normalized_value, "confidence": 1.0,
+        fields[key] = {"raw_value": fields.get(key, {}).get("raw_value"), "normalized_value": normalized_value, "confidence": 1.0,
                        "status": "USER_CONFIRMED", "page": fields.get(key, {}).get("page"),
                        "bbox": fields.get(key, {}).get("bbox"), "evidence_text": fields.get(key, {}).get("evidence_text", ""),
                        "coordinate_space": fields.get(key, {}).get("coordinate_space"),
                        "page_size_points": fields.get(key, {}).get("page_size_points"),
                        "previous_value": fields.get(key, {}).get("normalized_value"), "reason": body.reason}
-    canonical_date_key = {"VAT_INVOICE": "issue_date", "GOODS_RECEIPT": "receipt_date",
-                          "BANK_RECEIPT": "settlement_date", "PAYMENT_PROOF": "payment_date",
+    canonical_date_key = {"VAT_INVOICE": "issue_date", "VAT_SPECIAL_INVOICE": "issue_date", "GOODS_RECEIPT": "receipt_date",
+                          "BANK_RECEIPT": "settlement_date", "BANK_CREDIT_NOTICE": "settlement_date", "BUSINESS_RECEIPT": "settlement_date",
+                          "BUSINESS_RECEIPT_COLLECTION": "settlement_date", "BUSINESS_RECEIPT_PAYMENT": "settlement_date",
+                          "PAYMENT_PROOF": "payment_date", "EXPENSE_REIMBURSEMENT": "reimbursement_date",
                           "ACCEPTANCE_REPORT": "acceptance_date"}.get(body.document_type)
     if canonical_date_key and not fields.get(canonical_date_key, {}).get("normalized_value"):
         candidate = fields.get("issue_date", {})
@@ -570,7 +736,7 @@ def create_event(body: EventCreate, db: Session = Depends(db_session), who: str 
         extraction = db.scalar(select(DocumentExtraction).where(DocumentExtraction.document_id == doc.id).order_by(DocumentExtraction.version.desc()))
         if extraction is None or extraction.status != "CONFIRMED":
             raise HTTPException(409, f"单据 {doc.original_filename} 尚未人工确认字段")
-        if extraction.document_type != role_type(role):
+        if extraction.document_type not in (role_type(role) or set()):
             raise HTTPException(422, f"单据 {doc.original_filename} 的已确认类型与角色 {role} 不匹配")
     configured_policy = latest_accounting_policy(db, account.id, body.event_type)
     if body.event_type == "RENTAL" and body.rental_direct_expense_confirmed and (
@@ -658,9 +824,10 @@ def unassign_business_user(event_id: str, user_id: str, db: Session = Depends(db
     db.commit()
     return {"event_id":event.id,"user_id":user_id,"status":"UNASSIGNED"}
 
-def role_type(role: str) -> str | None:
-    return {"INVOICE":"VAT_INVOICE", "GOODS_RECEIPT":"GOODS_RECEIPT", "BANK_RECEIPT":"BANK_RECEIPT",
-            "PAYMENT_PROOF":"PAYMENT_PROOF", "CONTRACT":"CONTRACT"}.get(role)
+def role_type(role: str) -> set[str] | None:
+    return {"INVOICE": {"VAT_INVOICE", "VAT_SPECIAL_INVOICE"},
+            "GOODS_RECEIPT": {"GOODS_RECEIPT"}, "BANK_RECEIPT": {"BANK_RECEIPT"} | BUSINESS_RECEIPT_TYPE_CODES,
+            "PAYMENT_PROOF": {"PAYMENT_PROOF", "EXPENSE_REIMBURSEMENT"}, "CONTRACT": {"CONTRACT"}}.get(role)
 
 @router.post("/business-events/{event_id}/reconcile")
 def reconcile(event_id: str, db: Session = Depends(db_session), who: str = Depends(actor), principal: Principal = Depends(current_principal)):
@@ -716,9 +883,9 @@ def reconcile(event_id: str, db: Session = Depends(db_session), who: str = Depen
         findings.append({"code":"REQUIRED_DOCUMENT_ROLES_MISSING_OR_DUPLICATED",
                          "missing_roles":missing_roles,"duplicated_roles":duplicated_roles,
                          "severity":"BLOCKING"})
-    expected_types={"INVOICE":"VAT_INVOICE","GOODS_RECEIPT":"GOODS_RECEIPT","BANK_RECEIPT":"BANK_RECEIPT",
-                    "PAYMENT_PROOF":"PAYMENT_PROOF","CONTRACT":"CONTRACT"}
-    if any(role not in expected_types or extraction.document_type != expected_types[role]
+    expected_types={"INVOICE":{"VAT_INVOICE", "VAT_SPECIAL_INVOICE"},"GOODS_RECEIPT":{"GOODS_RECEIPT"},"BANK_RECEIPT":{"BANK_RECEIPT"} | BUSINESS_RECEIPT_TYPE_CODES,
+                    "PAYMENT_PROOF":{"PAYMENT_PROOF", "EXPENSE_REIMBURSEMENT"},"CONTRACT":{"CONTRACT"}}
+    if any(role not in expected_types or extraction.document_type not in expected_types[role]
            for role, extraction in facts):
         findings.append({"code":"DOCUMENT_TYPE_ROLE_CONFLICT","severity":"BLOCKING"})
     def value(fields,key): return fields.get(key,{}).get("normalized_value")
@@ -1158,11 +1325,22 @@ def require_auxiliary_complete(db: Session, draft: VoucherDraft) -> None:
 
 class VoucherLineCorrection(BaseModel):
     account_code: str = Field(min_length=1, max_length=40)
+    account_name: str | None = Field(default=None, max_length=200)
     debit: Decimal = Field(ge=0, max_digits=18, decimal_places=2)
     credit: Decimal = Field(ge=0, max_digits=18, decimal_places=2)
     description: str = Field(min_length=1, max_length=500)
     auxiliary: dict[str, str] = Field(default_factory=dict, max_length=20)
     evidence_refs: list[str] = Field(default_factory=list)
+
+    @field_validator("account_name")
+    @classmethod
+    def normalize_account_name(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("会计科目名称不能为空")
+        return normalized
 
     @field_validator("auxiliary")
     @classmethod
@@ -1286,7 +1464,8 @@ def correct_voucher(draft_id: str, body: VoucherCorrectionBody, db: Session = De
         db.flush()
         for sequence, (line, account_row) in enumerate(resolved_lines, 1):
             db.add(VoucherDraftLine(draft_id=corrected.id, sequence=sequence, account_code=account_row.code,
-                account_name=account_row.name, debit=line.debit, credit=line.credit,
+                account_name=line.account_name.strip() if line.account_name else account_row.name,
+                debit=line.debit, credit=line.credit,
                 description=line.description, auxiliary=line.auxiliary, evidence_refs=line.evidence_refs))
         audit(db, tenant.id, who, "VOUCHER_CORRECTED_NEW_VERSION", corrected.id,
             [ref for line in body.lines for ref in line.evidence_refs],
@@ -1524,7 +1703,8 @@ def get_event(event_id:str,db:Session=Depends(db_session),principal:Principal=De
             "rental_direct_expense_confirmed":event.rental_direct_expense_confirmed,
             "rental_direct_expense_confirmed_by":event.rental_direct_expense_confirmed_by,
             "rental_direct_expense_policy_version":event.rental_direct_expense_policy_version,
-            "documents":[{"id":d.id,"filename":d.original_filename,"role":link.role,"extraction_version":link.extraction_version} for link,d in docs]}
+            "documents":[{"id":d.id,"filename":d.original_filename,"mime_type":d.mime_type,
+                "role":link.role,"extraction_version":link.extraction_version} for link,d in docs]}
 
 @router.get("/exception-cases")
 def list_cases(page: int = Query(default=1, ge=1), page_size: int = Query(default=20, ge=1, le=100),

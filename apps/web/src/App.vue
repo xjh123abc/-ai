@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
-type Doc = { id: string; filename: string; mime_type: string; processing_status: string; uploaded_at?: string; uploaded_by?: string; document_type?: string; key_amount?: string | null; business_events?: { id: string; status: string; role: string }[]; missing_fields?: string[] }
+type Doc = { id: string; filename: string; mime_type: string; processing_status: string; recognition_status?: string; uploaded_at?: string; uploaded_by?: string; document_type?: string; key_amount?: string | null; business_events?: { id: string; status: string; role: string }[]; missing_fields?: string[] }
 type ExtractedField = { raw_value?: string | null; normalized_value?: string | null; confidence: number; evidence_confidence?: number; status?: string; message?: string; page?: number | null; bbox?: (number | number[])[] | null; evidence_text?: string; coordinate_space?: string | null; page_size_points?: number[] | null }
 type ExtractionHistory = { version: number; document_type: string; status: string; created_by: string; created_at: string; reason: string | null; fields: Record<string, ExtractedField> }
 type EventRow = { id: string; event_type: string; party_name: string | null; status: string; amount: string | null; created_at?: string; document_count: number; document_ids: string[]; voucher_status: string | null; posting_status: string }
 type Draft = { id: string; event_id: string; version: number; status: string; period: string; debit_total: string; credit_total: string; policy?: Record<string, unknown>; validations?: { code: string; passed: boolean; required_fields?: Record<string, string[]>; reason?: string }[]; lines: { account_code: string; account_name: string; debit: string; credit: string; description?: string; rationale?: string; auxiliary: Record<string, string>; auxiliary_text?: string; required_auxiliary_fields?: string[]; evidence_refs: string[] }[] }
 type CaseRow = { id: string; event_id: string | null; type: string; status: string; severity: string; details: Record<string, unknown>; source_refs: string[] }
 type CaseDetail = CaseRow & { event_status: string; findings: Record<string, unknown>[]; source_documents: { id: string; filename: string; role: string; extraction_version: number | null; mime_type: string }[]; unavailable_source_count: number; assignees: BusinessUserOption[]; audit_trail: { actor: string; event_type: string; occurred_at: string }[] }
-type EventDetail = { id: string; event_type: string; status: string; amount: string | null; findings: Record<string, unknown>[]; rental_direct_expense_confirmed?: boolean; rental_direct_expense_confirmed_by?: string | null; rental_direct_expense_policy_version?: string | null; documents: { id: string; filename: string; role: string; extraction_version: number }[] }
+type EventDetail = { id: string; event_type: string; status: string; amount: string | null; findings: Record<string, unknown>[]; rental_direct_expense_confirmed?: boolean; rental_direct_expense_confirmed_by?: string | null; rental_direct_expense_policy_version?: string | null; documents: { id: string; filename: string; mime_type: string; role: string; extraction_version: number }[] }
 type ArchiveDocument = { id: string; filename: string; role: string; extraction_version: number; mimeType: string; url: string; extraction: { document_type: string; fields: Record<string, ExtractedField>; full_text: string; provider: string; model_version: string } | null }
+type VoucherSourcePreview = { loading: boolean; mimeType: string; url: string | null; extraction: ArchiveDocument['extraction']; error: string }
 type ScopeOption = { membership_id: string; tenant_id: string; account_set_id: string; tenant_name: string; account_set_name: string; role: string }
 type BusinessUserOption = { user_id: string; email: string; display_name: string }
 type AccountingPeriod = { period: string; status: string }
@@ -71,9 +72,13 @@ const evidenceSelection = ref<{ documentId: string; fieldKey: string } | null>(n
 const previewImageSize = ref<Record<string, { width: number; height: number }>>({})
 const selected = ref<string[]>([])
 const roles = ref<Record<string, string>>({})
+const collapsedFieldEditors = ref<Record<string, boolean>>({})
+const documentTypePickerOpen = ref<Record<string, boolean>>({})
+const collapsedDocumentTypeGroups = ref<Record<string, boolean>>({})
+const voucherSourcePreviews = ref<Record<string, VoucherSourcePreview>>({})
 const selectedEventType = ref<'PURCHASE' | 'EXPENSE' | 'ASSET_PURCHASE' | 'RENTAL'>('PURCHASE')
 const rentalDirectExpenseConfirmed = ref(false)
-const editing = ref<Record<string, { version: number; type: string; typeCandidate?: ExtractedField; fields: Record<string, ExtractedField>; reason: string; fullText: string; extractionStatus: string; provider: string; modelVersion: string; history: ExtractionHistory[] }>>({})
+const editing = ref<Record<string, { version: number; type: string; typeCandidate?: ExtractedField; fields: Record<string, ExtractedField>; manualFieldKeys: string[]; reason: string; fullText: string; extractionStatus: string; provider: string; modelVersion: string; history: ExtractionHistory[] }>>({})
 const message = ref('')
 const activeView = ref('workspace')
 const eventId = ref('')
@@ -83,7 +88,6 @@ const editingVoucher = ref(false)
 const voucherLines = ref<Draft['lines']>([])
 const voucherCorrectionReason = ref('')
 const auditEntries = ref<AuditEntry[]>([])
-const voucherEvidence = ref<{ id: string; filename: string } | null>(null)
 const originalAiDraft = ref<Draft | null>(null)
 const loading = ref(false)
 const busy = ref(false)
@@ -91,7 +95,9 @@ const apiAvailable = ref(true)
 const uploadInput = ref<HTMLInputElement | null>(null)
 const uploadQueue = ref<UploadItem[]>([])
 let nextUploadId = 1
+let voucherSourceLoadGeneration = 0
 const documentPage = ref(1)
+const documentFilter = ref<'all' | 'unlinked'>('all')
 const businessPage = ref(1)
 const voucherPage = ref(1)
 const casePage = ref(1)
@@ -137,16 +143,31 @@ const recentEvents = computed(() => dashboardEvents.value.slice(0, 6))
 const archivePages = computed(() => Math.max(1, Math.ceil(archiveTotal.value / pageSize)))
 const pagedEvents = computed(() => events.value)
 const pagedDrafts = computed(() => drafts.value)
+const voucherSourceDocuments = computed(() => {
+  const currentDraft = draft.value
+  if (!currentDraft) return []
+  const byId = new Map((eventDetail.value?.documents || []).map((document) => [document.id, document] as const))
+  return voucherSourceIds(currentDraft).map((id) => byId.get(id))
+    .filter((document): document is EventDetail['documents'][number] => Boolean(document))
+})
+const voucherAccountChoices = computed(() => {
+  const allowed = draft.value?.policy?.allowed_account_codes
+  return chartAccounts.value.filter((account) => account.is_active && account.is_leaf
+    && (!Array.isArray(allowed) || allowed.includes(account.code)))
+})
 const documentPages = computed(() => Math.max(1, Math.ceil(documentTotal.value / pageSize)))
 const businessPages = computed(() => Math.max(1, Math.ceil(eventTotal.value / pageSize)))
 const voucherPages = computed(() => Math.max(1, Math.ceil(draftTotal.value / pageSize)))
 const casePages = computed(() => Math.max(1, Math.ceil(caseTotal.value / pageSize)))
 const canSubmitVoucher = computed(() => demoSession.value || ['TENANT_ADMIN', 'ACCOUNTANT'].includes(currentRole.value))
+const canDeleteDocuments = computed(() => demoSession.value || ['TENANT_ADMIN', 'ACCOUNTANT', 'BUSINESS_USER'].includes(currentRole.value))
+const selectedCanAssociate = computed(() => selected.value.length > 0 && selected.value.length <= 20
+  && selected.value.every((id) => Boolean(roles.value[id])))
 const canApproveVoucher = computed(() => demoSession.value || ['TENANT_ADMIN', 'APPROVER', 'OWNER'].includes(currentRole.value))
 const canExportVoucher = computed(() => demoSession.value || ['TENANT_ADMIN', 'ACCOUNTANT', 'APPROVER', 'AUDITOR', 'OWNER'].includes(currentRole.value))
 const canManageAccountingPolicy = computed(() => demoSession.value || ['TENANT_ADMIN', 'ACCOUNTANT'].includes(currentRole.value))
 const statusLabel = (status: string | null | undefined) => ({
-  UPLOADED: '待识别', PROCESSING: '识别中', NEEDS_REVIEW: '待确认', CONFIRMED: '已确认', USER_CONFIRMED: '人工已确认', FAILED: '解析失败',
+  NOT_STARTED: '待识别', UPLOADED: '待识别', PROCESSING: '识别中', NEEDS_REVIEW: '待确认', CONFIRMED: '已确认', USER_CONFIRMED: '人工已确认', FAILED: '识别失败',
   MATCHED: '核对一致', PARTIAL: '部分匹配', INSUFFICIENT_EVIDENCE: '证据不足', NEEDS_REVIEW_EVENT: '待复核',
   DRAFT: '草稿', VALIDATED: '校验通过', PENDING_APPROVAL: '待审核', APPROVED: '已批准', REJECTED: '已退回',
   SUBMITTING: '提交中', POSTED_PENDING_VERIFY: '入账待核实', VERIFIED: '已核实入账', UNKNOWN: '结果未知',
@@ -228,31 +249,72 @@ const documentRoleLabel = (role: string) => ({
   CONTRACT: '合同', PAYMENT_PROOF: '支付证明',
 } as Record<string, string>)[role] || role
 const documentTypeLabel = (type: string | undefined) => ({
-  VAT_INVOICE: '增值税发票', GOODS_RECEIPT: '入库 / 收货单', BANK_RECEIPT: '银行回单',
+  EXPENSE_REIMBURSEMENT: '费用报销单',
+  VAT_INVOICE: '普通发票', VAT_SPECIAL_INVOICE: '增值税专用发票',
+  GOODS_RECEIPT: '入库 / 收货单', BANK_RECEIPT: '银行回单',
+  BANK_CREDIT_NOTICE: '银行进账单（收账通知）',
+  BUSINESS_RECEIPT: '业务回单 / 未知',
+  BUSINESS_RECEIPT_COLLECTION: '业务回单 / 收款',
+  BUSINESS_RECEIPT_PAYMENT: '业务回单 / 付款',
   CONTRACT: '合同', PAYMENT_PROOF: '支付证明', ACCEPTANCE_REPORT: '验收报告',
   TAXI_RECEIPT: '出租车票据', TOLL_RECEIPT: '通行费票据',
+  PAYMENT_APPLICATION: '付款申请书', ASSET_REGISTRATION: '资产登记表',
+  OPENING_INVENTORY_INFO: '物料期初信息', OPENING_PAYABLE: '期初应付单',
+  TRAVELER_INFO: '出差人员表', TRAVEL_POLICY: '商旅平台差旅标准',
+  EMPLOYEE_DEDUCTION_SUMMARY: '员工专项扣除统计表',
   UNCLASSIFIED: '未分类', OTHER: '其他文件',
 } as Record<string, string>)[type || 'UNCLASSIFIED'] || type || '未分类'
+const documentTypeGroups = [
+  { label: '费用报销', types: ['EXPENSE_REIMBURSEMENT'] },
+  { label: '发票 / 税务', types: ['VAT_INVOICE', 'VAT_SPECIAL_INVOICE', 'TAXI_RECEIPT', 'TOLL_RECEIPT'] },
+  { label: '银行 / 资金', types: ['BUSINESS_RECEIPT_COLLECTION', 'BUSINESS_RECEIPT_PAYMENT', 'BUSINESS_RECEIPT', 'BANK_RECEIPT', 'BANK_CREDIT_NOTICE', 'PAYMENT_PROOF'] },
+  { label: '采购 / 仓储', types: ['GOODS_RECEIPT', 'ACCEPTANCE_REPORT'] },
+  { label: '合同 / 协议', types: ['CONTRACT'] },
+  { label: '内部申请', types: ['PAYMENT_APPLICATION'] },
+  { label: '资产管理', types: ['ASSET_REGISTRATION'] },
+  { label: '基础资料', types: ['OPENING_INVENTORY_INFO', 'OPENING_PAYABLE', 'TRAVELER_INFO', 'TRAVEL_POLICY', 'EMPLOYEE_DEDUCTION_SUMMARY'] },
+  { label: '其他', types: ['OTHER', 'UNCLASSIFIED'] },
+]
+const businessReceiptFieldKeys = ['settlement_date', 'receipt_number', 'payer', 'payer_account_number', 'payer_bank_name', 'payee', 'payee_account_number', 'payee_bank_name', 'gross_amount', 'transaction_type', 'instrument_type', 'instrument_number', 'transaction_summary', 'currency']
 const documentFieldKeys: Record<string, string[]> = {
-  VAT_INVOICE: ['invoice_number', 'issue_date', 'buyer', 'seller', 'net_amount', 'tax_rate', 'tax_amount', 'gross_amount'],
-  GOODS_RECEIPT: ['receipt_number', 'receipt_date', 'item', 'quantity', 'gross_amount', 'received'],
-  BANK_RECEIPT: ['payer', 'payee', 'settlement_date', 'gross_amount', 'settled'],
-  PAYMENT_PROOF: ['proof_number', 'payment_date', 'payer', 'payee', 'purpose', 'gross_amount', 'approved'],
+  EXPENSE_REIMBURSEMENT: ['reimbursement_date', 'department', 'payee', 'purpose', 'gross_amount'],
+  VAT_INVOICE: ['invoice_number', 'issue_date', 'buyer', 'seller', 'item', 'unit', 'quantity', 'unit_price', 'net_amount', 'tax_rate', 'tax_amount', 'gross_amount'],
+  VAT_SPECIAL_INVOICE: ['invoice_code', 'invoice_number', 'issue_date', 'buyer', 'buyer_tax_id', 'seller', 'seller_tax_id', 'item', 'unit', 'quantity', 'unit_price', 'net_amount', 'tax_rate', 'tax_amount', 'gross_amount'],
+  GOODS_RECEIPT: ['receipt_number', 'receipt_date', 'department', 'source_reference_number', 'item', 'unit', 'quantity', 'unit_price', 'gross_amount', 'received'],
+  BANK_RECEIPT: ['payer', 'payee', 'settlement_date', 'gross_amount', 'settled', 'electronic_receipt_number', 'transaction_id', 'transaction_summary', 'transaction_type'],
+  BANK_CREDIT_NOTICE: ['receipt_number', 'settlement_date', 'payer', 'payee', 'gross_amount', 'instrument_type', 'instrument_count'],
+  BUSINESS_RECEIPT: businessReceiptFieldKeys,
+  BUSINESS_RECEIPT_COLLECTION: businessReceiptFieldKeys,
+  BUSINESS_RECEIPT_PAYMENT: businessReceiptFieldKeys,
+  PAYMENT_PROOF: ['proof_number', 'payment_date', 'expense_subject', 'payer', 'payee', 'purpose', 'unit', 'quantity', 'unit_price', 'gross_amount', 'approved'],
   CONTRACT: ['contract_number', 'contract_date', 'buyer', 'seller', 'item', 'ordered_quantity', 'gross_amount'],
   ACCEPTANCE_REPORT: ['acceptance_date', 'acceptance_result'],
   TAXI_RECEIPT: ['invoice_number', 'issue_date', 'gross_amount'],
   TOLL_RECEIPT: ['receipt_number', 'issue_date', 'gross_amount'],
+  PAYMENT_APPLICATION: ['application_date', 'payment_number', 'payee', 'payee_account_number', 'bank_name', 'payee_bank_name', 'gross_amount', 'purpose', 'remittance_method', 'remarks', 'attachment_count', 'approval_status'],
+  ASSET_REGISTRATION: ['asset_category', 'asset_name', 'unit', 'acquisition_date', 'in_service_date', 'depreciation_years', 'asset_location', 'supplier', 'department', 'expense_subject'],
+  OPENING_INVENTORY_INFO: ['item', 'warehouse', 'opening_quantity', 'unit_price', 'gross_amount'],
+  OPENING_PAYABLE: ['supplier', 'purchaser', 'department', 'business_date', 'due_date', 'item', 'unit_price', 'quantity', 'tax_rate', 'remarks'],
+  TRAVELER_INFO: ['employee_name', 'department', 'job_title', 'id_number', 'phone'],
+  TRAVEL_POLICY: ['travel_type', 'job_grade', 'reimbursement_standard', 'city_level', 'amount_limit'],
+  EMPLOYEE_DEDUCTION_SUMMARY: ['employee_name', 'basic_salary', 'child_education', 'continuing_education', 'housing_loan_interest', 'housing_rent', 'support_elderly', 'infant_care', 'serious_illness_medical'],
 }
-const bankAuxiliaryFieldKeys = ['payer_account_number', 'payee_account_number', 'bank_account_number', 'bank_name', 'electronic_receipt_number', 'transaction_id']
+const bankAuxiliaryFieldKeys = ['payer_account_number', 'payee_account_number', 'payer_bank_name', 'payee_bank_name', 'bank_account_number', 'bank_name']
 const documentAuxiliaryFieldKeys: Record<string, string[]> = {
-  PAYMENT_PROOF: ['proof_number', ...bankAuxiliaryFieldKeys],
+  PAYMENT_PROOF: [...bankAuxiliaryFieldKeys],
+  BANK_CREDIT_NOTICE: ['payer_account_number', 'payee_account_number', 'payer_bank_name', 'payee_bank_name'],
+  BUSINESS_RECEIPT: [],
+  BUSINESS_RECEIPT_COLLECTION: [],
+  BUSINESS_RECEIPT_PAYMENT: [],
+  PAYMENT_APPLICATION: [],
 }
 function visibleDocumentFields(documentId: string) {
   const form = editing.value[documentId]
   const allowed = documentFieldKeys[form.type]
   if (!allowed) return Object.fromEntries(Object.entries(form.fields).filter(([key]) => !bankAuxiliaryFieldKeys.includes(key)))
+  const auxiliaryKeys = documentAuxiliaryFieldKeys[form.type] || bankAuxiliaryFieldKeys
   return Object.fromEntries(Object.entries(form.fields).filter(([key]) =>
-    allowed.includes(key) && !documentAuxiliaryFieldKeys[form.type]?.includes(key)))
+    allowed.includes(key) && !auxiliaryKeys.includes(key)))
 }
 function voucherSourceIds(voucher: Draft): string[] {
   const snapshots = voucher.policy?.source_snapshot
@@ -275,18 +337,67 @@ function canonicalSettlementValue(value: unknown): string {
 
 const fieldLabel = (key: string) => ({
   document_type: '单据类型', document_type_candidate: '单据类型建议',
+  reimbursement_date: '报销日期',
   invoice_number: '发票号码', issue_date: '开票日期', payment_date: '证明日期', buyer: '购买方', seller: '销售方',
+  invoice_code: '发票代码', buyer_tax_id: '购买方纳税人识别号', seller_tax_id: '销售方纳税人识别号',
   net_amount: '未税金额', tax_rate: '税率', tax_amount: '税额', gross_amount: '价税合计', purpose: '报销事由',
   receipt_number: '入库单号', receipt_date: '入库日期', item: '货物名称', quantity: '数量', received: '已收货',
-  proof_number: '证明编号', approved: '审批状态',
+  proof_number: '证明编号', approved: '审批状态', instrument_type: '票据种类', instrument_count: '票据张数',
   contract_number: '合同编号', contract_date: '合同日期', ordered_quantity: '合同采购数量',
   payer: '付款方', payee: '收款方', settlement_date: '结算日期', settled: '清算状态',
+  department: '部门', source_reference_number: '来源单号', expense_subject: '费用科目',
+  unit: '单位', unit_price: '单价', transaction_summary: '交易摘要', transaction_type: '业务种类',
   payer_account_number: '付款方银行账号', payee_account_number: '收款方银行账号', bank_account_number: '银行账号',
-  bank_name: '开户银行',
+  bank_name: '开户银行', payer_bank_name: '出票人开户行', payee_bank_name: '收款人开户行',
   electronic_receipt_number: '电子回单号', transaction_id: '交易流水号',
+  instrument_number: '凭证号码', currency: '币种',
   acceptance_date: '验收日期', acceptance_result: '验收结论',
+  application_date: '申请日期', payment_number: '付款单号 / 付字编号', remittance_method: '汇款方式',
+  attachment_count: '附件张数', approval_status: '审批状态', remarks: '备注', asset_category: '资产类别', asset_name: '资产名称',
+  acquisition_date: '购入日期', in_service_date: '投入使用日期', depreciation_years: '折旧年限',
+  asset_location: '资产位置', supplier: '供应商', warehouse: '仓库', opening_quantity: '期初数量',
+  purchaser: '采购员', business_date: '业务日期', due_date: '到期日', employee_name: '员工姓名',
+  job_title: '职级', id_number: '证件号码', phone: '手机号', travel_type: '交通 / 住宿类型',
+  job_grade: '职级', reimbursement_standard: '报销标准', city_level: '城市等级', amount_limit: '金额上限',
+  basic_salary: '基本工资', child_education: '子女教育', continuing_education: '继续教育',
+  housing_loan_interest: '住房贷款', housing_rent: '住房租金', support_elderly: '赡养老人',
+  infant_care: '婴幼儿照护', serious_illness_medical: '大病医疗',
 }[key] || key)
 function documentFieldLabel(key: string, documentType: string) {
+  if (documentType === 'PAYMENT_APPLICATION') {
+    const labels: Record<string, string> = {
+      payee: '收款单位', payee_account_number: '收款账号', bank_name: '开户行',
+      payee_bank_name: '收款银行全称', gross_amount: '金额', purpose: '付款原因 / 用途',
+    }
+    if (labels[key]) return labels[key]
+  }
+  if (documentType === 'ASSET_REGISTRATION' && key === 'expense_subject') return '费用项目'
+  if (documentType === 'OPENING_PAYABLE' && key === 'unit_price') return '含税单价'
+  if (documentType === 'OPENING_INVENTORY_INFO' && key === 'item') return '物料'
+  if (documentType === 'OPENING_INVENTORY_INFO' && key === 'gross_amount') return '金额'
+  if (documentType === 'OPENING_PAYABLE' && key === 'item') return '物料'
+  if (documentType === 'VAT_SPECIAL_INVOICE') {
+    const labels: Record<string, string> = { buyer: '购货单位', seller: '销货单位' }
+    if (labels[key]) return labels[key]
+  }
+  if (documentType === 'GOODS_RECEIPT') {
+    const labels: Record<string, string> = { item: '名称及规格', department: '入库单位及部门', source_reference_number: '发票号码或生产单号' }
+    if (labels[key]) return labels[key]
+  }
+  if (documentType === 'BUSINESS_RECEIPT' || documentType.startsWith('BUSINESS_RECEIPT_')) {
+    const labels: Record<string, string> = { settlement_date: '日期', receipt_number: '回单编号', payer: '付款人户名', payer_account_number: '付款人账号（卡号）', payer_bank_name: '付款人开户行', payee: '收款人户名', payee_account_number: '收款人账号（卡号）', payee_bank_name: '收款人开户行', gross_amount: '金额', transaction_type: '业务（产品）种类', instrument_type: '凭证种类', instrument_number: '凭证号码', transaction_summary: '摘要', currency: '币种' }
+    if (labels[key]) return labels[key]
+  }
+  if (documentType === 'BANK_CREDIT_NOTICE') {
+    const labels: Record<string, string> = { receipt_number: '进账单号', settlement_date: '进账日期', gross_amount: '进账金额', payer: '出票人', payee: '收款人', payer_account_number: '出票人银行账号', payee_account_number: '收款人银行账号' }
+    if (labels[key]) return labels[key]
+  }
+  if (documentType === 'BANK_RECEIPT') {
+    const labels: Record<string, string> = { transaction_summary: '用途 / 摘要', transaction_type: '业务种类' }
+    if (labels[key]) return labels[key]
+  }
+  if (documentType === 'PAYMENT_PROOF' && key === 'expense_subject') return '科目'
+  if (documentType === 'VAT_INVOICE' && key === 'item') return '项目名称'
   if (key === 'receipt_number' && documentType === 'TOLL_RECEIPT') return '票据号码'
   if (key === 'gross_amount' && documentType === 'PAYMENT_PROOF') return '证明金额'
   return fieldLabel(key)
@@ -472,8 +583,11 @@ async function load() {
     accountSetId.value = identity.account_set_id
     scopeOptions.value = identity.scopes || []
     const canReadFinancialData = identity.role !== 'BUSINESS_USER'
+    const documentPath = documentFilter.value === 'unlinked'
+      ? '/api/v1/documents?work_queue=true&unlinked_only=true'
+      : '/api/v1/documents?work_queue=true'
     const [documentPageResult, eventPageResult, dashboardEventResult, voucherPageResult, casePageResult, periods, assignableUsers, correctionStatsResult] = await Promise.all([
-      readPage<Doc>('/api/v1/documents?work_queue=true', documentPage.value), readPage<EventRow>('/api/v1/business-events?archive_only=false', businessPage.value),
+      readPage<Doc>(documentPath, documentPage.value), readPage<EventRow>('/api/v1/business-events?archive_only=false', businessPage.value),
       readPage<EventRow>('/api/v1/business-events?archive_only=false', 1),
       canReadFinancialData ? readPage<Draft>('/api/v1/voucher-drafts', voucherPage.value) : Promise.resolve({ items: [], page: 1, page_size: pageSize, total: 0, status_counts: [] }),
       readPage<CaseRow>('/api/v1/exception-cases', casePage.value),
@@ -517,6 +631,13 @@ async function changePage(kind: 'documents' | 'business' | 'vouchers' | 'cases',
   if (kind === 'business') businessPage.value = nextPage
   if (kind === 'vouchers') voucherPage.value = nextPage
   if (kind === 'cases') casePage.value = nextPage
+  await load()
+}
+
+async function changeDocumentFilter(filter: 'all' | 'unlinked') {
+  documentFilter.value = filter
+  documentPage.value = 1
+  selected.value = []
   await load()
 }
 
@@ -708,15 +829,67 @@ async function retryUpload(item: UploadItem) {
 }
 
 function toggle(id: string) {
-  if (selected.value.includes(id)) { selected.value = selected.value.filter((value) => value !== id); return }
+  if (selected.value.includes(id)) {
+    selected.value = selected.value.filter((value) => value !== id)
+    delete roles.value[id]
+    return
+  }
+  if (selected.value.length >= 100) { message.value = '一次最多选择 100 份单据，请分批删除。'; return }
   const type = docs.value.find((document) => document.id === id)?.document_type
-  const role = ({ VAT_INVOICE: 'INVOICE', GOODS_RECEIPT: 'GOODS_RECEIPT', BANK_RECEIPT: 'BANK_RECEIPT', CONTRACT: 'CONTRACT', PAYMENT_PROOF: 'PAYMENT_PROOF' } as Record<string, string>)[type || '']
-  if (!role) { message.value = '请先确认这张单据的类型，再关联业务。'; return }
-  roles.value[id] = role
+  const role = ({ VAT_INVOICE: 'INVOICE', VAT_SPECIAL_INVOICE: 'INVOICE', GOODS_RECEIPT: 'GOODS_RECEIPT', BANK_RECEIPT: 'BANK_RECEIPT', CONTRACT: 'CONTRACT', PAYMENT_PROOF: 'PAYMENT_PROOF' } as Record<string, string>)[type || '']
+  if (role) roles.value[id] = role
+  else delete roles.value[id]
   selected.value = [...selected.value, id]
+}
+function selectDocumentPage() {
+  const pageIds = docs.value.map((document) => document.id)
+  if (pageIds.length && pageIds.every((id) => selected.value.includes(id))) {
+    selected.value = selected.value.filter((id) => !pageIds.includes(id))
+    pageIds.forEach((id) => { delete roles.value[id] })
+    return
+  }
+  const additions = pageIds.filter((id) => !selected.value.includes(id))
+  if (selected.value.length + additions.length > 100) {
+    message.value = '一次最多选择 100 份单据，请分批删除。'
+    return
+  }
+  for (const document of docs.value) {
+    if (!selected.value.includes(document.id)) toggle(document.id)
+  }
+}
+async function deleteDocuments(ids: string[]) {
+  const uniqueIds = [...new Set(ids)]
+  if (!uniqueIds.length || !canDeleteDocuments.value) return
+  const messageText = `永久删除选中的 ${uniqueIds.length} 份单据及其 OCR 识别记录？已关联且尚未生成凭证的业务会移除这些证据并退回待核对。此操作无法撤销。`
+  if (!window.confirm(messageText)) return
+  busy.value = true
+  try {
+    const response = uniqueIds.length === 1
+      ? await api(`/api/v1/documents/${uniqueIds[0]}`, { method: 'DELETE' })
+      : await api('/api/v1/documents/bulk-delete', { method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: uniqueIds }) })
+    const body = await response.json()
+    if (!response.ok) { message.value = body.detail || '删除单据失败。'; return }
+    const deletedIds = new Set<string>(body.deleted_ids || uniqueIds)
+    selected.value = selected.value.filter((id) => !deletedIds.has(id))
+    deletedIds.forEach((id) => { delete roles.value[id]; delete editing.value[id] })
+    await load()
+    const resetBusinessIds = (body.reset_business_ids as string[] | undefined) || []
+    if (eventId.value && resetBusinessIds.includes(eventId.value)) await selectEvent(eventId.value)
+    message.value = `已删除 ${body.deleted_count} 份单据。`
+  } catch (error) {
+    message.value = error instanceof Error ? error.message : '删除单据失败。'
+  } finally { busy.value = false }
+}
+async function deleteDocument(document: Doc) {
+  await deleteDocuments([document.id])
+}
+async function deleteSelectedDocuments() {
+  await deleteDocuments(selected.value)
 }
 async function inspect(document: Doc) {
   if (editing.value[document.id]) { delete editing.value[document.id]; return }
+  collapsedFieldEditors.value[document.id] = false
   const response = await api(`/api/v1/documents/${document.id}`)
   const body = await response.json()
   if (!response.ok || !body.extraction) { message.value = body.detail || '没有可编辑的识别结果。'; return }
@@ -726,10 +899,38 @@ async function inspect(document: Doc) {
   }
   const typeCandidate = body.extraction.document_type_candidate || fields.document_type_candidate
   delete fields.document_type_candidate
-  const reviewType = body.extraction.document_type === 'UNCLASSIFIED'
-    ? typeCandidate?.normalized_value || 'UNCLASSIFIED'
-    : body.extraction.document_type
-  editing.value[document.id] = { version: body.extraction.version, type: reviewType, typeCandidate, fields, reason: '人工对照原件确认', fullText: body.extraction.full_text || '', extractionStatus: body.extraction.status || body.status || 'NEEDS_REVIEW', provider: body.extraction.provider || '未知识别器', modelVersion: body.extraction.model_version || '未知版本', history: body.extraction_history || [] }
+  const storedType = body.extraction.document_type || 'UNCLASSIFIED'
+  const suggestedType = typeCandidate?.normalized_value
+  let reviewType = storedType
+  if (typeof suggestedType === 'string' && documentFieldKeys[suggestedType] && suggestedType !== storedType) {
+    let candidates = body.extraction.review_candidates || {}
+    let candidatesReady = storedType === 'UNCLASSIFIED'
+    if (storedType !== 'UNCLASSIFIED') {
+      const candidateResponse = await api(`/api/v1/documents/${document.id}?candidate_type=${encodeURIComponent(suggestedType)}`)
+      const candidateBody = await candidateResponse.json()
+      if (candidateResponse.ok) {
+        candidates = candidateBody.extraction?.review_candidates || candidates
+        candidatesReady = true
+      }
+      else message.value = candidateBody.detail || '无法按 OCR 建议的类型重新匹配字段。'
+    }
+    if (candidatesReady) {
+      for (const key of documentFieldKeys[suggestedType]) {
+        const current = fields[key]
+        const candidate = candidates[key]
+        const hasCurrentValue = current?.normalized_value !== null && current?.normalized_value !== undefined && current.normalized_value !== ''
+        const manuallyConfirmed = current?.status === 'USER_CONFIRMED' && hasCurrentValue
+        if (!manuallyConfirmed && candidate?.normalized_value !== null && candidate?.normalized_value !== undefined && candidate.normalized_value !== '') {
+          fields[key] = candidate
+        }
+      }
+      reviewType = suggestedType
+    }
+  }
+  const manualFieldKeys = Object.entries(fields as Record<string, ExtractedField>)
+    .filter(([, field]) => field.status === 'USER_CONFIRMED' && field.normalized_value !== null && field.normalized_value !== undefined && field.normalized_value !== '')
+    .map(([key]) => key)
+  editing.value[document.id] = { version: body.extraction.version, type: reviewType, typeCandidate, fields, manualFieldKeys, reason: '人工对照原件确认', fullText: body.extraction.full_text || '', extractionStatus: body.extraction.status || body.status || 'NEEDS_REVIEW', provider: body.extraction.provider || '未知识别器', modelVersion: body.extraction.model_version || '未知版本', history: body.extraction_history || [] }
   ensureReviewFields(document)
 }
 async function focusEvidence(documentId: string, fieldKey: string) {
@@ -797,18 +998,64 @@ function ensureReviewFields(document: Doc) {
   if (form.type === 'BANK_RECEIPT' && form.fields.settled) {
     form.fields.settled.normalized_value = canonicalSettlementValue(form.fields.settled.normalized_value)
   }
-  const dateKey = ({ VAT_INVOICE: 'issue_date', GOODS_RECEIPT: 'receipt_date', BANK_RECEIPT: 'settlement_date', PAYMENT_PROOF: 'payment_date', CONTRACT: 'contract_date', ACCEPTANCE_REPORT: 'acceptance_date' } as Record<string, string>)[form.type]
+  const dateKey = ({ VAT_INVOICE: 'issue_date', VAT_SPECIAL_INVOICE: 'issue_date', GOODS_RECEIPT: 'receipt_date', BANK_RECEIPT: 'settlement_date', BANK_CREDIT_NOTICE: 'settlement_date', BUSINESS_RECEIPT: 'settlement_date', BUSINESS_RECEIPT_COLLECTION: 'settlement_date', BUSINESS_RECEIPT_PAYMENT: 'settlement_date', PAYMENT_PROOF: 'payment_date', CONTRACT: 'contract_date', ACCEPTANCE_REPORT: 'acceptance_date' } as Record<string, string>)[form.type]
   const genericDate = form.fields.issue_date
-  if (dateKey && dateKey !== 'issue_date' && !['PAYMENT_PROOF', 'BANK_RECEIPT', 'GOODS_RECEIPT', 'ACCEPTANCE_REPORT'].includes(form.type) && !form.fields[dateKey]?.normalized_value && genericDate?.normalized_value) {
+  if (dateKey && dateKey !== 'issue_date' && !['PAYMENT_PROOF', 'BANK_RECEIPT', 'BANK_CREDIT_NOTICE', 'BUSINESS_RECEIPT', 'BUSINESS_RECEIPT_COLLECTION', 'BUSINESS_RECEIPT_PAYMENT', 'GOODS_RECEIPT', 'ACCEPTANCE_REPORT'].includes(form.type) && !form.fields[dateKey]?.normalized_value && genericDate?.normalized_value) {
     form.fields[dateKey] = { ...genericDate }
   }
 }
-function applyDocumentTypeSuggestion(document: Doc) {
+function markFieldEdited(documentId: string, fieldKey: string) {
+  const form = editing.value[documentId]
+  if (form && !form.manualFieldKeys.includes(fieldKey)) form.manualFieldKeys.push(fieldKey)
+}
+async function changeDocumentType(document: Doc) {
   const form = editing.value[document.id]
-  const suggestedType = form.typeCandidate?.normalized_value
-  if (!suggestedType) return
+  if (!form) return
+  const selectedType = form.type
+  const selectedKeys = documentFieldKeys[selectedType] || []
+  let candidates: Record<string, ExtractedField> = {}
+  if (selectedKeys.length) {
+    const response = await api(`/api/v1/documents/${document.id}?candidate_type=${encodeURIComponent(selectedType)}`)
+    const body = await response.json()
+    if (!response.ok) { message.value = body.detail || '无法按所选单据类型重新匹配 OCR 字段。'; return }
+    if (form.type !== selectedType) return
+    candidates = body.extraction?.review_candidates || {}
+  }
+  const currentFields = form.fields
+  const manualFieldKeys = new Set(form.manualFieldKeys)
+  const allPrimaryKeys = new Set(Object.values(documentFieldKeys).flat())
+  const retainedFields = Object.fromEntries(Object.entries(currentFields).filter(([key]) => !allPrimaryKeys.has(key)))
+  const selectedFields = Object.fromEntries(selectedKeys.map((key) => {
+    if (manualFieldKeys.has(key) && currentFields[key]) return [key, currentFields[key]]
+    const candidate = candidates[key]
+    if (candidate && candidate.normalized_value !== null && candidate.normalized_value !== undefined && candidate.normalized_value !== '') return [key, candidate]
+    return [key, { raw_value: null, normalized_value: key === 'settled' ? 'UNKNOWN' : '', confidence: 0, status: 'NEEDS_REVIEW', page: null, bbox: null, evidence_text: '' }]
+  }))
+  form.fields = { ...retainedFields, ...selectedFields }
+  form.manualFieldKeys = form.manualFieldKeys.filter((key) => selectedKeys.includes(key))
+  if (selectedType === 'BANK_RECEIPT' && form.fields.settled) {
+    form.fields.settled.normalized_value = canonicalSettlementValue(form.fields.settled.normalized_value)
+  }
+}
+function toggleDocumentTypePicker(documentId: string) {
+  documentTypePickerOpen.value[documentId] = !documentTypePickerOpen.value[documentId]
+}
+function toggleDocumentTypeGroup(groupLabel: string) {
+  collapsedDocumentTypeGroups.value[groupLabel] = !collapsedDocumentTypeGroups.value[groupLabel]
+}
+async function chooseDocumentType(document: Doc, type: string) {
+  const form = editing.value[document.id]
+  if (!form) return
+  form.type = type
+  documentTypePickerOpen.value[document.id] = false
+  await changeDocumentType(document)
+}
+async function applyDocumentTypeSuggestion(document: Doc) {
+  const form = editing.value[document.id]
+  const suggestedType = form?.typeCandidate?.normalized_value
+  if (!suggestedType || !form) return
   form.type = suggestedType
-  ensureReviewFields(document)
+  await changeDocumentType(document)
 }
 async function confirm(document: Doc) {
   const form = editing.value[document.id]
@@ -845,6 +1092,7 @@ async function linkDocs() {
 }
 
 async function selectEvent(id: string) {
+  if (eventId.value && eventId.value !== id) clearVoucherSourcePreviews()
   eventId.value = id
   const response = await api(`/api/v1/business-events/${id}`)
   if (!response.ok) { message.value = '读取业务详情失败，请检查权限或网络后重试。'; return }
@@ -898,6 +1146,51 @@ async function loadAudit(draftId: string) {
   auditEntries.value = response.ok ? await response.json() : []
 }
 
+function clearVoucherSourcePreviews() {
+  voucherSourceLoadGeneration += 1
+  Object.values(voucherSourcePreviews.value).forEach((source) => {
+    if (source.url) URL.revokeObjectURL(source.url)
+  })
+  voucherSourcePreviews.value = {}
+}
+
+async function loadVoucherSource(document: EventDetail['documents'][number], event: Event) {
+  const disclosure = event.currentTarget as HTMLDetailsElement | null
+  if (!disclosure) return
+  if (!disclosure.open) {
+    if (voucherSourcePreviews.value[document.id]?.error) delete voucherSourcePreviews.value[document.id]
+    return
+  }
+  if (voucherSourcePreviews.value[document.id]) return
+  const generation = voucherSourceLoadGeneration
+  voucherSourcePreviews.value[document.id] = {
+    loading: true, mimeType: document.mime_type, url: null, extraction: null, error: '',
+  }
+  try {
+    const [detailResponse, contentResponse] = await Promise.all([
+      api(`/api/v1/documents/${document.id}?version=${document.extraction_version}`),
+      api(`/api/v1/documents/${document.id}/content`),
+    ])
+    if (!detailResponse.ok || !contentResponse.ok) throw new Error('读取来源单据失败。')
+    const detail = await detailResponse.json()
+    const url = URL.createObjectURL(await contentResponse.blob())
+    if (generation !== voucherSourceLoadGeneration) { URL.revokeObjectURL(url); return }
+    voucherSourcePreviews.value[document.id] = {
+      loading: false,
+      mimeType: contentResponse.headers.get('Content-Type') || document.mime_type,
+      url,
+      extraction: detail.extraction || null,
+      error: '',
+    }
+  } catch (error) {
+    if (generation !== voucherSourceLoadGeneration) return
+    voucherSourcePreviews.value[document.id] = {
+      loading: false, mimeType: document.mime_type, url: null, extraction: null,
+      error: error instanceof Error ? error.message : '读取来源单据失败。',
+    }
+  }
+}
+
 async function deleteVoucher() {
   if (!draft.value || !window.confirm('删除这笔业务的全部凭证版本？删除后可重新生成。')) return
   const response = await api(`/api/v1/voucher-drafts/${draft.value.id}`, { method: 'DELETE' })
@@ -905,16 +1198,10 @@ async function deleteVoucher() {
   if (!response.ok) { message.value = body.detail || '删除凭证失败。'; return }
   draft.value = null
   originalAiDraft.value = null
-  voucherEvidence.value = null
+  clearVoucherSourcePreviews()
   auditEntries.value = []
   await load()
   message.value = `已删除 ${body.deleted_count} 个凭证版本，可重新生成。`
-}
-
-async function openVoucherOriginal(documentId: string) {
-  const linked = eventDetail.value?.documents.find((document) => document.id === documentId)
-  voucherEvidence.value = { id: documentId, filename: linked?.filename || documentId }
-  await showEvidencePage(documentId, 1)
 }
 
 async function rerunReconciliation() {
@@ -998,8 +1285,12 @@ async function exportDraft() {
   draft.value = drafts.value.find((item) => item.id === draft.value?.id) || draft.value
   if (draft.value) await loadAudit(draft.value.id)
 }
-function startVoucherCorrection() {
+async function startVoucherCorrection() {
   if (!draft.value) return
+  const response = await api('/api/v1/auth/chart-accounts')
+  const body = await response.json()
+  if (!response.ok) { message.value = body.detail || '读取账套科目失败。'; return }
+  chartAccounts.value = body.accounts || []
   voucherLines.value = draft.value.lines.map((line) => ({ ...line,
     auxiliary: { ...line.auxiliary }, auxiliary_text: JSON.stringify(line.auxiliary || {}, null, 2),
     evidence_refs: [...line.evidence_refs],
@@ -1010,16 +1301,16 @@ function startVoucherCorrection() {
 function cancelVoucherCorrection() { editingVoucher.value = false; voucherLines.value = [] }
 async function saveVoucherCorrection() {
   if (!draft.value) return
-  let lines: { account_code: string; debit: string; credit: string; description?: string;
+  let lines: { account_code: string; account_name: string; debit: string; credit: string; description?: string;
     evidence_refs: string[]; auxiliary: Record<string, string> }[]
   try {
-    lines = voucherLines.value.map(({ account_code, debit, credit, description, evidence_refs, auxiliary_text }) => {
+    lines = voucherLines.value.map(({ account_code, account_name, debit, credit, description, evidence_refs, auxiliary_text }) => {
       const auxiliary: unknown = JSON.parse(auxiliary_text || '{}')
       if (!auxiliary || typeof auxiliary !== 'object' || Array.isArray(auxiliary)
         || Object.values(auxiliary).some((value) => typeof value !== 'string')) {
         throw new Error('辅助核算必须是字符串键值组成的 JSON 对象。')
       }
-      return { account_code, debit, credit, description, evidence_refs, auxiliary: auxiliary as Record<string, string> }
+      return { account_code, account_name, debit, credit, description, evidence_refs, auxiliary: auxiliary as Record<string, string> }
     })
   } catch (error) {
     message.value = error instanceof SyntaxError
@@ -1041,12 +1332,20 @@ async function saveVoucherCorrection() {
   await loadAudit(body.id)
   message.value = `修正已保存为凭证新版本 V${body.version}，需要重新提交审批。`
 }
+function selectVoucherAccount(line: Draft['lines'][number], code: string) {
+  const account = voucherAccountChoices.value.find((item) => item.code === code)
+  if (!account) return
+  line.account_code = account.code
+  line.account_name = account.name
+  line.required_auxiliary_fields = account.required_auxiliary_fields
+}
 
 function auxiliaryLabel(auxiliary: Record<string, string> | null | undefined) {
   return Object.entries(auxiliary || {}).map(([key, value]) => `${key}：${value}`).join('、') || '—'
 }
 
 async function chooseDraft(item: Draft) {
+  clearVoucherSourcePreviews()
   draft.value = item
   originalAiDraft.value = null
   eventId.value = item.event_id
@@ -1060,6 +1359,7 @@ onMounted(load)
 onBeforeUnmount(() => {
   Object.values(previews.value).forEach(URL.revokeObjectURL)
   clearArchiveDocuments()
+  clearVoucherSourcePreviews()
   if (evidencePreview.value) URL.revokeObjectURL(evidencePreview.value.url)
 })
 </script>
@@ -1096,9 +1396,9 @@ onBeforeUnmount(() => {
             <article class="kpi-card kpi-card-warning"><span class="kpi-label">写回失败 / 未知</span><strong>{{ postingIssues }}</strong><small>需要核查结果后再操作</small><button @click="activeView = 'vouchers'">查看状态 <span>→</span></button></article>
           </section>
           <div class="dashboard-grid">
-            <section class="content-card recent-card"><div class="card-heading"><div><h2>待处理业务</h2><p>已生成凭证的业务在“业务档案”查看</p></div><button class="text-button" @click="activeView = 'business'">查看全部 <span>→</span></button></div>
+            <section class="content-card recent-card"><div class="card-heading"><div><h2>待处理业务</h2><p>凭证中心可展开来源单据，完整业务记录见业务档案</p></div><button class="text-button" @click="activeView = 'business'">查看全部 <span>→</span></button></div>
               <div v-if="loading && !events.length" class="loading-state">正在读取业务记录…</div>
-              <div v-else-if="!recentEvents.length" class="empty-state"><div class="empty-icon">▤</div><strong>当前没有待处理业务</strong><p>已生成凭证的业务可以到业务档案查看。</p><button class="button button-secondary" @click="activeView = 'archives'; loadArchives()">查看业务档案</button></div>
+              <div v-else-if="!recentEvents.length" class="empty-state"><div class="empty-icon">▤</div><strong>当前没有待处理业务</strong><p>已生成凭证的来源单据可在凭证中心展开查看。</p><button class="button button-secondary" @click="activeView = 'vouchers'">查看凭证中心</button></div>
               <div v-else class="table-scroll"><table><thead><tr><th>业务编号 / 对方</th><th>金额</th><th>关联单据</th><th>业务状态</th><th>凭证状态</th><th>ERP 状态</th><th></th></tr></thead><tbody><tr v-for="item in recentEvents" :key="item.id"><td><button class="table-link" @click="selectEvent(item.id); activeView = 'business'">{{ item.id.slice(0, 8) }}</button><small>{{ item.party_name || '交易对方未提取' }}</small></td><td class="amount">{{ item.amount ? `¥ ${Number(item.amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}` : '待核对' }}</td><td>{{ item.document_count }} 份</td><td><span class="status-pill" :class="`status-${item.status.toLowerCase()}`">{{ businessStatusLabel(item.status) }}</span></td><td>{{ statusLabel(item.voucher_status) }}</td><td>{{ item.posting_status }}</td><td><button class="continue-button" @click="selectEvent(item.id); activeView = 'business'">继续处理 →</button></td></tr></tbody></table></div>
             </section>
             <section class="content-card attention-card"><div class="card-heading"><div><h2>需要关注</h2><p>待处理异常与风险提示</p></div><button class="text-button" @click="activeView = 'cases'">异常中心 <span>→</span></button></div>
@@ -1114,11 +1414,13 @@ onBeforeUnmount(() => {
           <section class="content-card correction-stats"><div class="card-heading"><div><h2>人工纠错统计</h2><p>仅统计当前账号可查看的单据版本，不展示单据字段内容。</p></div></div><p v-if="correctionStatsError" class="quiet-empty">{{ correctionStatsError }}</p><template v-else><div class="correction-stat-summary"><span><strong>{{ correctionStats.corrected_documents }}</strong><small>有人工更正的单据</small></span><span><strong>{{ correctionStats.correction_versions }}</strong><small>人工确认版本</small></span><span v-for="item in correctionStats.field_changes.slice(0, 5)" :key="item.field"><strong>{{ item.count }}</strong><small>{{ fieldLabel(item.field) }}被修改</small></span></div><p v-if="!correctionStats.correction_versions" class="quiet-empty">当前可见单据还没有人工更正记录。</p></template></section>
           <section class="upload-zone" @dragover.prevent @drop.prevent="onDrop"><input ref="uploadInput" type="file" accept="image/jpeg,image/png,application/pdf,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple @change="upload"><div class="upload-symbol">↑</div><strong>拖放文件到这里，或选择文件上传</strong><p>支持 JPG、PNG、PDF、CSV、XLSX</p><button class="button button-secondary" @click="uploadInput?.click()" :disabled="busy">{{ busy ? '正在上传…' : '选择文件' }}</button></section>
           <section v-if="uploadQueue.length" class="content-card upload-queue"><div class="card-heading"><div><h2>本次上传</h2><p>每个文件单独显示结果；失败文件可以单独重试。</p></div><button class="text-button" @click="uploadQueue = uploadQueue.filter((item) => item.status !== 'done')">清除已完成</button></div><div v-for="item in uploadQueue" :key="item.id" class="upload-queue-item"><div class="upload-queue-name"><strong>{{ item.file.name }}</strong><small v-if="item.error">{{ item.error }}</small><small v-else>{{ item.status === 'done' ? '已完成' : `上传中 ${item.progress}%` }}</small></div><progress :value="item.progress" max="100"></progress><button v-if="item.status === 'failed'" class="button button-quiet" @click="retryUpload(item)" :disabled="busy">重试</button><span v-else class="status-pill">{{ item.status === 'done' ? '完成' : '上传中' }}</span></div></section>
-          <section class="content-card document-card"><div class="card-heading"><div><h2>待处理单据 <span class="count-badge">{{ documentTotal }}</span></h2><p>已生成凭证的业务单据在业务档案查看</p></div><button class="button button-quiet" @click="load" :disabled="loading">刷新列表</button></div>
-            <div v-if="!docs.length" class="empty-state"><div class="empty-icon">▤</div><strong>当前没有待处理单据</strong><p>已处理单据可在业务档案查看；新单据上传后会出现在这里。</p></div>
-            <div v-else class="document-list"><article v-for="document in docs" :key="document.id" class="document-row"><input type="checkbox" :checked="selected.includes(document.id)" @change="toggle(document.id)"><div class="document-thumb"><img v-if="document.mime_type.startsWith('image/') && previews[document.id]" :src="previews[document.id]" alt="单据原件预览"><a v-else-if="previews[document.id]" :href="previews[document.id]" target="_blank" rel="noreferrer">{{ document.mime_type === 'application/pdf' ? 'PDF' : document.mime_type === 'text/csv' ? 'CSV' : 'XLSX' }}</a><span v-else>文件</span></div><div class="document-main"><strong>{{ document.filename }}</strong><small>{{ documentTypeLabel(document.document_type) }} · {{ document.uploaded_at ? new Date(document.uploaded_at).toLocaleString('zh-CN') : '上传时间未提供' }} · 来源 {{ document.uploaded_by || '未知' }}</small><small>关键金额：{{ document.key_amount ? `¥ ${Number(document.key_amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}` : '未识别' }} · {{ document.id.slice(0, 8) }}</small><div class="document-business-links"><span v-if="!document.business_events?.length">未关联业务</span><button v-for="business in document.business_events" :key="business.id" class="table-link" @click.stop="activeView = 'business'; selectEvent(business.id)">业务 {{ business.id.slice(0, 8) }} · {{ documentRoleLabel(business.role) }} · {{ businessStatusLabel(business.status) }}</button></div><small v-if="document.missing_fields?.length">缺少字段：{{ document.missing_fields.map((field) => documentFieldLabel(field, document.document_type || '')).join('、') }}</small></div><span class="status-pill" :class="`status-${document.processing_status.toLowerCase()}`">{{ statusLabel(document.processing_status) }}</span><button class="button button-quiet" @click="inspect(document)">{{ editing[document.id] ? '收起字段' : '查看并确认字段' }}</button></article>
-              <div v-for="document in docs.filter((item) => editing[item.id])" :key="`edit-${document.id}`" class="field-editor">
-                <div class="field-editor-heading"><div><strong>核对识别字段</strong><small>点击字段查看它在原件中的位置；没有定位证据时会明确显示。</small></div><button class="text-button" @click="browseOriginal(document.id)">浏览原件</button><select v-model="editing[document.id].type" class="document-type-select" aria-label="单据类型" @change="ensureReviewFields(document)"><option v-for="type in ['UNCLASSIFIED', 'VAT_INVOICE', 'GOODS_RECEIPT', 'BANK_RECEIPT', 'CONTRACT', 'PAYMENT_PROOF', 'ACCEPTANCE_REPORT', 'TAXI_RECEIPT', 'TOLL_RECEIPT', 'OTHER']" :key="type" :value="type">{{ documentTypeLabel(type) }}</option></select></div>
+          <section class="content-card document-card"><div class="card-heading"><div><h2>{{ documentFilter === 'unlinked' ? '待归类单据' : '待处理单据' }} <span class="count-badge">{{ documentTotal }}</span></h2><p>已生成凭证的单据已归档，可在凭证中心展开查看</p></div><div class="document-bulk-actions"><button class="button button-quiet" @click="selectDocumentPage" :disabled="!docs.length || busy">{{ docs.length && docs.every((item) => selected.includes(item.id)) ? "取消全选本页" : "全选本页" }}</button><button v-if="canDeleteDocuments" class="button button-delete" @click="deleteSelectedDocuments" :disabled="!selected.length || busy">删除选中（{{ selected.length }}）</button><button class="button button-quiet" @click="load" :disabled="loading">刷新列表</button></div></div>
+            <div class="document-filter-actions"><button class="button" :class="documentFilter === 'all' ? 'button-primary' : 'button-quiet'" :aria-pressed="documentFilter === 'all'" @click="changeDocumentFilter('all')">全部待处理 <span class="count-badge">{{ documentTotal }}</span></button><button class="button" :class="documentFilter === 'unlinked' ? 'button-primary' : 'button-quiet'" :aria-pressed="documentFilter === 'unlinked'" @click="changeDocumentFilter('unlinked')">待归类 <span class="count-badge">{{ unlinkedDocs }}</span></button></div>
+            <div v-if="!docs.length" class="empty-state"><div class="empty-icon">▤</div><strong>{{ documentFilter === 'unlinked' ? '当前没有待归类单据' : '当前没有待处理单据' }}</strong><p>{{ documentFilter === 'unlinked' ? '新上传且尚未关联业务的票据会出现在这里。' : '已生成凭证的单据已归档到凭证中心；新单据上传后会出现在这里。' }}</p></div>
+            <div v-else class="document-list"><article v-for="document in docs" :key="document.id" class="document-row"><input type="checkbox" :checked="selected.includes(document.id)" aria-label="选择单据进行关联或删除" @change="toggle(document.id)"><div class="document-thumb"><img v-if="document.mime_type.startsWith('image/') && previews[document.id]" :src="previews[document.id]" alt="单据原件预览"><a v-else-if="previews[document.id]" :href="previews[document.id]" target="_blank" rel="noreferrer">{{ document.mime_type === 'application/pdf' ? 'PDF' : document.mime_type === 'text/csv' ? 'CSV' : 'XLSX' }}</a><span v-else>文件</span></div><div class="document-main"><strong>{{ document.filename }}</strong><small>{{ documentTypeLabel(document.document_type) }} · {{ document.uploaded_at ? new Date(document.uploaded_at).toLocaleString('zh-CN') : '上传时间未提供' }} · 来源 {{ document.uploaded_by || '未知' }}</small><small>关键金额：{{ document.key_amount ? `¥ ${Number(document.key_amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}` : '未识别' }} · {{ document.id.slice(0, 8) }}</small><div class="document-business-links"><span class="status-pill" :class="document.business_events?.length ? 'status-confirmed' : ''" data-testid="document-association-status">归类状态：{{ document.business_events?.length ? '已归类' : '待归类' }}</span><button v-for="business in document.business_events" :key="business.id" class="table-link" @click.stop="activeView = 'business'; selectEvent(business.id)">业务 {{ business.id.slice(0, 8) }} · {{ documentRoleLabel(business.role) }} · {{ businessStatusLabel(business.status) }}</button></div><small v-if="document.missing_fields?.length">缺少字段：{{ document.missing_fields.map((field) => documentFieldLabel(field, document.document_type || '')).join('、') }}</small></div><span class="status-pill" :class="`status-${(document.recognition_status || document.processing_status).toLowerCase()}`" data-testid="document-recognition-status">识别状态：{{ statusLabel(document.recognition_status || document.processing_status) }}</span><button class="button button-quiet" @click="inspect(document)">{{ editing[document.id] ? '收起字段' : '查看并确认字段' }}</button><button v-if="canDeleteDocuments" class="button button-delete" @click.stop="deleteDocument(document)" :disabled="busy">删除</button></article>
+              <div v-for="document in docs.filter((item) => editing[item.id])" :key="`edit-${document.id}`" class="field-editor" @click="documentTypePickerOpen[document.id] = false">
+              <div class="field-editor-heading"><div><strong>核对识别字段</strong><small>点击字段查看它在原件中的位置；没有定位证据时会明确显示。</small></div><button class="text-button" @click="browseOriginal(document.id)">浏览原件</button><div class="document-type-picker"><button class="document-type-picker-trigger" aria-label="单据类型" :aria-expanded="Boolean(documentTypePickerOpen[document.id])" @click.stop="toggleDocumentTypePicker(document.id)">{{ documentTypeLabel(editing[document.id].type) }} <span>▾</span></button><div v-if="documentTypePickerOpen[document.id]" class="document-type-picker-menu" @click.stop><section v-for="group in documentTypeGroups" :key="group.label" class="document-type-picker-group"><div class="document-type-picker-group-heading"><strong>{{ group.label }}</strong><button class="text-button" :aria-expanded="!collapsedDocumentTypeGroups[group.label]" @click="toggleDocumentTypeGroup(group.label)">{{ collapsedDocumentTypeGroups[group.label] ? '展开' : '收起' }}</button></div><div v-show="!collapsedDocumentTypeGroups[group.label]" class="document-type-picker-options"><button v-for="type in group.types" :key="type" :class="{ selected: editing[document.id].type === type }" @click.stop="chooseDocumentType(document, type)">{{ documentTypeLabel(type) }}</button></div></section></div></div><button class="text-button" :aria-expanded="!collapsedFieldEditors[document.id]" @click="collapsedFieldEditors[document.id] = !collapsedFieldEditors[document.id]">{{ collapsedFieldEditors[document.id] ? '展开核对区' : '收起核对区' }}</button></div>
+              <div v-show="!collapsedFieldEditors[document.id]">
                 <div v-if="editing[document.id].typeCandidate?.normalized_value" class="document-type-suggestion"><span>类型建议：{{ documentTypeLabel(editing[document.id].typeCandidate?.normalized_value || undefined) }} · {{ editing[document.id].typeCandidate?.evidence_text ? `识别依据：${editing[document.id].typeCandidate?.evidence_text}` : '需对照原件确认' }}</span><button class="text-button" @click="applyDocumentTypeSuggestion(document)">采用建议</button></div>
                 <div v-if="evidenceSelection?.documentId === document.id" class="source-preview-panel">
                   <div v-if="evidencePreview?.documentId === document.id" class="source-preview-canvas">
@@ -1133,7 +1435,7 @@ onBeforeUnmount(() => {
                     <button class="text-button" @click="showEvidencePage(document.id, evidencePreview.page + 1)" :disabled="evidencePreview.page >= evidencePreview.pageCount">下一页</button>
                   </div>
                 </div>
-                <section class="field-tier"><h3>第一层 · 记账关键字段</h3><p>识别候选仅供核对；保存前请对照原件确认。</p><div class="field-grid"><label v-for="(field, key) in visibleDocumentFields(document.id)" :key="key" @click="focusEvidence(document.id, String(key))">{{ documentFieldLabel(String(key), editing[document.id].type) }}<small>识别置信度 {{ field.confidence }} · {{ statusLabel(field.status) }} · {{ field.page ? `第 ${field.page} 页` : '未定位到页面' }}</small><small v-if="field.evidence_text">原文证据：{{ field.evidence_text }}</small><small v-if="field.bbox?.length">来源位置（{{ field.coordinate_space || '坐标系未知' }}）：{{ field.bbox.join(', ') }}</small><select v-if="key === 'settled'" v-model="field.normalized_value" aria-label="settled" @focus="focusEvidence(document.id, String(key))"><option value="SETTLED">已清算</option><option value="NOT_SETTLED">未清算</option><option value="UNKNOWN">无法确认</option></select><input v-else v-model="field.normalized_value" :aria-label="String(key)" @focus="focusEvidence(document.id, String(key))"></label></div></section>
+                <section class="field-tier"><h3>第一层 · 记账关键字段</h3><p>识别候选仅供核对；保存前请对照原件确认。</p><div class="field-grid"><label v-for="(field, key) in visibleDocumentFields(document.id)" :key="key" @click="focusEvidence(document.id, String(key))">{{ documentFieldLabel(String(key), editing[document.id].type) }}<small>识别置信度 {{ field.confidence }} · {{ statusLabel(field.status) }} · {{ field.page ? `第 ${field.page} 页` : '未定位到页面' }}</small><small v-if="field.evidence_text">原文证据：{{ field.evidence_text }}</small><small v-if="field.bbox?.length">来源位置（{{ field.coordinate_space || '坐标系未知' }}）：{{ field.bbox.join(', ') }}</small><select v-if="key === 'settled'" v-model="field.normalized_value" aria-label="settled" @change="markFieldEdited(document.id, String(key))" @focus="focusEvidence(document.id, String(key))"><option value="SETTLED">已清算</option><option value="NOT_SETTLED">未清算</option><option value="UNKNOWN">无法确认</option></select><input v-else v-model="field.normalized_value" :aria-label="String(key)" @input="markFieldEdited(document.id, String(key))" @focus="focusEvidence(document.id, String(key))"></label></div></section>
                 <details class="auxiliary-fields">
                   <summary>第二层 · 业务辅助字段（{{ Object.keys(visibleAuxiliaryDocumentFields(document.id)).length }} 项）</summary>
                   <p>用于查重、匹配和追溯。</p>
@@ -1152,8 +1454,9 @@ onBeforeUnmount(() => {
                 <div v-if="editing[document.id].history[0]" class="current-extraction-version"><strong>当前已保存版本 V{{ editing[document.id].history[0].version }}</strong><small>{{ editing[document.id].history[0].created_by }} · {{ new Date(editing[document.id].history[0].created_at).toLocaleString('zh-CN') }} · {{ editing[document.id].history[0].reason || '此版本未记录修改原因' }}</small></div>
                 <div class="field-editor-footer"><input v-model="editing[document.id].reason" aria-label="人工确认原因"><button class="button button-primary" @click="confirm(document)">保存确认版本</button></div>
               </div>
+              </div>
             </div>
-            <div v-if="selected.length && currentRole !== 'BUSINESS_USER'" class="association-bar"><span>已选 {{ selected.length }} 份 · 关联前请确认每份单据的类型和字段</span><select v-model="selectedEventType" class="business-type-select" aria-label="业务类型" @change="selectedEventType === 'RENTAL' && canManageAccountingPolicy && loadChartAccounts()"><option value="PURCHASE">采购</option><option value="EXPENSE">费用报销</option><option value="ASSET_PURCHASE">设备购置</option><option value="RENTAL">租赁</option></select><label v-if="selectedEventType === 'RENTAL' && canManageAccountingPolicy && policyForms.RENTAL.version && policyForms.RENTAL.accounting_treatment === 'DIRECT_EXPENSE'" class="rental-confirmation"><input v-model="rentalDirectExpenseConfirmed" type="checkbox">我已核对本笔合同，确认适用账套的“租赁直接费用”政策，不需要按使用权资产和租赁负债处理</label><span v-else-if="selectedEventType === 'RENTAL' && canManageAccountingPolicy" class="rental-confirmation-hint">请先在设置中确认租赁直接费用政策；未确认政策前，租赁业务会保持待复核。</span><button class="button button-primary" @click="linkDocs" :disabled="busy">确认关联并核对</button></div><div v-if="documentPages > 1" class="pagination"><button @click="changePage('documents', Math.max(1, documentPage - 1))" :disabled="documentPage === 1">上一页</button><span>{{ documentPage }} / {{ documentPages }}</span><button @click="changePage('documents', Math.min(documentPages, documentPage + 1))" :disabled="documentPage === documentPages">下一页</button></div>
+            <div v-if="selectedCanAssociate && currentRole !== 'BUSINESS_USER'" class="association-bar"><span>已选 {{ selected.length }} 份 · 关联前请确认每份单据的类型和字段</span><select v-model="selectedEventType" class="business-type-select" aria-label="业务类型" @change="selectedEventType === 'RENTAL' && canManageAccountingPolicy && loadChartAccounts()"><option value="PURCHASE">采购</option><option value="EXPENSE">费用报销</option><option value="ASSET_PURCHASE">设备购置</option><option value="RENTAL">租赁</option></select><label v-if="selectedEventType === 'RENTAL' && canManageAccountingPolicy && policyForms.RENTAL.version && policyForms.RENTAL.accounting_treatment === 'DIRECT_EXPENSE'" class="rental-confirmation"><input v-model="rentalDirectExpenseConfirmed" type="checkbox">我已核对本笔合同，确认适用账套的“租赁直接费用”政策，不需要按使用权资产和租赁负债处理</label><span v-else-if="selectedEventType === 'RENTAL' && canManageAccountingPolicy" class="rental-confirmation-hint">请先在设置中确认租赁直接费用政策；未确认政策前，租赁业务会保持待复核。</span><button class="button button-primary" @click="linkDocs" :disabled="busy">确认关联并核对</button></div><div v-if="documentPages > 1" class="pagination"><button @click="changePage('documents', Math.max(1, documentPage - 1))" :disabled="documentPage === 1">上一页</button><span>{{ documentPage }} / {{ documentPages }}</span><button @click="changePage('documents', Math.min(documentPages, documentPage + 1))" :disabled="documentPage === documentPages">下一页</button></div>
           </section>
         </template>
 
@@ -1189,7 +1492,7 @@ onBeforeUnmount(() => {
         <template v-else-if="activeView === 'vouchers'">
           <section class="welcome-row"><div><p class="eyebrow">凭证中心</p><h1>凭证草稿与审批</h1><p class="page-subtitle">审批锁定凭证版本；导出不等于 ERP 入账。</p></div><span class="connection-badge">ERP 写入未连接</span></section>
           <section class="voucher-layout"><div class="content-card voucher-list"><div class="card-heading"><div><h2>凭证列表</h2><p>{{ draftTotal }} 份凭证</p></div></div><div v-if="!drafts.length" class="empty-state compact"><strong>还没有凭证草稿</strong><p>先完成业务关联和核对，再生成凭证候选。</p><button class="button button-secondary" @click="activeView = 'business'">查看业务</button></div><button v-for="item in pagedDrafts" :key="item.id" class="voucher-list-item" :class="{ selected: draft?.id === item.id }" @click="chooseDraft(item)"><span><strong>{{ item.id.slice(0, 8) }} · V{{ item.version }}</strong><small>{{ item.period }} · 借方 ¥{{ item.debit_total }}</small></span><span class="status-pill">{{ voucherStatusLabel(item.status) }}</span></button><div v-if="voucherPages > 1" class="pagination"><button @click="changePage('vouchers', Math.max(1, voucherPage - 1))" :disabled="voucherPage === 1">上一页</button><span>{{ voucherPage }} / {{ voucherPages }}</span><button @click="changePage('vouchers', Math.min(voucherPages, voucherPage + 1))" :disabled="voucherPage === voucherPages">下一页</button></div></div>
-            <section class="content-card voucher-detail"><template v-if="draft"><div class="card-heading"><div><p class="eyebrow">{{ String(draft.policy?.provider || '').startsWith('DEEPSEEK:') ? 'AI 生成' : '凭证建议' }} · {{ String(draft.policy?.provider || '来源未记录') }} / {{ String(draft.policy?.model || '模型未记录') }}</p><h2>凭证 {{ draft.id.slice(0, 8) }} <span class="version-tag">V{{ draft.version }}</span></h2><p>会计期间 {{ draft.period }} · 状态 {{ voucherStatusLabel(draft.status) }}</p><p class="source-note">{{ voucherPolicySummary(draft.policy) }}</p></div><span class="status-pill">{{ voucherStatusLabel(draft.status) }}</span></div><div v-if="draft.status === 'NEEDS_REVIEW'" class="export-state"><strong>必填辅助核算尚未补齐</strong><p>{{ draft.validations?.find((item) => item.code === 'AUXILIARY_COMPLETE')?.reason || '请补齐科目要求的辅助核算维度后再提交审核。' }}</p></div><div class="voucher-summary"><div><small>借方合计</small><strong>¥ {{ Number(draft.debit_total).toLocaleString('zh-CN', { minimumFractionDigits: 2 }) }}</strong></div><div><small>贷方合计</small><strong>¥ {{ Number(draft.credit_total).toLocaleString('zh-CN', { minimumFractionDigits: 2 }) }}</strong></div><div><small>来源业务</small><button class="table-link" @click="selectEvent(draft!.event_id); activeView = 'business'">{{ draft.event_id.slice(0, 8) }} →</button></div></div><button v-if="correctedFromDraftId(draft.policy)" class="button button-quiet" @click="showOriginalAiDraft">查看原 AI 草稿 V{{ correctedFromVersion(draft.policy) }}</button><section v-if="originalAiDraft" class="voucher-evidence-panel original-ai-panel"><div class="card-heading"><div><h3>原 AI 凭证草稿 V{{ originalAiDraft.version }}</h3><p>{{ String(originalAiDraft.policy?.provider || 'DeepSeek') }} / {{ String(originalAiDraft.policy?.model || '模型未记录') }}</p></div><button class="text-button" @click="originalAiDraft = null">关闭</button></div><div v-for="line in originalAiDraft.lines" :key="`${line.account_code}-${line.description}`" class="original-ai-line"><strong>{{ line.account_code }} {{ line.account_name }}</strong><span>{{ line.description }} · 借 {{ line.debit }} / 贷 {{ line.credit }}</span><small>AI 理由：{{ line.rationale || '未记录' }}</small></div></section><div class="table-scroll"><table class="entry-table"><thead><tr><th>科目编码</th><th>会计科目</th><th>摘要</th><th>借方</th><th>贷方</th><th>辅助核算</th></tr></thead><tbody><tr v-for="(line, index) in (editingVoucher ? voucherLines : draft.lines)" :key="`${line.account_code}-${index}`"><td><input v-if="editingVoucher" v-model="line.account_code" aria-label="科目编码"><template v-else>{{ line.account_code }}</template></td><td>{{ line.account_name }}</td><td><input v-if="editingVoucher" v-model="line.description" aria-label="摘要"><template v-else>{{ line.description }}</template><small v-if="!editingVoucher && line.rationale" class="ai-rationale">AI 理由：{{ line.rationale }}</small></td><td class="amount"><input v-if="editingVoucher" v-model="line.debit" type="number" min="0" step="0.01" aria-label="借方金额"><template v-else>{{ line.debit === '0.00' ? '—' : `¥ ${line.debit}` }}</template></td><td class="amount"><input v-if="editingVoucher" v-model="line.credit" type="number" min="0" step="0.01" aria-label="贷方金额"><template v-else>{{ line.credit === '0.00' ? '—' : `¥ ${line.credit}` }}</template></td><td><textarea v-if="editingVoucher" v-model="line.auxiliary_text" :aria-label="`辅助核算 JSON ${line.account_code}`"></textarea><span v-else>{{ auxiliaryLabel(line.auxiliary) }}</span><small v-if="editingVoucher && line.required_auxiliary_fields?.length">必填：{{ line.required_auxiliary_fields.join('、') }}</small></td></tr></tbody></table></div><section class="voucher-sources"><h3>来源单据</h3><button v-for="ref in voucherSourceIds(draft)" :key="ref" class="table-link" @click="openVoucherOriginal(ref)">{{ eventDetail?.documents.find((document) => document.id === ref)?.filename || `来源 ${ref.slice(0, 8)}` }}</button><span v-if="!voucherSourceIds(draft).length">缺少证据</span></section><section v-if="voucherEvidence" class="voucher-evidence-panel"><div class="card-heading"><div><h3>原始单据：{{ voucherEvidence.filename }}</h3></div><button class="text-button" @click="voucherEvidence = null">关闭</button></div><img v-if="evidencePreview?.documentId === voucherEvidence.id" class="voucher-evidence-preview" :src="evidencePreview.url" alt="来源单据原件"></section><div class="validation-panel"><h3>后端校验</h3><div v-for="validation in draft.validations || []" :key="validation.code" class="validation-row"><span :class="validation.passed ? 'check-mark' : 'attention-mark'">{{ validation.passed ? '✓' : '!' }}</span><span>{{ validationLabel(validation.code) }}<small v-if="validation.reason">{{ validation.reason }}</small></span><strong>{{ validation.passed ? '通过' : '待处理' }}</strong></div><div class="validation-row"><span class="attention-mark">!</span><span>ERP 写入与回读</span><strong>未接入，不能标记已入账</strong></div></div><section class="audit-timeline"><h3>处理记录</h3><div v-if="!auditEntries.length" class="audit-empty">当前没有可显示的审批或入账记录。</div><div v-for="entry in auditEntries" :key="entry.id" class="audit-entry"><span class="audit-dot"></span><div><strong>{{ auditLabel(entry.event_type) }}</strong><small>{{ entry.actor }} · {{ new Date(entry.occurred_at).toLocaleString('zh-CN') }}</small></div></div></section><div v-if="editingVoucher" class="correction-editor"><label>修正原因<input v-model="voucherCorrectionReason" minlength="3" maxlength="500" placeholder="请说明为什么修改这份凭证"></label><button class="button button-primary" @click="saveVoucherCorrection" :disabled="voucherCorrectionReason.trim().length < 3">保存为新版本并重新校验</button><button class="button button-quiet" @click="cancelVoucherCorrection">取消</button></div><div class="approval-notice">审批需由与制单人不同的有权限用户完成。演示审批只用于本地验收。</div><div class="action-row"><button v-if="!editingVoucher" class="button button-secondary" @click="startVoucherCorrection" :disabled="!canSubmitVoucher || !['NEEDS_REVIEW', 'VALIDATED', 'REJECTED', 'APPROVED'].includes(draft.status)">修正凭证</button><button class="button button-secondary" @click="submitReview" :disabled="draft.status !== 'VALIDATED' || !canSubmitVoucher" :title="canSubmitVoucher ? '提交审核' : '当前角色没有提交审核权限'">提交审核</button><button class="button button-secondary" @click="returnDraft" :disabled="draft.status !== 'PENDING_APPROVAL' || !canApproveVoucher">退回修改</button><button class="button button-secondary" @click="approveDraft" :disabled="draft.status !== 'PENDING_APPROVAL' || !canApproveVoucher" :title="canApproveVoucher ? '批准凭证' : '当前角色没有审批权限'">批准凭证</button><button class="button button-primary" @click="exportDraft" :disabled="draft.status !== 'APPROVED' || !canExportVoucher" :title="canExportVoucher ? '导出待人工入账 CSV' : '当前角色没有导出权限'">导出待人工入账 CSV</button><button class="button button-delete" @click="deleteVoucher" :disabled="!canSubmitVoucher">删除凭证</button></div><div v-if="draft.status === 'EXPORTED_PENDING_MANUAL_POST'" class="export-state"><strong>已导出待人工入账</strong><p>此凭证文件尚未写入 ERP，也没有 ERP 凭证号或回读核实结果。</p></div></template><div v-else class="empty-state"><strong>选择一份凭证查看详情</strong><p>凭证状态、借贷分录和校验结果会显示在这里。</p></div></section></section>
+            <section class="content-card voucher-detail"><template v-if="draft"><div class="card-heading"><div><p class="eyebrow">{{ String(draft.policy?.provider || '').startsWith('DEEPSEEK:') ? 'AI 生成' : '凭证建议' }} · {{ String(draft.policy?.provider || '来源未记录') }} / {{ String(draft.policy?.model || '模型未记录') }}</p><h2>凭证 {{ draft.id.slice(0, 8) }} <span class="version-tag">V{{ draft.version }}</span></h2><p>会计期间 {{ draft.period }} · 状态 {{ voucherStatusLabel(draft.status) }}</p><p class="source-note">{{ voucherPolicySummary(draft.policy) }}</p></div><span class="status-pill">{{ voucherStatusLabel(draft.status) }}</span></div><div v-if="draft.status === 'NEEDS_REVIEW'" class="export-state"><strong>必填辅助核算尚未补齐</strong><p>{{ draft.validations?.find((item) => item.code === 'AUXILIARY_COMPLETE')?.reason || '请补齐科目要求的辅助核算维度后再提交审核。' }}</p></div><div class="voucher-summary"><div><small>借方合计</small><strong>¥ {{ Number(draft.debit_total).toLocaleString('zh-CN', { minimumFractionDigits: 2 }) }}</strong></div><div><small>贷方合计</small><strong>¥ {{ Number(draft.credit_total).toLocaleString('zh-CN', { minimumFractionDigits: 2 }) }}</strong></div><div><small>来源业务</small><button class="table-link" @click="selectEvent(draft!.event_id); activeView = 'business'">{{ draft.event_id.slice(0, 8) }} →</button></div></div><button v-if="correctedFromDraftId(draft.policy)" class="button button-quiet" @click="showOriginalAiDraft">查看原 AI 草稿 V{{ correctedFromVersion(draft.policy) }}</button><section v-if="originalAiDraft" class="voucher-evidence-panel original-ai-panel"><div class="card-heading"><div><h3>原 AI 凭证草稿 V{{ originalAiDraft.version }}</h3><p>{{ String(originalAiDraft.policy?.provider || 'DeepSeek') }} / {{ String(originalAiDraft.policy?.model || '模型未记录') }}</p></div><button class="text-button" @click="originalAiDraft = null">关闭</button></div><div v-for="line in originalAiDraft.lines" :key="`${line.account_code}-${line.description}`" class="original-ai-line"><strong>{{ line.account_code }} {{ line.account_name }}</strong><span>{{ line.description }} · 借 {{ line.debit }} / 贷 {{ line.credit }}</span><small>AI 理由：{{ line.rationale || '未记录' }}</small></div></section><div class="table-scroll"><table class="entry-table"><thead><tr><th>科目编码</th><th>会计科目</th><th>摘要</th><th>借方</th><th>贷方</th><th>辅助核算</th></tr></thead><tbody><tr v-for="(line, index) in (editingVoucher ? voucherLines : draft.lines)" :key="`${line.account_code}-${index}`"><td><input v-if="editingVoucher" v-model="line.account_code" :aria-label="`科目编码 ${index + 1}`"><template v-else>{{ line.account_code }}</template></td><td><template v-if="editingVoucher"><select :value="line.account_code" :aria-label="`选择账套科目 ${index + 1}`" @change="selectVoucherAccount(line, ($event.target as HTMLSelectElement).value)"><option value="">选择账套科目</option><option v-for="account in voucherAccountChoices" :key="account.code" :value="account.code">{{ account.code }} · {{ account.name }}</option></select><input v-model="line.account_name" placeholder="或手动输入科目名称" :aria-label="`会计科目名称 ${line.account_code}`"></template><template v-else>{{ line.account_name }}</template></td><td><input v-if="editingVoucher" v-model="line.description" aria-label="摘要"><template v-else>{{ line.description }}</template><small v-if="!editingVoucher && line.rationale" class="ai-rationale">AI 理由：{{ line.rationale }}</small></td><td class="amount"><input v-if="editingVoucher" v-model="line.debit" type="number" min="0" step="0.01" aria-label="借方金额"><template v-else>{{ line.debit === '0.00' ? '—' : `¥ ${line.debit}` }}</template></td><td class="amount"><input v-if="editingVoucher" v-model="line.credit" type="number" min="0" step="0.01" aria-label="贷方金额"><template v-else>{{ line.credit === '0.00' ? '—' : `¥ ${line.credit}` }}</template></td><td><textarea v-if="editingVoucher" v-model="line.auxiliary_text" :aria-label="`辅助核算 JSON ${line.account_code}`"></textarea><span v-else>{{ auxiliaryLabel(line.auxiliary) }}</span><small v-if="editingVoucher && line.required_auxiliary_fields?.length">必填：{{ line.required_auxiliary_fields.join('、') }}</small></td></tr></tbody></table></div><section class="voucher-sources"><h3>来源单据</h3><details v-if="voucherSourceDocuments.length" class="voucher-source-accordion"><summary>展开查看 {{ voucherSourceDocuments.length }} 份来源单据</summary><details v-for="document in voucherSourceDocuments" :key="document.id" class="voucher-source-document" @toggle="loadVoucherSource(document, $event)"><summary>{{ documentRoleLabel(document.role) }} · {{ document.filename }}</summary><div v-if="voucherSourcePreviews[document.id]?.loading" class="loading-state">正在读取原件和 OCR 结果…</div><p v-else-if="voucherSourcePreviews[document.id]?.error" class="quiet-empty">{{ voucherSourcePreviews[document.id]?.error }}</p><template v-else-if="voucherSourcePreviews[document.id]?.url"><div class="voucher-source-file"><img v-if="voucherSourcePreviews[document.id]?.mimeType.startsWith('image/')" :src="voucherSourcePreviews[document.id]?.url || ''" :alt="document.filename"><iframe v-else-if="voucherSourcePreviews[document.id]?.mimeType.includes('pdf')" :src="voucherSourcePreviews[document.id]?.url || ''" :title="document.filename"></iframe><a v-else class="table-link" :href="voucherSourcePreviews[document.id]?.url || ''" :download="document.filename">下载原件</a></div><details v-if="voucherSourcePreviews[document.id]?.extraction" class="voucher-source-ocr"><summary>确认后的 OCR 字段</summary><div class="archive-ocr"><div v-for="(field, key) in voucherSourcePreviews[document.id]?.extraction?.fields" :key="key"><strong>{{ documentFieldLabel(String(key), voucherSourcePreviews[document.id]?.extraction?.document_type || '') }}</strong><span>{{ field.normalized_value ?? field.raw_value ?? '—' }}</span></div><details v-if="voucherSourcePreviews[document.id]?.extraction?.full_text"><summary>识别原文</summary><pre>{{ voucherSourcePreviews[document.id]?.extraction?.full_text }}</pre></details></div></details></template></details></details><span v-else>缺少证据</span></section><div class="validation-panel"><h3>后端校验</h3><div v-for="validation in draft.validations || []" :key="validation.code" class="validation-row"><span :class="validation.passed ? 'check-mark' : 'attention-mark'">{{ validation.passed ? '✓' : '!' }}</span><span>{{ validationLabel(validation.code) }}<small v-if="validation.reason">{{ validation.reason }}</small></span><strong>{{ validation.passed ? '通过' : '待处理' }}</strong></div><div class="validation-row"><span class="attention-mark">!</span><span>ERP 写入与回读</span><strong>未接入，不能标记已入账</strong></div></div><section class="audit-timeline"><h3>处理记录</h3><div v-if="!auditEntries.length" class="audit-empty">当前没有可显示的审批或入账记录。</div><div v-for="entry in auditEntries" :key="entry.id" class="audit-entry"><span class="audit-dot"></span><div><strong>{{ auditLabel(entry.event_type) }}</strong><small>{{ entry.actor }} · {{ new Date(entry.occurred_at).toLocaleString('zh-CN') }}</small></div></div></section><div v-if="editingVoucher" class="correction-editor"><label>修正原因<input v-model="voucherCorrectionReason" minlength="3" maxlength="500" placeholder="请说明为什么修改这份凭证"></label><button class="button button-primary" @click="saveVoucherCorrection" :disabled="voucherCorrectionReason.trim().length < 3">保存为新版本并重新校验</button><button class="button button-quiet" @click="cancelVoucherCorrection">取消</button></div><div class="approval-notice">审批需由与制单人不同的有权限用户完成。演示审批只用于本地验收。</div><div class="action-row"><button v-if="!editingVoucher" class="button button-secondary" @click="startVoucherCorrection" :disabled="!canSubmitVoucher || !['NEEDS_REVIEW', 'VALIDATED', 'REJECTED', 'APPROVED'].includes(draft.status)">修正凭证</button><button class="button button-secondary" @click="submitReview" :disabled="draft.status !== 'VALIDATED' || !canSubmitVoucher" :title="canSubmitVoucher ? '提交审核' : '当前角色没有提交审核权限'">提交审核</button><button class="button button-secondary" @click="returnDraft" :disabled="draft.status !== 'PENDING_APPROVAL' || !canApproveVoucher">退回修改</button><button class="button button-secondary" @click="approveDraft" :disabled="draft.status !== 'PENDING_APPROVAL' || !canApproveVoucher" :title="canApproveVoucher ? '批准凭证' : '当前角色没有审批权限'">批准凭证</button><button class="button button-primary" @click="exportDraft" :disabled="draft.status !== 'APPROVED' || !canExportVoucher" :title="canExportVoucher ? '导出待人工入账 CSV' : '当前角色没有导出权限'">导出待人工入账 CSV</button><button class="button button-delete" @click="deleteVoucher" :disabled="!canSubmitVoucher">删除凭证</button></div><div v-if="draft.status === 'EXPORTED_PENDING_MANUAL_POST'" class="export-state"><strong>已导出待人工入账</strong><p>此凭证文件尚未写入 ERP，也没有 ERP 凭证号或回读核实结果。</p></div></template><div v-else class="empty-state"><strong>选择一份凭证查看详情</strong><p>凭证状态、借贷分录和校验结果会显示在这里。</p></div></section></section>
         </template>
 
         <template v-else-if="activeView === 'cases'">

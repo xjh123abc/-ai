@@ -106,7 +106,9 @@ def test_deepseek_receives_linked_document_facts_with_sources_and_four_tasks():
         http_post=lambda _url, _headers, payload, _timeout: (requests.append(payload), valid_completion())[1],
     )
     source_context = replace(context(), source_documents=(
-        {"evidence_ref": INVOICE_ID, "role": "INVOICE", "fields": {"item": "办公用品", "net_amount": "40000.00"}},
+        {"evidence_ref": INVOICE_ID, "role": "INVOICE", "fields": {
+            "item": "*住宿服务*住宿费；*餐饮服务*餐饮费", "net_amount": "40000.00",
+        }},
         {"evidence_ref": RECEIPT_ID, "role": "PAYMENT_PROOF", "fields": {"purpose": "办公室采购报销", "gross_amount": "45200.00"}},
     ))
 
@@ -116,9 +118,11 @@ def test_deepseek_receives_linked_document_facts_with_sources_and_four_tasks():
 
     prompt = requests[0]["messages"]
     sent = json.loads(prompt[1]["content"])
+    assert sent["source_documents"][0]["fields"]["item"] == "*住宿服务*住宿费；*餐饮服务*餐饮费"
     assert sent["source_documents"][1] == {"evidence_ref": RECEIPT_ID, "role": "PAYMENT_PROOF",
                                             "fields": {"purpose": "办公室采购报销", "gross_amount": "45200.00"}}
     assert all(word in prompt[0]["content"] for word in ("业务性质", "有效科目表", "完整凭证", "每条分录"))
+    assert "全角分号表示多条票面明细" in prompt[0]["content"]
 
 
 def test_deepseek_provider_requires_credentials_and_context():

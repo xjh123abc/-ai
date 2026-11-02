@@ -25,12 +25,18 @@ GOLD_PATH = ROOT / "tests/fixtures/expected/all_15_samples.json"
 # Canonical gold field -> current candidate field. Unsupported gold fields are
 # reported separately and never counted as correct.
 FIELD_MAP = {
-    "invoice_number": "invoice_number", "issue_date": "issue_date",
+    "invoice_code": "invoice_code", "invoice_number": "invoice_number", "issue_date": "issue_date",
+    "buyer_tax_id": "buyer_tax_id", "seller_tax_id": "seller_tax_id",
     "buyer": "buyer", "seller": "seller", "purpose": "purpose", "gross_amount": "gross_amount",
     "payer": "payer", "payee": "payee",
     "payment_date": "payment_date",
     "settlement_date": "settlement_date",
     "receipt_number": "receipt_number", "receipt_date": "receipt_date", "item": "item",
+    "unit": "unit", "unit_price": "unit_price", "department": "department",
+    "source_reference_number": "source_reference_number",
+    "electronic_receipt_number": "electronic_receipt_number", "transaction_id": "transaction_id",
+    "transaction_summary": "transaction_summary", "transaction_type": "transaction_type",
+    "expense_subject": "expense_subject", "approved": "approved",
     "acceptance_date": "acceptance_date", "acceptance_result": "acceptance_result",
     "contract_number": "contract_number",
     "settled": "settled",

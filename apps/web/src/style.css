@@ -27,6 +27,7 @@
 .correction-editor { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin: 16px 0; }
 .correction-editor label { display: grid; flex: 1; min-width: 220px; gap: 6px; font-size: 13px; }
 .entry-table input { width: 100%; min-width: 90px; }
+.entry-table select { width: 100%; min-width: 90px; margin-bottom: 4px; }
 .upload-queue { margin-bottom: 16px; }
 .upload-queue-item { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(120px, 1.4fr) auto; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line, #e5e7eb); }
 .upload-queue-name { display: grid; gap: 4px; min-width: 0; }
@@ -52,7 +53,8 @@
 .voucher-sources{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding:12px;border:1px solid #edf1ef;border-radius:7px}
 .voucher-sources h3{width:100%;margin:0 0 3px;font-size:11px}
 .field-editor-heading .document-type-select{min-width:210px;max-width:260px;min-height:44px;padding:9px 12px;font-size:14px}
-@media(max-width:640px){.field-editor-heading{flex-wrap:wrap}.field-editor-heading .document-type-select{min-width:0;width:100%;max-width:none}}
+.document-type-picker{position:relative;min-width:210px;max-width:260px;flex:0 1 260px}.document-type-picker-trigger{display:flex;width:100%;min-height:44px;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border:1px solid #dfe7e3;border-radius:6px;background:#fff;color:#344b40;text-align:left;font-size:13px;cursor:pointer}.document-type-picker-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:40;width:min(360px,calc(100vw - 48px));max-height:min(70vh,620px);overflow:auto;padding:7px;border:1px solid #dfe7e3;border-radius:8px;background:#fff;box-shadow:0 12px 30px #1d433018}.document-type-picker-group{border-bottom:1px solid #edf1ef}.document-type-picker-group:last-child{border-bottom:0}.document-type-picker-group-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 8px;color:#53675e;font-size:11px}.document-type-picker-options{display:grid;gap:2px;padding:0 4px 7px}.document-type-picker-options>button{padding:8px 10px;border:0;border-radius:5px;background:transparent;color:#40554b;text-align:left;font-size:12px;cursor:pointer}.document-type-picker-options>button:hover,.document-type-picker-options>button.selected{background:#eaf4ef;color:#176348}
+@media(max-width:640px){.field-editor-heading{flex-wrap:wrap}.field-editor-heading .document-type-select{min-width:0;width:100%;max-width:none}.document-type-picker{min-width:0;width:100%;max-width:none;flex-basis:100%}.document-type-picker-menu{right:auto;left:0;width:100%}}
 .button-delete{background:#fff;color:#a4493f;border-color:#e9c9c5}
 .button-delete:hover:not(:disabled){background:#fff3f1}
 .voucher-evidence-panel .voucher-evidence-preview{width:100%;max-height:75vh;object-fit:contain}
@@ -62,3 +64,14 @@
 .field-grid label{display:flex;flex-direction:column;min-width:0;height:100%}
 .field-grid label>input,.field-grid label>select,.field-grid label>.auxiliary-field-value{width:100%;min-height:36px;margin-top:auto}
 .field-grid label>select{max-width:none}
+.document-filter-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.document-bulk-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.voucher-sources{display:block}
+.voucher-source-accordion,.voucher-source-document,.voucher-source-ocr{margin-top:8px}
+.voucher-source-accordion>summary,.voucher-source-document>summary,.voucher-source-ocr>summary{cursor:pointer;color:#34765f;font-size:11px;font-weight:600;padding:8px 2px}
+.voucher-source-document{padding:6px 10px;border-top:1px solid #edf1ef;background:#fbfcfb}
+.voucher-source-file{margin:8px 0}
+.voucher-source-file img,.voucher-source-file iframe{display:block;width:100%;max-height:480px;min-height:220px;object-fit:contain;border:1px solid #e3e9e6;border-radius:6px;background:#fff}
+.voucher-source-file iframe{height:480px}
+.voucher-source-ocr{padding:0 8px 8px;border:1px solid #edf1ef;border-radius:6px;background:#fff}
+@media(max-width:640px){.document-bulk-actions{justify-content:flex-start;width:100%}.document-bulk-actions .button{flex:1}.voucher-source-file img,.voucher-source-file iframe{max-height:55vh}.voucher-source-file iframe{height:55vh}}
