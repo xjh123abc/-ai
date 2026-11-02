@@ -28,6 +28,10 @@
         "issue_date": "2024-12-01",
         "buyer": "南昌市杰盛科技有限公司",
         "seller": "南昌市视维科技公司",
+        "item": "*其他机械设备*教学专用 VR眼镜",
+        "unit": "副",
+        "quantity": "100",
+        "unit_price": "400.00",
         "net_amount": "40000.00",
         "tax_rate": "13%",
         "tax_amount": "5200.00",
@@ -40,10 +44,14 @@
       "fields": {
         "receipt_number": "NO56784001",
         "receipt_date": "2024-12-01",
+        "department": "行政部门",
+        "source_reference_number": "25165954",
         "item": "教学专用VR眼镜",
+        "unit": "副",
         "quantity": "100",
+        "unit_price": "452.00",
         "gross_amount": "45200.00",
-        "received": true
+        "received": null
       }
     },
     {
@@ -52,6 +60,10 @@
       "fields": {
         "payer": "南昌市杰盛科技有限公司",
         "payee": "南昌市视维科技公司",
+        "electronic_receipt_number": "4564-4964-4337-8224",
+        "transaction_id": "025896316778246785",
+        "transaction_summary": "采购软件配套商品",
+        "transaction_type": "转账",
         "gross_amount": "45200.00",
         "settlement_date": "2024-12-01",
         "settled": "SETTLED"

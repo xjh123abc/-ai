@@ -143,6 +143,7 @@ def workflow_client(request):
                     "issue_date": {"normalized_value": "2024-12-01"},
                     "buyer": {"normalized_value": "Buyer Ltd"},
                     "seller": {"normalized_value": "Seller Ltd"},
+                    "item": {"normalized_value": "*住宿服务*住宿费；*餐饮服务*餐饮费"},
                     "net_amount": {"normalized_value": f"{net_amount:.2f}"},
                     "tax_amount": {"normalized_value": f"{tax_amount:.2f}"},
                     "gross_amount": {"normalized_value": f"{gross_amount:.2f}"},
@@ -223,6 +224,96 @@ def test_document_list_shows_only_latest_visible_business_event(workflow_client)
     assert [event["id"] for event in invoice["business_events"]] == [second.json()["id"]]
 
 
+def test_unlinked_document_filter_separates_business_link_and_recognition_status(workflow_client):
+    client, linked_document_ids, invoice_count, _ = workflow_client
+    linked = client.post("/api/v1/business-events", json={
+        "document_ids": linked_document_ids,
+        "roles": ["INVOICE"] * invoice_count + ["GOODS_RECEIPT", "BANK_RECEIPT"],
+        "reason": "保留既有业务关联",
+    })
+    assert linked.status_code == 200
+
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        tenant = db.scalar(select(Tenant))
+        account = db.scalar(select(AccountSet))
+        unlinked_documents = []
+        for index, (processing_status, extraction_status) in enumerate((
+            ("NEEDS_REVIEW", "NEEDS_REVIEW"),
+            ("FAILED", "FAILED"),
+            ("UPLOADED", None),
+        ), start=1):
+            document = DocumentAsset(
+                tenant_id=tenant.id,
+                account_set_id=account.id,
+                sha256=uuid4().hex.ljust(64, "0"),
+                original_filename=f"unlinked-{index}.jpg",
+                mime_type="image/jpeg",
+                byte_size=10,
+                storage_key=f"/tmp/unlinked-{index}.jpg",
+                uploaded_by="workflow-test",
+                processing_status=processing_status,
+            )
+            db.add(document)
+            db.flush()
+            if extraction_status:
+                db.add(DocumentExtraction(
+                    document_id=document.id,
+                    version=1,
+                    document_type="UNCLASSIFIED",
+                    full_text="识别失败" if extraction_status == "FAILED" else "待确认票据",
+                    fields={},
+                    lines=[],
+                    provider="fixture",
+                    model_version="fixture-v1",
+                    status=extraction_status,
+                    created_by="workflow-test",
+                ))
+            unlinked_documents.append((document.id, extraction_status))
+        db.commit()
+    finally:
+        dependency.close()
+
+    filtered = client.get("/api/v1/documents", params={
+        "unlinked_only": True, "page": 1, "page_size": 1,
+    })
+    assert filtered.status_code == 200
+    filtered_page = filtered.json()
+    assert filtered_page["total"] == 3
+    assert len(filtered_page["items"]) == 1
+    assert filtered_page["items"][0]["business_events"] == []
+    assert filtered_page["items"][0]["recognition_status"] in {"NEEDS_REVIEW", "FAILED", "NOT_STARTED"}
+    assert filtered_page["items"][0]["processing_status"] in {"NEEDS_REVIEW", "FAILED", "UPLOADED"}
+    assert filtered_page["status_counts"] == {
+        "CONFIRMED": len(linked_document_ids), "NEEDS_REVIEW": 1, "FAILED": 1, "UPLOADED": 1,
+    }
+
+    second_page = client.get("/api/v1/documents", params={
+        "unlinked_only": True, "page": 2, "page_size": 1,
+    }).json()
+    assert second_page["total"] == 3
+    assert len(second_page["items"]) == 1
+    third_page = client.get("/api/v1/documents", params={
+        "unlinked_only": True, "page": 3, "page_size": 1,
+    }).json()
+    assert third_page["total"] == 3
+    assert len(third_page["items"]) == 1
+    assert {filtered_page["items"][0]["id"], second_page["items"][0]["id"], third_page["items"][0]["id"]} == {
+        document_id for document_id, _ in unlinked_documents
+    }
+    returned_statuses = {
+        item["id"]: item["recognition_status"]
+        for item in filtered_page["items"] + second_page["items"] + third_page["items"]
+    }
+    assert returned_statuses == {
+        document_id: status or "NOT_STARTED" for document_id, status in unlinked_documents
+    }
+
+    existing_queue = client.get("/api/v1/documents", params={"work_queue": True}).json()
+    assert existing_queue["total"] == len(linked_document_ids) + len(unlinked_documents)
+
+
 def test_unconfirmed_legacy_document_review_recovers_ocr_candidates(workflow_client):
     client, _, _, _ = workflow_client
     dependency = app.dependency_overrides[db_session]()
@@ -266,6 +357,334 @@ def test_unconfirmed_legacy_document_review_recovers_ocr_candidates(workflow_cli
     assert extraction["fields"]["gross_amount"]["status"] == "NEEDS_REVIEW"
     historical = client.get(f"/api/v1/documents/{document_id}?version=1").json()["extraction"]
     assert historical["fields"]["gross_amount"]["normalized_value"] is None
+
+
+def test_confirmed_legacy_invoice_recovers_missing_ocr_fields_without_mutating_history(workflow_client):
+    client, *_ = workflow_client
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        tenant = db.scalar(select(Tenant))
+        account = db.scalar(select(AccountSet))
+        document = DocumentAsset(
+            tenant_id=tenant.id, account_set_id=account.id, sha256=uuid4().hex.ljust(64, "0"),
+            original_filename="confirmed-invoice-missing-ocr-fields.jpg", mime_type="image/jpeg", byte_size=1,
+            storage_key="/tmp/confirmed-invoice-missing-ocr-fields.jpg", uploaded_by="workflow-test",
+            processing_status="CONFIRMED",
+        )
+        db.add(document)
+        db.flush()
+        lines = [
+            {"text": "电子发票普通发票", "page": 1, "bbox": [533, 34, 668, 83]},
+            {"text": "税率/征收率", "page": 1, "bbox": [752, 248, 846, 269]},
+            {"text": "13%", "page": 1, "bbox": [781, 277, 820, 300]},
+            {"text": "价税合计(小写) ￥45200.00", "page": 1, "bbox": [668, 454, 802, 475]},
+        ]
+        blank_candidate = {"raw_value": None, "normalized_value": None, "confidence": 0,
+            "status": "NEEDS_REVIEW", "page": None, "bbox": None, "evidence_text": ""}
+        db.add(DocumentExtraction(
+            document_id=document.id, version=10, document_type="VAT_INVOICE",
+            full_text="电子发票普通发票 税率/征收率 13% 价税合计(小写) ￥45200.00",
+            lines=lines, fields={"tax_rate": dict(blank_candidate), "gross_amount": dict(blank_candidate)},
+            provider="RapidOCR", model_version="fixture-v1", status="CONFIRMED",
+            created_by="workflow-test", correction_reason="人工确认旧版本",
+        ))
+        db.commit()
+        document_id = document.id
+    finally:
+        dependency.close()
+
+    listed = client.get("/api/v1/documents?page=1&page_size=100").json()["items"]
+    summary = next(item for item in listed if item["id"] == document_id)
+    assert summary["key_amount"] == "45200.00"
+    assert "tax_rate" not in summary["missing_fields"]
+    assert "gross_amount" not in summary["missing_fields"]
+
+    detail = client.get(f"/api/v1/documents/{document_id}").json()["extraction"]
+    for key, value in (("tax_rate", "13%"), ("gross_amount", "45200.00")):
+        assert detail["fields"][key]["normalized_value"] == value
+        assert detail["fields"][key]["raw_value"] == value
+        assert detail["fields"][key]["page"] == 1
+        assert detail["fields"][key]["bbox"]
+
+    historical = client.get(f"/api/v1/documents/{document_id}?version=10").json()["extraction"]
+    assert historical["fields"]["tax_rate"]["normalized_value"] is None
+    assert historical["fields"]["gross_amount"]["normalized_value"] is None
+
+    confirmed = client.patch(f"/api/v1/documents/{document_id}/extraction", json={
+        "expected_version": 10, "document_type": "VAT_INVOICE",
+        "fields": {"tax_rate": "13%", "gross_amount": "45200.00"},
+        "reason": "确认旧版缺失字段的 OCR 候选",
+    })
+    assert confirmed.status_code == 200
+    for key, value in (("tax_rate", "13%"), ("gross_amount", "45200.00")):
+        assert confirmed.json()["fields"][key]["normalized_value"] == value
+        assert confirmed.json()["fields"][key]["raw_value"] == value
+        assert confirmed.json()["fields"][key]["page"] == 1
+        assert confirmed.json()["fields"][key]["bbox"]
+    saved = client.get(f"/api/v1/documents/{document_id}").json()["extraction"]
+    assert saved["version"] == 11
+    assert saved["fields"]["tax_rate"]["evidence_text"] == "13%"
+    assert saved["fields"]["gross_amount"]["evidence_text"] == "价税合计(小写) ￥45200.00"
+
+
+def test_selected_document_type_recalculates_and_saves_matching_ocr_fields(workflow_client):
+    client, *_ = workflow_client
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        tenant = db.scalar(select(Tenant))
+        account = db.scalar(select(AccountSet))
+        document = DocumentAsset(
+            tenant_id=tenant.id, account_set_id=account.id, sha256=uuid4().hex.ljust(64, "0"),
+            original_filename="unclear-document.jpg", mime_type="image/jpeg", byte_size=1,
+            storage_key="/tmp/unclear-document.jpg", uploaded_by="workflow-test",
+            processing_status="NEEDS_REVIEW",
+        )
+        db.add(document)
+        db.flush()
+        lines = [
+            {"text": "科目", "bbox": [60, 100, 110, 120], "page": 1},
+            {"text": "管理费用", "bbox": [140, 100, 220, 120], "page": 1},
+        ]
+        db.add(DocumentExtraction(
+            document_id=document.id, version=1, document_type="UNCLASSIFIED",
+            full_text="科目 管理费用", lines=lines, fields={},
+            provider="RapidOCR", model_version="fixture-v1", status="NEEDS_REVIEW",
+            created_by="workflow-test",
+        ))
+        db.commit()
+        document_id = document.id
+    finally:
+        dependency.close()
+
+    selected = client.get(f"/api/v1/documents/{document_id}", params={"candidate_type": "PAYMENT_PROOF"})
+    assert selected.status_code == 200
+    candidates = selected.json()["extraction"]["review_candidates"]
+    assert candidates["expense_subject"]["normalized_value"] == "管理费用"
+    assert candidates["expense_subject"]["evidence_text"] == "科目 管理费用"
+
+    confirmed = client.patch(f"/api/v1/documents/{document_id}/extraction", json={
+        "expected_version": 1, "document_type": "PAYMENT_PROOF",
+        "fields": {"expense_subject": candidates["expense_subject"]["normalized_value"]},
+        "reason": "按支付证明的科目字段核对原文",
+    })
+    assert confirmed.status_code == 200
+    assert confirmed.json()["fields"]["expense_subject"]["normalized_value"] == "管理费用"
+    assert confirmed.json()["fields"]["expense_subject"]["status"] == "USER_CONFIRMED"
+    assert confirmed.json()["fields"]["expense_subject"]["page"] == 1
+    assert confirmed.json()["fields"]["expense_subject"]["bbox"] == [140, 100, 220, 120]
+    assert confirmed.json()["fields"]["expense_subject"]["evidence_text"] == "科目 管理费用"
+
+    saved = client.get(f"/api/v1/documents/{document_id}").json()["extraction"]
+    assert saved["fields"]["expense_subject"]["page"] == 1
+    assert saved["fields"]["expense_subject"]["bbox"] == [140, 100, 220, 120]
+    assert saved["fields"]["expense_subject"]["evidence_text"] == "科目 管理费用"
+
+
+def test_confirmed_date_preserves_raw_ocr_text_and_normalized_value(workflow_client):
+    client, *_ = workflow_client
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        tenant = db.scalar(select(Tenant))
+        account = db.scalar(select(AccountSet))
+        document = DocumentAsset(
+            tenant_id=tenant.id, account_set_id=account.id, sha256=uuid4().hex.ljust(64, "0"),
+            original_filename="payment-proof-raw-date.jpg", mime_type="image/jpeg", byte_size=1,
+            storage_key="/tmp/payment-proof-raw-date.jpg", uploaded_by="workflow-test",
+            processing_status="NEEDS_REVIEW",
+        )
+        db.add(document)
+        db.flush()
+        lines = [
+            {"text": "支付证明单", "bbox": [100, 10, 200, 30], "page": 1},
+            {"text": "2024年12月07日", "bbox": [170, 64, 390, 85], "page": 1},
+        ]
+        db.add(DocumentExtraction(
+            document_id=document.id, version=1, document_type="UNCLASSIFIED",
+            full_text="支付证明单 2024年12月07日", lines=lines,
+            fields={"payment_date": {"normalized_value": "2024-12-07",
+                "bbox": [170, 64, 390, 85], "status": "NEEDS_REVIEW"}},
+            provider="RapidOCR", model_version="fixture-v1", status="NEEDS_REVIEW",
+            created_by="workflow-test",
+        ))
+        db.commit()
+        document_id = document.id
+    finally:
+        dependency.close()
+
+    candidates = client.get(f"/api/v1/documents/{document_id}", params={
+        "candidate_type": "PAYMENT_PROOF",
+    }).json()["extraction"]["review_candidates"]
+    assert candidates["payment_date"]["raw_value"] == "2024年12月07日"
+    assert candidates["payment_date"]["normalized_value"] == "2024-12-07"
+    before_save = client.get(f"/api/v1/documents/{document_id}", params={
+        "candidate_type": "PAYMENT_PROOF",
+    }).json()["extraction"]["fields"]["payment_date"]
+    assert before_save["raw_value"] == "2024年12月07日"
+
+    confirmed = client.patch(f"/api/v1/documents/{document_id}/extraction", json={
+        "expected_version": 1, "document_type": "PAYMENT_PROOF",
+        "fields": {"payment_date": "2024-12-07"}, "reason": "确认 OCR 日期格式化结果",
+    })
+    assert confirmed.status_code == 200
+    assert confirmed.json()["fields"]["payment_date"]["raw_value"] == "2024年12月07日"
+    assert confirmed.json()["fields"]["payment_date"]["normalized_value"] == "2024-12-07"
+    saved = client.get(f"/api/v1/documents/{document_id}").json()["extraction"]
+    assert saved["fields"]["payment_date"]["raw_value"] == "2024年12月07日"
+    assert saved["fields"]["payment_date"]["normalized_value"] == "2024-12-07"
+
+
+def test_special_invoice_code_is_in_missing_field_list_when_unrecognized(workflow_client):
+    client, *_ = workflow_client
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        tenant = db.scalar(select(Tenant))
+        account = db.scalar(select(AccountSet))
+        document = DocumentAsset(
+            tenant_id=tenant.id, account_set_id=account.id, sha256=uuid4().hex.ljust(64, "0"),
+            original_filename="special-invoice-missing-code.jpg", mime_type="image/jpeg", byte_size=1,
+            storage_key="/tmp/special-invoice-missing-code.jpg", uploaded_by="workflow-test",
+            processing_status="NEEDS_REVIEW",
+        )
+        db.add(document)
+        db.flush()
+        db.add(DocumentExtraction(
+            document_id=document.id, version=1, document_type="VAT_SPECIAL_INVOICE",
+            full_text="增值税专用发票", lines=[{
+                "text": "增值税专用发票", "bbox": [300, 5, 520, 30], "page": 1,
+            }], fields={}, provider="RapidOCR", model_version="fixture-v1",
+            status="NEEDS_REVIEW", created_by="workflow-test",
+        ))
+        db.commit()
+        document_id = document.id
+    finally:
+        dependency.close()
+
+    documents = client.get("/api/v1/documents?page=1&page_size=100").json()["items"]
+    document_summary = next(item for item in documents if item["id"] == document_id)
+    assert "invoice_code" in document_summary["missing_fields"]
+
+
+def test_vat_special_invoice_fields_recalculate_save_and_link_as_invoice(workflow_client):
+    client, linked_document_ids, invoice_count, _ = workflow_client
+    dependency = app.dependency_overrides[db_session]()
+    db = next(dependency)
+    try:
+        tenant = db.scalar(select(Tenant))
+        account = db.scalar(select(AccountSet))
+        document = DocumentAsset(
+            tenant_id=tenant.id, account_set_id=account.id, sha256=uuid4().hex.ljust(64, "0"),
+            original_filename="special-invoice.jpg", mime_type="image/jpeg", byte_size=1,
+            storage_key="/tmp/special-invoice.jpg", uploaded_by="workflow-test",
+            processing_status="NEEDS_REVIEW",
+        )
+        db.add(document)
+        db.flush()
+        lines = [
+            {"text": "增值税专用发票", "page": 1, "bbox": [300, 5, 520, 30]},
+            {"text": "1100162130", "page": 1, "bbox": [30, 40, 150, 60]},
+            {"text": "No. 06214751", "page": 1, "bbox": [500, 40, 620, 60]},
+            {"text": "购货单位", "page": 1, "bbox": [30, 100, 75, 210]},
+            {"text": "名称：青岛长城公司", "page": 1, "bbox": [100, 100, 280, 120]},
+            {"text": "纳税人识别号：", "page": 1, "bbox": [100, 130, 220, 150]},
+            {"text": "382415675361234", "page": 1, "bbox": [230, 130, 360, 150]},
+            {"text": "销货单位", "page": 1, "bbox": [30, 220, 75, 330]},
+            {"text": "名称：华兴有限责任公司", "page": 1, "bbox": [100, 220, 310, 240]},
+            {"text": "纳税人识别号：", "page": 1, "bbox": [100, 250, 220, 270]},
+            {"text": "91150102MA0NB78Q9M", "page": 1, "bbox": [230, 250, 390, 270]},
+            {"text": "货物及应税劳务名称", "page": 1, "bbox": [60, 300, 270, 320]},
+            {"text": "单位", "page": 1, "bbox": [760, 300, 810, 320]},
+            {"text": "数量", "page": 1, "bbox": [860, 300, 910, 320]},
+            {"text": "单价", "page": 1, "bbox": [980, 300, 1030, 320]},
+            {"text": "*FUD", "page": 1, "bbox": [90, 330, 160, 350]},
+            {"text": "件", "page": 1, "bbox": [770, 330, 800, 350]},
+            {"text": "100", "page": 1, "bbox": [870, 330, 900, 350]},
+            {"text": "3 200.00", "page": 1, "bbox": [980, 330, 1050, 350]},
+            {"text": "价税合计（大写）", "page": 1, "bbox": [60, 454, 220, 475]},
+            {"text": "叁拾柒万壹仟贰佰元整", "page": 1, "bbox": [225, 454, 420, 475]},
+            {"text": "（小写）", "page": 1, "bbox": [1025, 454, 1090, 475]},
+            {"text": "371 200.00", "page": 1, "bbox": [1100, 454, 1190, 475]},
+        ]
+        db.add(DocumentExtraction(
+            document_id=document.id, version=1, document_type="VAT_INVOICE",
+            full_text="增值税专用发票 1100162130 No. 06214751 购货单位 名称：青岛长城公司 纳税人识别号 382415675361234 销货单位 名称：华兴有限责任公司 纳税人识别号 91150102MA0NB78Q9M 货物及应税劳务名称 *FUD 单位 件 数量 100 单价 3 200.00 价税合计（大写）叁拾柒万壹仟贰佰元整（小写）371 200.00",
+            lines=lines, fields={"document_type_candidate": {"normalized_value": "VAT_INVOICE"}},
+            provider="RapidOCR", model_version="fixture-v1",
+            status="CONFIRMED", created_by="workflow-test",
+        ))
+        db.commit()
+        document_id = document.id
+    finally:
+        dependency.close()
+
+    opened = client.get(f"/api/v1/documents/{document_id}")
+    assert opened.status_code == 200
+    assert opened.json()["extraction"]["document_type_candidate"]["normalized_value"] == "VAT_SPECIAL_INVOICE"
+    for key, value in (("item", "*FUD"), ("unit", "件"), ("quantity", "100"), ("unit_price", "3200.00")):
+        assert opened.json()["extraction"]["fields"][key]["normalized_value"] == value
+    assert opened.json()["extraction"]["fields"]["buyer"]["normalized_value"] == "青岛长城公司"
+    assert opened.json()["extraction"]["fields"]["gross_amount"]["normalized_value"] == "371200.00"
+
+    selected = client.get(f"/api/v1/documents/{document_id}", params={"candidate_type": "VAT_SPECIAL_INVOICE"})
+    assert selected.status_code == 200
+    candidates = selected.json()["extraction"]["review_candidates"]
+    assert candidates["invoice_code"]["normalized_value"] == "1100162130"
+    assert candidates["buyer_tax_id"]["normalized_value"] == "382415675361234"
+    assert candidates["seller_tax_id"]["normalized_value"] == "91150102MA0NB78Q9M"
+    assert candidates["buyer"]["normalized_value"] == "青岛长城公司"
+    assert candidates["buyer"]["evidence_text"] == "名称：青岛长城公司"
+    assert candidates["gross_amount"]["normalized_value"] == "371200.00"
+    assert candidates["gross_amount"]["evidence_text"] == "371 200.00"
+    assert candidates["item"]["normalized_value"] == "*FUD"
+    assert candidates["unit"]["normalized_value"] == "件"
+    assert candidates["quantity"]["normalized_value"] == "100"
+    assert candidates["unit_price"]["normalized_value"] == "3200.00"
+
+    confirmed = client.patch(f"/api/v1/documents/{document_id}/extraction", json={
+        "expected_version": 1, "document_type": "VAT_SPECIAL_INVOICE",
+        "fields": {key: candidates[key]["normalized_value"]
+                   for key in ("invoice_code", "buyer", "buyer_tax_id", "seller_tax_id", "gross_amount")},
+        "reason": "确认增值税专用发票的专属字段",
+    })
+    assert confirmed.status_code == 200
+    for key in ("invoice_code", "buyer", "buyer_tax_id", "seller_tax_id", "gross_amount"):
+        assert confirmed.json()["fields"][key]["status"] == "USER_CONFIRMED"
+    assert confirmed.json()["fields"]["buyer"]["evidence_text"] == "名称：青岛长城公司"
+    assert confirmed.json()["fields"]["gross_amount"]["evidence_text"] == "371 200.00"
+    refreshed = client.get(f"/api/v1/documents/{document_id}").json()["extraction"]["fields"]
+    assert refreshed["buyer"]["normalized_value"] == "青岛长城公司"
+    assert refreshed["gross_amount"]["normalized_value"] == "371200.00"
+
+    business = client.post("/api/v1/business-events", json={
+        "document_ids": [document_id, linked_document_ids[invoice_count], linked_document_ids[invoice_count + 1]],
+        "roles": ["INVOICE", "GOODS_RECEIPT", "BANK_RECEIPT"],
+        "reason": "增值税专用发票按发票角色关联",
+    })
+    assert business.status_code == 200
+
+
+def test_type_specific_fields_save_and_read_back_for_each_primary_document(workflow_client):
+    client, document_ids, invoice_count, _ = workflow_client
+    cases = (
+        (document_ids[0], "VAT_INVOICE", "unit_price", "400.00"),
+        (document_ids[invoice_count], "GOODS_RECEIPT", "source_reference_number", "25165954"),
+        (document_ids[invoice_count + 1], "BANK_RECEIPT", "transaction_summary", "采购软件配套商品"),
+    )
+
+    for document_id, document_type, field_key, value in cases:
+        detail = client.get(f"/api/v1/documents/{document_id}").json()["extraction"]
+        confirmed = client.patch(f"/api/v1/documents/{document_id}/extraction", json={
+            "expected_version": detail["version"], "document_type": document_type,
+            "fields": {field_key: value}, "reason": "确认单据类型对应的第一层字段",
+        })
+        assert confirmed.status_code == 200
+        assert confirmed.json()["fields"][field_key]["normalized_value"] == value
+
+        refreshed = client.get(f"/api/v1/documents/{document_id}").json()["extraction"]
+        assert refreshed["fields"][field_key]["normalized_value"] == value
 
 
 def test_old_bank_receipt_amount_from_timestamp_is_replaced_by_ocr_amount(workflow_client):
@@ -897,6 +1316,9 @@ def test_confirmed_expense_policy_is_versioned_and_checks_a_balanced_model_candi
                for document in seen_contexts[-1].source_documents)
     assert any(document["role"] == "INVOICE" and "tax_amount" in document["fields"]
                for document in seen_contexts[-1].source_documents)
+    assert any(document["role"] == "INVOICE"
+               and document["fields"].get("item") == "*住宿服务*住宿费；*餐饮服务*餐饮费"
+               for document in seen_contexts[-1].source_documents)
     assert any(document["role"] == "BANK_RECEIPT" and document["fields"].get("settled") is True
                for document in seen_contexts[-1].source_documents)
     replay_after_draft = client.put("/api/v1/auth/accounting-policies/EXPENSE", json={
@@ -1297,10 +1719,12 @@ def test_payment_proof_does_not_replace_a_bank_receipt(workflow_client):
     confirmed_as_proof = client.patch(f"/api/v1/documents/{payment_proof_id}/extraction", json={
         "expected_version": 1,
         "document_type": "PAYMENT_PROOF",
-        "fields": {"proof_number": "PAY-2024-12-001", "payment_date": "2024-12-01", "gross_amount": "45200.00"},
+        "fields": {"proof_number": "PAY-2024-12-001", "payment_date": "2024-12-01",
+                   "expense_subject": "管理费用", "gross_amount": "45200.00"},
         "reason": "验收付款证明不能作为银行清算凭据",
     })
     assert confirmed_as_proof.status_code == 200
+    assert confirmed_as_proof.json()["fields"]["expense_subject"]["normalized_value"] == "管理费用"
 
     created = client.post("/api/v1/business-events", json={
         "document_ids": document_ids,
@@ -1993,6 +2417,7 @@ def test_voucher_correction_creates_a_balanced_new_version(workflow_client):
     assert client.post(url, json={**body, "lines": unexpected_auxiliary}).status_code == 422
     lines_with_auxiliary = [dict(line) for line in valid_lines]
     lines_with_auxiliary[0]["auxiliary"] = {"department": "Operations"}
+    lines_with_auxiliary[0]["account_name"] = "存货科目（手工更正）"
     body_with_auxiliary = {**body, "lines": lines_with_auxiliary}
     response = client.post(url, json=body_with_auxiliary)
     assert response.status_code == 200, response.text
@@ -2001,7 +2426,11 @@ def test_voucher_correction_creates_a_balanced_new_version(workflow_client):
     assert response.json()["status"] == "VALIDATED"
     assert response.json()["debit_total"] == response.json()["credit_total"] == "45200.00"
     corrected_inventory = next(line for line in response.json()["lines"] if line["account_code"] == "1405")
+    assert corrected_inventory["account_name"] == "存货科目（手工更正）"
     assert corrected_inventory["auxiliary"] == {"department": "Operations"}
+    original_inventory = next(line for line in client.get(f"/api/v1/voucher-drafts/{original['id']}").json()["lines"]
+                              if line["account_code"] == "1405")
+    assert original_inventory["account_name"] == "库存商品"
     dependency = app.dependency_overrides[db_session]()
     db = next(dependency)
     try:
